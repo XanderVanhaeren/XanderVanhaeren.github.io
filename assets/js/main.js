@@ -163,7 +163,7 @@ function renderSkills() {
             
             let badge = '';
             if (level) {
-                const colors = { beginner: '#707782', intermediate: '#A0A5AE', advanced: '#3A95D8' };
+                const colors = { beginner: '#404450', intermediate: '#606672', advanced: '#3A95D8' };
                 badge = `<span style="font-size: 0.65rem; padding: 2px 6px; background: ${colors[level] || '#707782'}; color: #fff; border-radius: 3px; margin-left: 6px;">${level}</span>`;
             }
 
