@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="assets/favicon.ico">
+    <title>Xander Vanhaeren — Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">XV.</a>
+            <ul class="nav-links">
+                <li><a href="#home" class="active">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#projects">Projects</a></li>
+                <li><a href="#skills">Skills</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero section">
+        <div class="container hero-content fade-in-up">
+            <p class="hero-greeting">Hello, I'm</p>
+            <h1 class="hero-name"></h1>
+            <p class="hero-title"></p>
+            <p class="hero-description"></p>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="section">
+        <div class="container about-content fade-in-up"></div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="section">
+        <div class="container">
+            <h2 class="section-title">Projects</h2>
+            <div class="projects-grid"></div>
+        </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="section">
+        <div class="container">
+            <h2 class="section-title">Skills</h2>
+            <div class="skills-grid"></div>
+        </div>
+    </section>
+
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Xander Vanhaeren. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Embedded Data (single source of truth) -->
+    <script type="application/json" id="portfolio-data">
+{
+    "personal": {
+        "name": "Xander Vanhaeren",
+        "title": "Engineering Student",
+        "description": "Bachelor in Engineering Sciences at KU Leuven | Aerospace enthusiast | 3D printing, IoT, and robotics hobbyist | Aspiring aerospace engineer passionate about aerodynamics and flight dynamics.",
+        "email": "xandervanhaeren@icloud.com",
+        "linkedin": "",
+        "github": "",
+        "website": "",
+        "location": "Leuven, Belgium"
+    },
+    "about": {
+        "name": "About Me",
+        "bio": "I am a third-year engineering student at KU Leuven with a passion for aerospace engineering. My interests span aerodynamics, flight dynamics, and control systems. Beyond academics, I enjoy 3D printing, IoT projects, and robotics — building things that move and think.",
+        "education": [
+            {
+                "type": "Bachelor",
+                "degree": "Engineering Sciences (Aerospace Engineering)",
+                "institution": "KU Leuven",
+                "year": "2026"
+            }
+        ],
+        "interests": ["Aerodynamics", "Flight Dynamics", "Control Systems", "3D Printing", "IoT", "Robotics"]
+    },
+    "projects": [
+        {
+            "title": "Project Typhoon",
+            "description": "An advanced aerodynamic simulation and analysis project exploring high-speed flow phenomena.",
+            "technologies": ["Python", "CFD", "OpenFOAM"],
+            "category": "Aerodynamics"
+        },
+        {
+            "title": "RCXD",
+            "description": "Remote-controlled vehicle with embedded sensors and autonomous navigation capabilities.",
+            "technologies": ["Arduino", "C++", "ROS"],
+            "category": "Robotics"
+        },
+        {
+            "title": "XyO",
+            "description": "A custom IoT platform for environmental monitoring and data visualization.",
+            "technologies": ["ESP32", "MQTT", "Python"],
+            "category": "IoT"
+        },
+        {
+            "title": "BikeySens",
+            "description": "Smart bicycle sensor system with real-time telemetry and safety features.",
+            "technologies": ["Arduino", "Bluetooth", "Mobile App"],
+            "category": "Embedded Systems"
+        }
+    ],
+    "skills": [
+        {
+            "category": "Programming",
+            "items": [
+                {"name": "Python", "level": "advanced"},
+                {"name": "C/C++", "level": "intermediate"},
+                {"name": "MATLAB", "level": "advanced"},
+                {"name": "JavaScript", "level": "beginner"}
+            ]
+        },
+        {
+            "category": "Electronics & Embedded Systems",
+            "items": [
+                {"name": "Arduino / ESP32", "level": "intermediate"},
+                {"name": "Raspberry Pi", "level": "intermediate"},
+                {"name": "Circuit Design", "level": "beginner"}
+            ]
+        },
+        {
+            "category": "CAD & Mechanical Design",
+            "items": [
+                {"name": "Fusion 360", "level": "advanced"},
+                {"name": "SolidWorks", "level": "intermediate"},
+                {"name": "3D Printing (FDM/SLA)", "level": "intermediate"}
+            ]
+        },
+        {
+            "category": "Data Analysis & Simulation",
+            "items": [
+                {"name": "CFD / Aerodynamics", "level": "advanced"},
+                {"name": "MATLAB Simulink", "level": "beginner"},
+                {"name": "Python (NumPy, SciPy)", "level": "intermediate"}
+            ]
+        },
+        {
+            "category": "Tools & Technologies",
+            "items": [
+                {"name": "Git / GitHub", "level": "intermediate"},
+                {"name": "LaTeX", "level": "beginner"},
+                {"name": "Linux", "level": "beginner"}
+            ]
+        }
+    ],
+    "experience": [
+        {
+            "title": "Student Project Lead",
+            "company": "KU Leuven",
+            "location": "Leuven, Belgium",
+            "start_date": "2026-09",
+            "end_date": "",
+            "description": "Leading a team of 4 students on a Peno1 project."
+        }
+    ]
+}
+</script>
+
+    <!-- Main JS -->
+    <script src="assets/js/main.js" data-portfolio='{"personal":{"name":"Xander Vanhaeren","title":"Engineering Student","description":"Bachelor in Engineering Sciences at KU Leuven | Aerospace enthusiast | 3D printing, IoT, and robotics hobbyist | Aspiring aerospace engineer passionate about aerodynamics and flight dynamics.","email":"xandervanhaeren@icloud.com","linkedin":"","github":"","website":"","location":"Leuven, Belgium"},"about":{"name":"About Me","bio":"I am a third-year engineering student at KU Leuven with a passion for aerospace engineering. My interests span aerodynamics, flight dynamics, and control systems. Beyond academics, I enjoy 3D printing, IoT projects, and robotics — building things that move and think.","education":[{"type":"Bachelor","degree":"Engineering Sciences (Aerospace Engineering)","institution":"KU Leuven","year":"2026"}],"interests":["Aerodynamics","Flight Dynamics","Control Systems","3D Printing","IoT","Robotics"]},"projects":[{"title":"Project Typhoon","description":"An advanced aerodynamic simulation and analysis project exploring high-speed flow phenomena.","technologies":["Python","CFD","OpenFOAM"],"category":"Aerodynamics"},{"title":"RCXD","description":"Remote-controlled vehicle with embedded sensors and autonomous navigation capabilities.","technologies":["Arduino","C++","ROS"],"category":"Robotics"},{"title":"XyO","description":"A custom IoT platform for environmental monitoring and data visualization.","technologies":["ESP32","MQTT","Python"],"category":"IoT"},{"title":"BikeySens","description":"Smart bicycle sensor system with real-time telemetry and safety features.","technologies":["Arduino","Bluetooth","Mobile App"],"category":"Embedded Systems"}],"skills":[{"category":"Programming","items":[{"name":"Python","level":"advanced"},{"name":"C/C++","level":"intermediate"},{"name":"MATLAB","level":"advanced"},{"name":"JavaScript","level":"beginner"}]},{"category":"Electronics & Embedded Systems","items":[{"name":"Arduino / ESP32","level":"intermediate"},{"name":"Raspberry Pi","level":"intermediate"},{"name":"Circuit Design","level":"beginner"}]},{"category":"CAD & Mechanical Design","items":[{"name":"SolidWorks","level":"advanced"},{"name":"Fusion 360","level":"intermediate"},{"name":"3D Printing (FDM/SLA)","level":"intermediate"}]},{"category":"Data Analysis & Simulation","items":[{"name":"CFD / Aerodynamics","level":"advanced"},{"name":"MATLAB Simulink","level":"advanced"},{"name":"Python (NumPy, SciPy)","level":"intermediate"}]},{"category":"Tools & Technologies","items":[{"name":"Git / GitHub","level":"intermediate"},{"name":"LaTeX","level":"beginner"},{"name":"Linux (Ubuntu)","level":"intermediate"}]}],"experience":[{"title":"Research Assistant","company":"KU Leuven — Department of Mechanical Engineering","location":"Leuven, Belgium","start_date":"2025-09","end_date":"","description":"Assisting with aerodynamic research projects and computational fluid dynamics simulations."},{"title":"Student Project Lead","company":"KU Leuven — Aerospace Engineering Club","location":"Leuven, Belgium","start_date":"2024-09","end_date":"","description":"Leading a team of 5 students on an autonomous drone project."}]}'></script>
+
+</body>
+</html>
