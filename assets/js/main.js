@@ -17,6 +17,7 @@ const heroDescription = document.querySelector('.hero-description');
 const aboutContent = document.querySelector('.about-content');
 const projectsGrid = document.querySelector('.projects-grid');
 const skillsGrid = document.querySelector('.skills-grid');
+const experienceList = document.querySelector('.experience-list');
 
 // ===== Render Functions =====
 
@@ -26,7 +27,6 @@ function renderHero() {
     heroName.textContent = get(personal, 'name', '');
     heroTitle.textContent = get(personal, 'title', '');
     heroDescription.textContent = get(personal, 'description', '');
-
 }
 
 function renderAbout() {
@@ -44,7 +44,7 @@ function renderAbout() {
     // Bio paragraphs
     const bio = get(about, 'bio', '');
     if (bio) {
-        html += `<p>${bio}</p>`;
+        html += `<p class="bio-text">${bio}</p>`;
     }
 
     // Education
@@ -58,11 +58,11 @@ function renderAbout() {
 
             if (degree || institution) {
                 html += `
-                    <div style="margin-bottom: var(--space-6);">
-                        <span style="font-size: 0.875rem; font-weight: 600; color: var(--accent-blue);">${get(item, 'type', '')}</span>
-                        <h3 style="font-size: 1.25rem; margin-top: var(--space-2);">${degree}</h3>
-                        <p style="color: var(--text-muted); font-size: 0.9rem;">${institution} ${year ? `| ${year}` : ''}</p>
-                        ${description ? `<p style="margin-top: var(--space-2); color: var(--text-secondary); line-height: 1.7;">${description}</p>` : ''}
+                    <div class="education-item">
+                        <span class="education-type">${get(item, 'type', '')}</span>
+                        <h3 class="education-degree">${degree}</h3>
+                        <p class="education-institution">${institution} ${year ? `| ${year}` : ''}</p>
+                        ${description ? `<p class="education-description">${description}</p>` : ''}
                     </div>
                 `;
             }
@@ -72,9 +72,9 @@ function renderAbout() {
     // Interests
     const interests = get(about, 'interests');
     if (interests && Array.isArray(interests)) {
-        html += `<h3 style="font-size: 1rem; margin-top: var(--space-6);">Interests</h3>`;
+        html += `<h3 class="interests-title">Interests</h3>`;
         for (const interest of interests) {
-            html += `<span style="display: inline-block; font-size: 0.875rem; padding: 4px 12px; background: rgba(58,149,216,0.1); color: var(--accent-blue); border-radius: 4px; margin-right: 8px;">${interest}</span>`;
+            html += `<span class="interest-tag">${interest}</span>`;
         }
     }
 
@@ -164,10 +164,10 @@ function renderSkills() {
             let badge = '';
             if (level) {
                 const colors = { beginner: '#404450', intermediate: '#606672', advanced: '#3A95D8' };
-                badge = `<span style="font-size: 0.65rem; padding: 2px 6px; background: ${colors[level] || '#707782'}; color: #fff; border-radius: 3px; margin-left: 6px;">${level}</span>`;
+                badge = `<span class="skill-level-badge ${level}">${level}</span>`;
             }
 
-            html += `<li>${name}${badge}</li>`;
+            html += `<li class="skill-item"><span class="skill-name">${name}</span><span>${badge}</span></li>`;
         }
 
         html += `</ul></div>`;
@@ -175,7 +175,36 @@ function renderSkills() {
     }
 }
 
+function renderExperience() {
+    const experience = get(data, 'experience', []);
 
+    if (!Array.isArray(experience) || experience.length === 0) return;
+
+    for (const item of experience) {
+        const title = get(item, 'title', '');
+        const company = get(item, 'company', '');
+        const location = get(item, 'location', '');
+        const start_date = get(item, 'start_date', '');
+        const end_date = get(item, 'end_date');
+        const description = get(item, 'description', '');
+
+        let html = '';
+
+        if (title || company) {
+            html += `
+                <div class="experience-item">
+                    <h3 class="experience-title">${title}</h3>
+                    <p class="experience-company">${company}</p>
+                    ${location ? `<p class="experience-location">${location}</p>` : ''}
+                    ${start_date ? `<p class="experience-location" style="font-size: 0.8rem;">${start_date}${end_date ? ` — ${end_date}` : ''}</p>` : ''}
+                    ${description ? `<p class="experience-description">${description}</p>` : ''}
+                </div>
+            `;
+        }
+    }
+
+    experienceList.innerHTML = html || '<p>No content available.</p>';
+}
 
 // ===== Initialize =====
 
@@ -184,6 +213,7 @@ function init() {
     renderAbout();
     renderProjects();
     renderSkills();
+    renderExperience();
 
     // Smooth scroll spy for nav active state
     const sections = document.querySelectorAll('section[id]');
@@ -212,7 +242,14 @@ function init() {
     }
 
     window.addEventListener('scroll', updateActiveNav, { passive: true });
+
+// Smooth scroll to section with offset for fixed navbar
+const hero = document.querySelector('#home');
+if (hero) {
+    hero.style.scrollMarginTop = `${nav.offsetHeight}px`;
+}
     updateActiveNav(); // initial call
 }
 
 document.addEventListener('DOMContentLoaded', init);
+
