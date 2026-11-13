@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Portfolio of Xander Vanhaeren, engineering student focused on aerospace, simulation, robotics and embedded systems.">
+  <meta name="color-scheme" content="dark">
+  <title>Xander Vanhaeren | Engineering Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  <header class="site-header" id="top">
+    <nav class="navbar" aria-label="Primary navigation">
+      <a class="brand" href="#home" aria-label="Xander Vanhaeren, home">XV<span>.</span></a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-menu" aria-label="Open navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="nav-menu">
+        <li><a class="active" href="#home">Home</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#skills">Skills</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="hero section" id="home">
+      <div class="hero-glow" aria-hidden="true"></div>
+      <div class="container hero-grid">
+        <div class="hero-content reveal">
+          <p class="eyebrow">Engineering portfolio · Leuven, Belgium</p>
+          <h1>Building thoughtful systems at the intersection of <span>flight, code and hardware.</span></h1>
+          <p class="hero-title"></p>
+          <p class="hero-description"></p>
+          <div class="hero-actions">
+            <a class="button button-primary" href="#projects">View selected work <span aria-hidden="true">↘</span></a>
+          </div>
+        </div>
+        <aside class="hero-panel reveal" aria-label="Current focus">
+          <div class="panel-label"><span class="status-dot"></span> Current focus</div>
+          <div class="focus-item"><span>01</span><strong>Aerodynamics & CFD</strong></div>
+          <div class="focus-item"><span>02</span><strong>Flight dynamics</strong></div>
+          <div class="focus-item"><span>03</span><strong>Embedded systems</strong></div>
+          <div class="panel-footer"><span>KU Leuven</span><span>Engineering Sciences</span></div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section section-compact" id="about">
+      <div class="container two-column">
+        <div><p class="eyebrow">Profile</p><h2 class="section-title">Curious by nature.<br>Practical by design.</h2></div>
+        <div class="about-content reveal"></div>
+      </div>
+    </section>
+
+    <section class="section" id="projects">
+      <div class="container">
+        <div class="section-heading"><div><p class="eyebrow">Selected work</p><h2 class="section-title">Projects</h2></div><p>Hands-on engineering across simulation, robotics, IoT and embedded systems.</p></div>
+        <div class="projects-grid"></div>
+      </div>
+    </section>
+
+
+    <section class="section" id="skills">
+      <div class="container">
+        <div class="section-heading"><div><p class="eyebrow">Technical toolkit</p><h2 class="section-title">Skills</h2></div><p>A focused set of tools developed through coursework and project work.</p></div>
+        <div class="skills-grid"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer"><div class="container footer-inner"><p>© 2026 Xander Vanhaeren</p><a href="#top">Back to top ↑</a></div></footer>
+
+  <script type="application/json" id="portfolio-data">
+  {
+    "personal": {
+      "name": "Xander Vanhaeren",
+      "title": "Engineering student focused on aerospace, simulation and intelligent hardware.",
+      "description": "I am a first-year Engineering Sciences student at KU Leuven with a strong interest in aerospace engineering.",
+      "location": "Leuven, Belgium"
+    },
+    "about": {
+      "bio": "I am a first-year Engineering Sciences student at KU Leuven with a strong interest in aerospace engineering. I am mostly intrested by aerodynamics.",
+      "education": [{"type":"Bachelor","degree":"Engineering Sciences","specialisation":"Mechanical Engineering","institution":"KU Leuven","year":"Expected 2026"}],
+      "interests": ["Aerodynamics","Flight dynamics","Control systems","3D printing","IoT","Robotics"]
+    },
+    "projects": [
+      {"title":"Project Typhoon","description":"Aerodynamic simulation and analysis project investigating high-speed flow phenomena through computational methods.","technologies":["Python","CFD","OpenFOAM"],"category":"Aerodynamics","number":"01"},
+      {"title":"RCXD","description":"Remote-controlled vehicle integrating embedded sensors with autonomous navigation capabilities.","technologies":["Arduino","C++","ROS"],"category":"Robotics","number":"02"},
+      {"title":"BikeySens","description":"Smart bicycle sensor system designed for real-time telemetry and practical safety features.","technologies":["Arduino","Bluetooth","Mobile app"],"category":"Data Analasys","number":"03"}
+    ],
+    "skills": [
+      {"category":"Programming","items":[{"name":"Python","level":"Advanced"},{"name":"MATLAB","level":"Advanced"},{"name":"C / C++","level":"Intermediate"},{"name":"JavaScript","level":"Working knowledge"}]},
+      {"category":"Simulation & data","items":[{"name":"CFD / Aerodynamics","level":"Advanced"},{"name":"NumPy / SciPy","level":"Intermediate"},{"name":"MATLAB Simulink","level":"Working knowledge"}]},
+      {"category":"Hardware & design","items":[{"name":"Arduino / ESP32","level":"Intermediate"},{"name":"Fusion 360","level":"Advanced"},{"name":"SolidWorks","level":"Intermediate"},{"name":"FDM / SLA printing","level":"Intermediate"}]},
+      {"category":"Engineering workflow","items":[{"name":"Git / GitHub","level":"Intermediate"},{"name":"Linux","level":"Working knowledge"},{"name":"LaTeX","level":"Working knowledge"}]}
+    ],
+    "experience": [{"title":"Student Project Lead","company":"KU Leuven","location":"Leuven, Belgium","start_date":"Sep 2026","end_date":"Present","description":"Leading a four-person student team on a P&O project, coordinating technical decisions, integration and delivery."}]
+  }
+  </script>
+  <script src="main.js" defer></script>
+</body>
+</html>
