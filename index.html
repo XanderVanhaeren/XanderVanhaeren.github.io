@@ -3,181 +3,290 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="assets/favicon.ico">
-    <title>Xander Vanhaeren — Portfolio</title>
+    <title>Xander Vanhaeren — Engineering Student & Aerospace Portfolio</title>
+    <meta name="description" content="Portfolio of Xander Vanhaeren, engineering student at KU Leuven focused on aerospace: aerodynamics, flight dynamics, CAD, embedded systems and RC aircraft projects.">
+    <meta name="author" content="Xander Vanhaeren">
+    <meta name="theme-color" content="#0B0D10">
+    <link rel="canonical" href="https://xandervanhaeren.github.io/">
+
+    <!-- Social previews -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Xander Vanhaeren — Engineering Portfolio">
+    <meta property="og:description" content="Engineering student at KU Leuven. Aerodynamics, flight dynamics, CAD and embedded systems projects.">
+    <meta property="og:url" content="https://xandervanhaeren.github.io/">
+    <meta property="og:image" content="https://xandervanhaeren.github.io/assets/images/projects/Typhoon/typhoon-v3.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <link rel="icon" href="assets/Logo/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="assets/Logo/favicon.ico" sizes="any">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    </noscript>
     <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
+    <a class="skip-link" href="#main">Skip to content</a>
 
     <!-- Navigation -->
-    <nav class="navbar" id="navbar">
-        <div class="nav-container">
-            <div class="logo-group">
-                <a href="#" class="logo">XV</a>
-                <a href="#" class="logo-accent">.</a>
-            </div>
-            <ul class="nav-links">
+    <header class="navbar" id="navbar">
+        <nav class="nav-container" aria-label="Main">
+            <a href="#home" class="logo" aria-label="Xander Vanhaeren — home">XV<span class="logo-accent">.</span></a>
+            <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="nav-links" aria-label="Open menu">
+                <span></span><span></span><span></span>
+            </button>
+            <ul class="nav-links" id="nav-links">
                 <li><a href="#home" class="active">Home</a></li>
                 <li><a href="#about">About</a></li>
                 <li><a href="#projects">Projects</a></li>
                 <li><a href="#skills">Skills</a></li>
             </ul>
-        </div>
-    </nav>
+        </nav>
+    </header>
 
-    <!-- Hero Section -->
-    <section id="home" class="hero section">
-        <div class="hero-content fade-in-up">
-            <p class="hero-greeting">Hello, I'm</p>
-            <h1 class="hero-name"></h1>
-            <p class="hero-title"></p>
-            <p class="hero-description"></p>
-            <div class="hero-buttons">
-                <a href="#about" class="btn btn-primary">About Me</a>
-                <a href="#projects" class="btn btn-secondary">My Projects</a>
+    <main id="main">
+        <!-- Hero Section -->
+        <section id="home" class="hero" aria-labelledby="hero-heading">
+            <canvas class="topo-canvas" id="topo-canvas" aria-hidden="true"></canvas>
+            <div class="hero-inner container">
+                <div class="hero-grid">
+                    <div class="hero-content">
+                        <div class="hero-eyebrow">
+                            <span class="eyebrow-dot" aria-hidden="true"></span>
+                            <span>Leuven, Belgium · 50.88° N, 4.70° E</span>
+                        </div>
+                        <h1 class="hero-name" id="hero-heading">Xander Vanhaeren</h1>
+                        <p class="hero-title">Engineering Student</p>
+                        <p class="hero-description"></p>
+                        <div class="hero-buttons">
+                            <a href="#projects" class="btn btn-primary">Explore Projects</a>
+                            <a href="#about" class="btn btn-secondary">About &amp; Workbench</a>
+                        </div>
+                    </div>
+                    <aside class="hero-fieldnotes" aria-label="Engineering field notes">
+                        <div class="fieldnotes-header">
+                            <h2 class="fieldnotes-title">Flight &amp; Lab Telemetry</h2>
+                            <span class="fieldnotes-coord">ISO // 1013.25 hPa</span>
+                        </div>
+                        <dl class="fieldnotes-list">
+                            <div class="fieldnotes-row">
+                                <dt>Discipline</dt>
+                                <dd>B.Sc. Engineering Sciences · KU Leuven</dd>
+                            </div>
+                            <div class="fieldnotes-row">
+                                <dt>Primary Focus</dt>
+                                <dd>Aerodynamics, Flight Dynamics &amp; Control</dd>
+                            </div>
+                            <div class="fieldnotes-row">
+                                <dt>Flagship Airframe</dt>
+                                <dd>Project Typhoon V3 · 821 g</dd>
+                            </div>
+                            <div class="fieldnotes-row">
+                                <dt>Avionics Stack</dt>
+                                <dd>ESP32-C6 · BNO085 · BMP390</dd>
+                            </div>
+                        </dl>
+                    </aside>
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <!-- About Section -->
-    <section id="about" class="section">
-        <div class="container">
-            <div class="about-content fade-in-up"></div>
-        </div>
-    </section>
+        <!-- About Section -->
+        <section id="about" class="section" aria-labelledby="about-heading">
+            <div class="container">
+                <div class="about-content"></div>
+            </div>
+        </section>
 
-    <!-- Projects Section -->
-    <section id="projects" class="section">
-        <div class="container">
-            <h2 class="section-title">Projects</h2>
-            <div class="projects-grid"></div>
-        </div>
-    </section>
-    
-    <!-- Skills Section -->
-    <section id="skills" class="section">
-        <div class="container">
-            <h2 class="section-title">Skills</h2>
-            <div class="skills-grid"></div>
-        </div>
-    </section>
+        <!-- Projects Section -->
+        <section id="projects" class="section" aria-labelledby="projects-heading">
+            <div class="container">
+                <div class="section-header">
+                    <div>
+                        <p class="section-kicker">Selected Engineering Work</p>
+                        <h2 class="section-title" id="projects-heading">Projects &amp; Prototypes</h2>
+                    </div>
+                    <p class="section-subtitle">Simulated in CAD &amp; CFD, fabricated on FDM printers, and validated with custom embedded hardware.</p>
+                </div>
+                <div class="projects-grid"></div>
+                <!-- Visual proof-of-work placeholder slots: swap data:image/svg+xml src with your Typhoon V3 render/photo and CFD pressure-contour image -->
+                <div class="proof-grid" aria-label="Visual proof placeholder slots">
+                    <figure class="proof-slot">
+                        <div class="proof-media">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 500'%3E%3Crect width='800' height='500' fill='%230F1218'/%3E%3Ctext x='400' y='244' text-anchor='middle' fill='%23A6B0BD' font-family='sans-serif' font-size='16' font-weight='500'%3ETyphoon V3 Photo / CAD Render%3C/text%3E%3Ctext x='400' y='270' text-anchor='middle' fill='%23848F9E' font-family='monospace' font-size='12'%3E16:10 · placeholder slot%3C/text%3E%3C/svg%3E"
+                                 width="800" height="500" loading="lazy" decoding="async"
+                                 alt="Placeholder slot for Project Typhoon V3 photo or CAD render">
+                        </div>
+                        <figcaption>Typhoon V3 photo / CAD render slot</figcaption>
+                    </figure>
+                    <figure class="proof-slot">
+                        <div class="proof-media">
+                            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 800 500'%3E%3Crect width='800' height='500' fill='%230F1218'/%3E%3Ctext x='400' y='244' text-anchor='middle' fill='%23A6B0BD' font-family='sans-serif' font-size='16' font-weight='500'%3ECFD / Pressure-Contour Plot%3C/text%3E%3Ctext x='400' y='270' text-anchor='middle' fill='%23848F9E' font-family='monospace' font-size='12'%3E16:10 · placeholder slot%3C/text%3E%3C/svg%3E"
+                                 width="800" height="500" loading="lazy" decoding="async"
+                                 alt="Placeholder slot for Project Typhoon CFD pressure-contour plot">
+                        </div>
+                        <figcaption>CFD / pressure-contour plot slot</figcaption>
+                    </figure>
+                </div>
+            </div>
+        </section>
 
+        <!-- Skills Section -->
+        <section id="skills" class="section" aria-labelledby="skills-heading">
+            <div class="container">
+                <div class="section-header">
+                    <div>
+                        <p class="section-kicker">Technical Stack</p>
+                        <h2 class="section-title" id="skills-heading">Skills &amp; Instruments</h2>
+                    </div>
+                </div>
+                <div class="skills-grid"></div>
+            </div>
+        </section>
+    </main>
 
-    <!-- Footer -->
+    <noscript>
+        <p class="noscript">Enable JavaScript to see projects and skills.</p>
+    </noscript>
+
     <footer class="footer">
-        <div class="container">
-            <p>&copy; 2026 Xander Vanhaeren. All rights reserved.</p>
+        <div class="container footer-inner">
+            <p>&copy; 2026 Xander Vanhaeren · Built in Leuven, Belgium</p>
+            <p class="footer-coords">50.8798° N, 4.7005° E · KU Leuven Engineering Sciences</p>
         </div>
     </footer>
 
-    <!-- Embedded Data (single source of truth) -->
+    <dialog id="project-modal" class="project-modal" aria-label="Project article">
+        <div class="project-modal-bar">
+            <a href="#" class="project-modal-full" target="_self">Open full page &nearr;</a>
+            <button type="button" class="project-modal-close" aria-label="Close article">&times;</button>
+        </div>
+        <div class="project-modal-body"></div>
+    </dialog>
+
+    <!-- Portfolio content: edit this block to update the site -->
     <script type="application/json" id="portfolio-data">
 {
     "personal": {
         "name": "Xander Vanhaeren",
-        "title": "Engineering Student",
-        "description": "Bachelor in Engineering Sciences at KU Leuven | Aerospace enthusiast | 3D printing, IoT, and robotics hobbyist | Aspiring aerospace engineer passionate about aerodynamics and flight dynamics.",
-        "email": "xandervanhaeren@icloud.com",
-        "linkedin": "",
-        "github": "",
-        "website": "",
+        "title": "Engineering Sciences Student · Aerospace & Embedded Systems",
+        "description": "Designing things that move, sense, and fly — combining SolidWorks CFD aerodynamics, lightweight 3D-printed airframes, and custom ESP32 avionics at KU Leuven.",
         "location": "Leuven, Belgium"
     },
     "about": {
-        "name": "About Me",
-        "bio": "I am a third-year engineering student at KU Leuven with a passion for aerospace engineering. My interests span aerodynamics, flight dynamics, and control systems. Beyond academics, I enjoy 3D printing, IoT projects, and robotics — building things that move and think.",
-        "education": [
+        "name": "About & Engineering Approach",
+        "bio": "I am an Engineering Sciences student at KU Leuven with a deep focus on aerospace engineering. My work lives at the intersection of aerodynamics, flight dynamics, and embedded control systems — taking ideas from mathematical models and CFD pressure contours all the way to 3D-printed hardware and custom flight controllers.",
+        "approach": [
             {
-                "type": "Bachelor",
-                "degree": "Engineering Sciences (Aerospace Engineering)",
-                "institution": "KU Leuven",
-                "year": "2026"
+                "step": "01 // Simulate",
+                "title": "Aerodynamics & Mathematical Modeling",
+                "detail": "Airfoil selection (NACA 2412), lift/drag polar calculation, and SolidWorks Flow Simulation mesh validation before cutting or printing a single part."
+            },
+            {
+                "step": "02 // Fabricate",
+                "title": "Parametric CAD & Lightweight FDM",
+                "detail": "Thin-wall fuselage and wing architecture in Fusion 360 & SolidWorks, printed in foaming LW-PLA and carbon-reinforced PETG."
+            },
+            {
+                "step": "03 // Control",
+                "title": "Custom Avionics & Sensor Fusion",
+                "detail": "4-layer PCBs built around ESP32-C6, BNO085 9-DOF IMU, and BMP390 barometric altimeters running real-time C++ control loops."
             }
         ],
-        "interests": ["Aerodynamics", "Flight Dynamics", "Control Systems", "3D Printing", "IoT", "Robotics"]
+        "education": [
+            {
+                "type": "Bachelor of Science",
+                "degree": "Engineering Sciences (Mechanical Engineering)",
+                "institution": "KU Leuven · Leuven, Belgium",
+                "year": "Expected 2027"
+            }
+        ],
+        "interests": ["Aerodynamics", "Flight Dynamics", "Control Systems", "CFD Simulation", "3D Printing (LW-PLA)", "Custom PCBs & IoT", "Robotics"]
     },
     "projects": [
         {
             "title": "Project Typhoon",
-            "description": "An advanced aerodynamic simulation and analysis project exploring high-speed flow phenomena.",
-            "technologies": ["Python", "CFD", "OpenFOAM"],
-            "category": "Aerodynamics",
-            "image": "assets/images/projects/Typhoon/V3.png"
+            "featured": true,
+            "description": "Complete aerodynamic design, SolidWorks CFD flow validation, LW-PLA 3D-printed airframe, and custom 4-layer ESP32-C6 flight controller (TARS V2) for an 821 g delta-wing RC jet.",
+            "specs": [
+                { "label": "Airfoil", "value": "NACA 2412" },
+                { "label": "Flight Mass", "value": "821 g" },
+                { "label": "Stall Speed", "value": "13.7 m/s" },
+                { "label": "Flight Controller", "value": "TARS V2 (ESP32-C6)" }
+            ],
+            "technologies": ["SolidWorks CFD", "Fusion 360", "ESP32-C6 / C++", "LW-PLA 3D Printing", "Aerodynamics"],
+            "category": "Flagship Aerospace Case Study",
+            "image": "assets/images/projects/Typhoon/VelocitySolidworks.png",
+            "image_width": 571,
+            "image_height": 387,
+            "image_alt": "SolidWorks flow simulation of the Typhoon airframe showing velocity streamlines",
+            "gallery": [
+                {
+                    "src": "assets/images/projects/Typhoon/typhoon-v3.jpg",
+                    "width": 1400,
+                    "height": 948,
+                    "alt": "Project Typhoon V3 CAD airframe assembly",
+                    "caption": "V3 Airframe CAD"
+                },
+                {
+                    "src": "assets/images/projects/Typhoon/tars-v2.jpg",
+                    "width": 1200,
+                    "height": 704,
+                    "alt": "TARS V2 flight controller hardware assembly",
+                    "caption": "TARS V2 Flight Controller"
+                }
+            ],
+            "article": "projects/typhoon.html"
         },
         {
             "title": "RCXD",
-            "description": "Remote-controlled vehicle with embedded sensors and autonomous navigation capabilities.",
-            "technologies": ["Arduino", "C++", "ROS"],
-            "category": "Robotics"
+            "description": "Compact remote-controlled ground vehicle with onboard obstacle sensing, telemetry link, and autonomous waypoint navigation experiments.",
+            "specs": [
+                { "label": "Platform", "value": "4WD Chassis" },
+                { "label": "Compute", "value": "Arduino + ROS" }
+            ],
+            "technologies": ["Arduino", "C++", "ROS", "Embedded Sensors"],
+            "category": "Autonomous Robotics",
+            "diagram": "rover"
         },
         {
             "title": "BikeySens",
-            "description": "Smart bicycle sensor system with real-time telemetry and safety features.",
-            "technologies": ["Arduino", "Bluetooth", "Mobile App"],
-            "category": "Embedded Systems"
-        }
-    ],
-    "skills": [
-        {
-            "category": "Programming",
-            "items": [
-                {"name": "Python", "level": "advanced"},
-                {"name": "C/C++", "level": "intermediate"},
-                {"name": "MATLAB", "level": "advanced"},
-                {"name": "JavaScript", "level": "beginner"}
-            ]
-        },
-        {
-            "category": "Electronics & Embedded Systems",
-            "items": [
-                {"name": "Arduino / ESP32", "level": "intermediate"},
-                {"name": "Raspberry Pi", "level": "intermediate"},
-                {"name": "Circuit Design", "level": "beginner"}
-            ]
-        },
-        {
-            "category": "CAD & Mechanical Design",
-            "items": [
-                {"name": "Fusion 360", "level": "advanced"},
-                {"name": "SolidWorks", "level": "intermediate"},
-                {"name": "3D Printing (FDM/SLA)", "level": "intermediate"}
-            ]
-        },
-        {
-            "category": "Data Analysis & Simulation",
-            "items": [
-                {"name": "CFD / Aerodynamics", "level": "advanced"},
-                {"name": "MATLAB Simulink", "level": "beginner"},
-                {"name": "Python (NumPy, SciPy)", "level": "intermediate"}
-            ]
-        },
-        {
-            "category": "Tools & Technologies",
-            "items": [
-                {"name": "Git / GitHub", "level": "intermediate"},
-                {"name": "LaTeX", "level": "beginner"},
-                {"name": "Linux", "level": "beginner"}
-            ]
-        }
-    ],
-    "experience": [
-        {
-            "title": "Student Project Lead",
-            "company": "KU Leuven",
-            "location": "Leuven, Belgium",
-            "start_date": "2026-09",
-            "end_date": "",
-            "description": "Leading a team of 4 students on a Peno1 project."
+            "description": "Smart bicycle instrumentation node capturing real-time cadence, speed, barometric grade, and proximity safety alerts over Bluetooth Low Energy.",
+            "specs": [
+                { "label": "Link", "value": "BLE Telemetry" },
+                { "label": "Interface", "value": "Mobile Companion" }
+            ],
+            "technologies": ["Arduino", "Bluetooth LE", "Sensor Fusion", "Mobile App"],
+            "category": "Embedded Telemetry & Data Analysis",
+            "diagram": "telemetry"
         }
     ]
 }
-</script>
+    </script>
 
-    <!-- Main JS -->
-    <script src="assets/js/main.js" data-portfolio='{"personal":{"name":"Xander Vanhaeren","title":"Engineering Student","description":"Bachelor in Engineering Sciences at KU Leuven | Aerospace enthusiast | 3D printing, IoT, and robotics hobbyist | Aspiring aerospace engineer passionate about aerodynamics and flight dynamics.","email":"xandervanhaeren@icloud.com","linkedin":"","github":"","website":"","location":"Leuven, Belgium"},"about":{"name":"About Me","bio":"I am a third-year engineering student at KU Leuven with a passion for aerospace engineering. My interests span aerodynamics, flight dynamics, and control systems. Beyond academics, I enjoy 3D printing, IoT projects, and robotics — building things that move and think.","education":[{"type":"Bachelor","degree":"Engineering Sciences (Aerospace Engineering)","institution":"KU Leuven","year":"2026"}],"interests":["Aerodynamics","Flight Dynamics","Control Systems","3D Printing","IoT","Robotics"]},"projects":[{"title":"Project Typhoon","description":"An advanced aerodynamic simulation and analysis project exploring high-speed flow phenomena.","technologies":["Python","CFD","OpenFOAM"],"category":"Aerodynamics"},{"title":"RCXD","description":"Remote-controlled vehicle with embedded sensors and autonomous navigation capabilities.","technologies":["Arduino","C++","ROS"],"category":"Robotics"},{"title":"XyO","description":"A custom IoT platform for environmental monitoring and data visualization.","technologies":["ESP32","MQTT","Python"],"category":"IoT"},{"title":"BikeySens","description":"Smart bicycle sensor system with real-time telemetry and safety features.","technologies":["Arduino","Bluetooth","Mobile App"],"category":"Embedded Systems"}],"skills":[{"category":"Programming","items":[{"name":"Python","level":"advanced"},{"name":"C/C++","level":"intermediate"},{"name":"MATLAB","level":"advanced"},{"name":"JavaScript","level":"beginner"}]},{"category":"Electronics & Embedded Systems","items":[{"name":"Arduino / ESP32","level":"intermediate"},{"name":"Raspberry Pi","level":"intermediate"},{"name":"Circuit Design","level":"beginner"}]},{"category":"CAD & Mechanical Design","items":[{"name":"SolidWorks","level":"advanced"},{"name":"Fusion 360","level":"intermediate"},{"name":"3D Printing (FDM/SLA)","level":"intermediate"}]},{"category":"Data Analysis & Simulation","items":[{"name":"CFD / Aerodynamics","level":"advanced"},{"name":"MATLAB Simulink","level":"advanced"},{"name":"Python (NumPy, SciPy)","level":"intermediate"}]},{"category":"Tools & Technologies","items":[{"name":"Git / GitHub","level":"intermediate"},{"name":"LaTeX","level":"beginner"},{"name":"Linux (Ubuntu)","level":"intermediate"}]}],"experience":[{"title":"Research Assistant","company":"KU Leuven — Department of Mechanical Engineering","location":"Leuven, Belgium","start_date":"2025-09","end_date":"","description":"Assisting with aerodynamic research projects and computational fluid dynamics simulations."},{"title":"Student Project Lead","company":"KU Leuven — Aerospace Engineering Club","location":"Leuven, Belgium","start_date":"2024-09","end_date":"","description":"Leading a team of 5 students on an autonomous drone project."}]}'></script>
+    <!-- Fallback copy of assets/data/skills.csv used only when opened via file:// (where fetch is blocked by CORS) -->
+    <script type="text/csv" id="skills-fallback">
+category;skill;level
+Programming;Python;advanced
+Programming;C/C++;intermediate
+Programming;MATLAB;advanced
+Programming;JavaScript;beginner
+Electronics & Embedded Systems;Arduino / ESP32;advanced
+Electronics & Embedded Systems;Raspberry Pi;intermediate
+Electronics & Embedded Systems;Circuit Design;beginner
+CAD & Mechanical Design;Fusion 360;advanced
+CAD & Mechanical Design;SolidWorks;intermediate
+CAD & Mechanical Design;3D Printing (FDM/SLA);intermediate
+Data Analysis & Simulation;CFD / Aerodynamics;advanced
+Data Analysis & Simulation;MATLAB Simulink;beginner
+Data Analysis & Simulation;Python (NumPy, SciPy);intermediate
+Tools & Technologies;Git / GitHub;intermediate
+Tools & Technologies;LaTeX;beginner
+Tools & Technologies;Linux;beginner
+    </script>
 
+    <script src="assets/js/main.js" defer></script>
 </body>
 </html>
