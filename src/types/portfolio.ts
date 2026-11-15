@@ -45,7 +45,7 @@ export interface ProjectItem {
   id: string;
   title: string;
   category: string;
-  filterGroup: 'aerospace' | 'robotics' | 'telemetry';
+  filterGroup: 'aerospace' | 'robotics' | 'telemetry' | 'software';
   featured?: boolean;
   description: string;
   technologies: string[];
@@ -54,7 +54,7 @@ export interface ProjectItem {
   imageAlt?: string;
   imageWidth?: number;
   imageHeight?: number;
-  diagram?: 'rover' | 'telemetry';
+  diagram?: 'rover' | 'telemetry' | 'pdf';
   gallery?: ProjectGalleryItem[];
   articleUrl?: string;
   githubUrl?: string;
