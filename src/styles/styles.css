@@ -809,12 +809,19 @@ button {
     --lg-tab-width: 104px;
     --lg-tab-height: 34px;
     max-width: 100%;
-    overflow-x: auto;
 }
 
 .section-toolbar .skills-segmented {
     --lg-tab-width: auto;
     flex: 1 1 auto;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.section-toolbar .skills-segmented::-webkit-scrollbar {
+    display: none;
 }
 
 .section-toolbar .skills-segmented .lg-segmented-tab,
