@@ -1,117 +1,29 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project Typhoon — Xander Vanhaeren</title>
     <meta name="description" content="Project Typhoon: custom 3D-printed delta-wing RC jet, SolidWorks CFD validation, and ESP32-C6 flight controller studying how airfoil choice affects maneuverability.">
+    <meta name="author" content="Xander Vanhaeren">
     <meta name="theme-color" content="#0B0D10">
-    <link rel="icon" href="../assets/Logo/favicon.svg" type="image/svg+xml">
-    <link rel="icon" href="../assets/Logo/favicon.ico" sizes="any">
+    <link rel="canonical" href="https://xandervanhaeren.github.io/projects/typhoon.html">
+
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Project Typhoon — Xander Vanhaeren">
+    <meta property="og:description" content="Project Typhoon: custom 3D-printed delta-wing RC jet, SolidWorks CFD validation, and ESP32-C6 flight controller studying how airfoil choice affects maneuverability.">
+    <meta property="og:url" content="https://xandervanhaeren.github.io/projects/typhoon.html">
+    <meta property="og:image" content="https://xandervanhaeren.github.io/assets/images/projects/Typhoon/typhoon-v3.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <link rel="icon" href="/assets/Logo/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/assets/Logo/favicon.ico" sizes="any">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../assets/css/styles.css">
 </head>
 <body class="article-page">
-    <header class="article-topbar">
-        <div class="container article-topbar-inner">
-            <a href="../index.html#projects" class="article-back">&larr; Back to Portfolio</a>
-            <a href="../index.html#home" class="logo" aria-label="Xander Vanhaeren — home">XV<span class="logo-accent">.</span></a>
-        </div>
-    </header>
-
-    <main class="container article-standalone">
-        <article class="project-article">
-            <header class="article-header">
-                <span class="project-category">Aerodynamics &amp; Flight Control</span>
-                <h1>Project Typhoon</h1>
-                <p class="article-subtitle">Designing, simulating, and flight-testing a 3D-printed delta-wing RC jet with a custom ESP32-C6 flight controller to study how airfoil geometry drives maneuverability.</p>
-                <ul class="project-tags">
-                    <li class="tag">SolidWorks CFD</li>
-                    <li class="tag">Fusion 360</li>
-                    <li class="tag">ESP32-C6 / C++</li>
-                    <li class="tag">3D Printing (PLA / PETG / ASA)</li>
-                    <li class="tag">ExpressLRS</li>
-                </ul>
-            </header>
-
-            <figure class="article-hero-figure">
-                <img src="../assets/images/projects/Typhoon/typhoon-v3.jpg" width="1400" height="948"
-                     alt="Project Typhoon V3 airframe showing delta wings, twin ducted fans, exposed avionics bay, and metal nose cone">
-                <figcaption>Typhoon V3 airframe: open ASA frame around a carbon-fiber main spar, twin 50 mm EDFs, and vase-mode PLA wings.</figcaption>
-            </figure>
-
-            <dl class="article-specs">
-                <div><dt>Wingspan / Length</dt><dd>680 mm &times; 602 mm</dd></div>
-                <div><dt>Total Mass</dt><dd>821 g (wings &lt; 60 g each)</dd></div>
-                <div><dt>Airfoil</dt><dd>NACA 2412 (4&deg; &rarr; 2&deg; washout)</dd></div>
-                <div><dt>Propulsion</dt><dd>2 &times; 50 mm EDF &middot; 12.96 N thrust</dd></div>
-                <div><dt>Thrust-to-Weight</dt><dd>1.61 (1034 W peak)</dd></div>
-                <div><dt>Flight Controller</dt><dd>TARS V2 (24 g, ESP32-C6 + MPU-6050)</dd></div>
-            </dl>
-
-            <section>
-                <h2>Research Question &amp; Airfoil Selection</h2>
-                <p>Project Typhoon began as my 2025&ndash;2026 GSTEMP research project at Don Bosco Haacht, asking: <em>how does airfoil choice affect the maneuverability of a delta-wing aircraft?</em></p>
-                <p>Using 2D flight mechanics and polar data from AirfoilTools, I compared three candidate profiles—<strong>NACA 2412</strong>, <strong>NACA 2408</strong>, and <strong>LS013</strong>—on pitch-up angular acceleration at 30 m/s. Because NACA 2412 sustains a higher maximum lift coefficient (c<sub>L,max</sub> &approx; 1.3 at 12&deg; AoA) than LS013 (c<sub>L,max</sub> &approx; 1.0 at 10&deg;), it yields a theoretical turn-initiation acceleration of <strong>3.04 rad/s&sup2;</strong> versus <strong>2.28 rad/s&sup2;</strong>—a 34% advantage in maneuverability.</p>
-                <p>In Fusion 360, I built the 0.09575 m&sup2; delta wing (aspect ratio 4.83) with geometric washout from <strong>4&deg; at the root to 2&deg; at the tip</strong> so stall begins inboard rather than at the wingtips, combined with slight dihedral for roll stability.</p>
-            </section>
-
-            <section>
-                <h2>Airframe &amp; Structural Evolution</h2>
-                <p>Inspired by the Eurofighter Typhoon layout, the aircraft combines canards, elevons, and twin rear-mounted 50 mm Electric Ducted Fans (60,800 RPM, 4S 1550 mAh LiPo). Reaching the 821 g flight weight took over five months of structural iteration:</p>
-                <ul>
-                    <li><strong>Wings (&lt; 60 g each, rated to 12G):</strong> Carbon-fiber spars carry bending loads through 3D-printed PETG ribs, wrapped in a single-wall vase-mode PLA skin for a smooth surface at minimal weight.</li>
-                    <li><strong>Open-frame fuselage:</strong> The original streamlined Eurofighter shell starved the EDFs of intake air. Replacing it with an open 3D-printed ASA frame around a central carbon-fiber tube solved intake airflow and made field repairs fast. The wing spars mount beneath the main tube so lift puts the joint in compression.</li>
-                </ul>
-            </section>
-
-            <section>
-                <h2>CFD Validation in SolidWorks</h2>
-                <p>Before committing to flight hardware, I ran qualitative flow simulations in SolidWorks Flow Simulation at 30 m/s and 0&deg; angle of attack to check for gross aerodynamic flaws.</p>
-                <div class="article-gallery">
-                    <figure>
-                        <img src="../assets/images/projects/Typhoon/VelocitySolidworks.png" width="571" height="387" loading="lazy"
-                             alt="SolidWorks CFD velocity surface render showing high-speed low-pressure regions over the delta wings and canards">
-                        <figcaption>Surface velocity plot confirming accelerated low-pressure flow over the main wings and canards, plus tip vortices.</figcaption>
-                    </figure>
-                    <figure>
-                        <img src="../assets/images/projects/Typhoon/Fuselage Flowsim.png" width="2559" height="1439" loading="lazy"
-                             alt="SolidWorks flow simulation side plane showing velocity field around the fuselage and vertical stabilizer">
-                        <figcaption>Longitudinal velocity plane used to inspect fuselage wake and intake behavior.</figcaption>
-                    </figure>
-                </div>
-            </section>
-
-            <section>
-                <h2>Custom Avionics: TARS V2 &amp; Saturn OS</h2>
-                <p>Rather than using an off-the-shelf flight controller, I built <strong>TARS V2</strong> (24 g total) around an <strong>Arduino Nano ESP32-C6</strong> (RISC-V core), an <strong>MPU-6050</strong> 6-axis IMU, and a <strong>Radiomaster RP3</strong> ExpressLRS receiver communicating over CRSF serial.</p>
-                <figure class="article-figure">
-                    <img src="../assets/images/projects/Typhoon/tars-v2.jpg" width="1200" height="704" loading="lazy"
-                         alt="TARS V2 custom flight controller with ESP32-C6, MPU-6050 IMU, and dual ExpressLRS antennas">
-                    <figcaption>TARS V2 flight controller (24 g) integrating the ESP32-C6, MPU-6050 IMU, and Radiomaster RP3 receiver.</figcaption>
-                </figure>
-                <p>Because standard Arduino servo libraries conflicted with the ESP32-C6 hardware, I wrote a custom 50 Hz, 12-bit LEDC PWM driver in C++ (<strong>Saturn OS</strong>) to mix the canards, elevons, and steerable nose gear. Attitude estimation uses a complementary filter (&alpha; = 0.9875) feeding three selectable flight modes:</p>
-                <ul>
-                    <li><strong>Manual:</strong> Direct stick-to-surface mixing without active stabilization.</li>
-                    <li><strong>Angle Stabilization:</strong> Maps stick deflection to target roll/pitch angles via a PID loop (K<sub>p</sub> = 1.25, K<sub>i</sub> = 0.001, K<sub>d</sub> = 0.035).</li>
-                    <li><strong>Horizontal Failsafe:</strong> Automatically cuts EDF throttle and levels the airframe if the ELRS radio link drops.</li>
-                </ul>
-            </section>
-
-            <section>
-                <h2>Test Campaign &amp; First Flight</h2>
-                <p>Testing progressed in strict steps—static bench tests (thrust, thermal limits, failsafe behavior), then high-speed taxi runs up to 10 m/s (36 km/h). Taxi testing exposed wheel-alignment tracking issues and the lack of brakes, which I solved by programming the elevons to drag on aborted takeoffs and widening the main gear track after two early ditching incidents.</p>
-                <p>On <strong>January 17, 2026</strong>, Typhoon achieved its first liftoff, validating that the NACA 2412 delta-wing airframe generates sufficient lift near the calculated 10.1 m/s stall speed. A sharp uncommanded roll to the right immediately after rotation forced an emergency landing in the adjacent field, damaging the nose gear. Flight testing was paused ahead of the May 9 school exhibition, with future flights planned to log quantitative IMU and airspeed data.</p>
-            </section>
-        </article>
-    </main>
-
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2026 Xander Vanhaeren</p>
-        </div>
-    </footer>
+    <div id="root"></div>
+    <script type="module" src="/src/typhoonMain.tsx"></script>
 </body>
 </html>

@@ -1,0 +1,248 @@
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { Glass, TabBar } from 'glisse';
+import type { GlassOpticsSettings } from '../../types/portfolio';
+import { GlassOpticsHud } from './GlassOpticsHud';
+
+export interface NavbarProps {
+  optics: GlassOpticsSettings;
+  onOpticsChange: (next: GlassOpticsSettings) => void;
+  onOpticsReset: () => void;
+}
+
+const NAV_ITEMS = [
+  { value: 'home', label: 'Home' },
+  { value: 'about', label: 'About' },
+  { value: 'projects', label: 'Projects' },
+  { value: 'skills', label: 'Skills' },
+] as const;
+
+type NavSectionId = (typeof NAV_ITEMS)[number]['value'];
+
+function prefersReducedMotion(): boolean {
+  if (typeof window === 'undefined' || !window.matchMedia) return false;
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+export function Navbar({
+  optics,
+  onOpticsChange,
+  onOpticsReset,
+}: NavbarProps) {
+  const [activeSection, setActiveSection] = useState<NavSectionId>('home');
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const toggleRef = useRef<HTMLButtonElement | null>(null);
+  const drawerRef = useRef<HTMLUListElement | null>(null);
+
+  const navigateToSection = useCallback((sectionId: string) => {
+    const valid = NAV_ITEMS.find((item) => item.value === sectionId);
+    if (!valid) return;
+    setActiveSection(valid.value);
+    setMobileOpen(false);
+    const target = document.getElementById(valid.value);
+    if (target && typeof target.scrollIntoView === 'function') {
+      target.scrollIntoView({
+        behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 24);
+    };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const sections = NAV_ITEMS.map((item) =>
+      document.getElementById(item.value)
+    ).filter((el): el is HTMLElement => el !== null);
+
+    if (sections.length === 0) return;
+
+    const updateActiveSectionFromScroll = () => {
+      const docHeight = document.documentElement.scrollHeight;
+      const viewportHeight = window.innerHeight;
+      if (
+        docHeight > viewportHeight + 10 &&
+        window.scrollY + viewportHeight >= docHeight - 4
+      ) {
+        setActiveSection(sections[sections.length - 1].id as NavSectionId);
+        return;
+      }
+
+      const threshold = Math.max(140, viewportHeight * 0.35);
+      let current: NavSectionId = sections[0].id as NavSectionId;
+      for (const section of sections) {
+        const rect = section.getBoundingClientRect();
+        if (rect.height === 0 && rect.top === 0) continue;
+        if (rect.top <= threshold) {
+          current = section.id as NavSectionId;
+        }
+      }
+      setActiveSection(current);
+    };
+
+    updateActiveSectionFromScroll();
+    window.addEventListener('scroll', updateActiveSectionFromScroll, {
+      passive: true,
+    });
+
+    let observer: IntersectionObserver | undefined;
+    if (typeof IntersectionObserver !== 'undefined') {
+      observer = new IntersectionObserver(
+        () => {
+          updateActiveSectionFromScroll();
+        },
+        {
+          rootMargin: '-25% 0px -55% 0px',
+          threshold: [0, 0.1, 0.25, 0.5, 0.75],
+        }
+      );
+      sections.forEach((section) => observer!.observe(section));
+    }
+
+    return () => {
+      window.removeEventListener('scroll', updateActiveSectionFromScroll);
+      observer?.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!mobileOpen) return;
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setMobileOpen(false);
+        toggleRef.current?.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [mobileOpen]);
+
+  const handleNavKeyDown = (
+    event: React.KeyboardEvent<HTMLElement>,
+    selector: string
+  ) => {
+    if (event.key === 'Escape' && mobileOpen) {
+      event.preventDefault();
+      setMobileOpen(false);
+      toggleRef.current?.focus();
+      return;
+    }
+
+    const container = event.currentTarget;
+    const focusables = Array.from(
+      container.querySelectorAll<HTMLElement>(selector)
+    );
+    if (focusables.length === 0) return;
+
+    const currentIndex = focusables.findIndex(
+      (el) => el === document.activeElement
+    );
+    if (currentIndex === -1) return;
+
+    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+      event.preventDefault();
+      const nextIndex = (currentIndex + 1) % focusables.length;
+      focusables[nextIndex]?.focus();
+    } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      const prevIndex =
+        (currentIndex - 1 + focusables.length) % focusables.length;
+      focusables[prevIndex]?.focus();
+    } else if (event.key === 'Home') {
+      event.preventDefault();
+      focusables[0]?.focus();
+    } else if (event.key === 'End') {
+      event.preventDefault();
+      focusables[focusables.length - 1]?.focus();
+    }
+  };
+
+  return (
+    <header className={scrolled ? 'navbar scrolled' : 'navbar'} id="navbar">
+      <Glass
+        className="nav-container"
+        style={{ borderRadius: 'var(--radius-pill)' }}
+      >
+        <a
+          href="#home"
+          className="logo"
+          aria-label="Xander Vanhaeren home"
+          onClick={(e) => {
+            e.preventDefault();
+            navigateToSection('home');
+          }}
+        >
+          XV<span className="logo-accent">.</span>
+        </a>
+
+        <nav className="nav-actions" aria-label="Primary">
+          <div
+            onKeyDown={(e) => handleNavKeyDown(e, '[role="tab"], button')}
+          >
+            <TabBar
+              className="nav-tabbar"
+              items={NAV_ITEMS.map((item) => ({
+                value: item.value,
+                label: item.label,
+              }))}
+              value={activeSection}
+              onValueChange={navigateToSection}
+            />
+          </div>
+
+          <GlassOpticsHud
+            settings={optics}
+            onChange={onOpticsChange}
+            onReset={onOpticsReset}
+          />
+
+          <button
+            ref={toggleRef}
+            className="nav-toggle"
+            type="button"
+            aria-label="Toggle navigation"
+            aria-expanded={mobileOpen}
+            aria-controls="mobile-nav-drawer"
+            onClick={() => setMobileOpen((prev) => !prev)}
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+        </nav>
+
+        <ul
+          ref={drawerRef}
+          id="mobile-nav-drawer"
+          className={`nav-links mobile-drawer${mobileOpen ? ' open' : ''}`}
+          aria-label="Mobile navigation"
+          onKeyDown={(e) => handleNavKeyDown(e, 'a')}
+        >
+          {NAV_ITEMS.map((item) => (
+            <li key={item.value}>
+              <a
+                href={`#${item.value}`}
+                className={activeSection === item.value ? 'active' : undefined}
+                aria-current={activeSection === item.value ? 'page' : undefined}
+                onClick={(e) => {
+                  e.preventDefault();
+                  navigateToSection(item.value);
+                }}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </Glass>
+    </header>
+  );
+}
