@@ -1,15 +1,13 @@
-import React, { useEffect, useLayoutEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AboutSection } from './components/about/AboutSection';
 import { HeroSection } from './components/hero/HeroSection';
 import { Footer } from './components/layout/Footer';
-import { syncGlassOpticsCssVars } from './components/layout/GlassOpticsHud';
 import { Navbar } from './components/layout/Navbar';
 import { ProjectModal } from './components/projects/ProjectModal';
 import { ProjectsSection } from './components/projects/ProjectsSection';
 import { SkillsSection } from './components/skills/SkillsSection';
-import { DEFAULT_GLASS_OPTICS } from './data/portfolioData';
 import { DEFAULT_SKILLS_DATA, fetchSkillsData } from './data/skillsData';
-import type { GlassOpticsSettings, SkillCategory } from './types/portfolio';
+import type { SkillCategory } from './types/portfolio';
 
 function isTyphoonUrlActive(): boolean {
   if (typeof window === 'undefined') return false;
@@ -21,8 +19,6 @@ function isTyphoonUrlActive(): boolean {
 }
 
 export default function App() {
-  const [optics, setOptics] =
-    useState<GlassOpticsSettings>(DEFAULT_GLASS_OPTICS);
   const [skillsData, setSkillsData] =
     useState<SkillCategory[]>(DEFAULT_SKILLS_DATA);
   const [isProjectModalOpen, setIsProjectModalOpen] = useState<boolean>(() =>
@@ -31,20 +27,6 @@ export default function App() {
   const [modalArticleUrl, setModalArticleUrl] = useState<string>(
     'projects/typhoon.html'
   );
-
-  useLayoutEffect(() => {
-    syncGlassOpticsCssVars(optics);
-  }, [optics]);
-
-  const handleOpticsChange = (next: GlassOpticsSettings) => {
-    syncGlassOpticsCssVars(next);
-    setOptics(next);
-  };
-
-  const handleOpticsReset = () => {
-    syncGlassOpticsCssVars(DEFAULT_GLASS_OPTICS);
-    setOptics(DEFAULT_GLASS_OPTICS);
-  };
 
   useEffect(() => {
     let active = true;
@@ -103,14 +85,10 @@ export default function App() {
         Skip to main content
       </a>
 
-      <Navbar
-        optics={optics}
-        onOpticsChange={handleOpticsChange}
-        onOpticsReset={handleOpticsReset}
-      />
+      <Navbar />
 
       <main id="main">
-        <HeroSection pauseContours={optics.pauseContours} />
+        <HeroSection />
 
         <AboutSection />
 

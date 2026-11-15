@@ -1,13 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Glass, TabBar } from 'glisse';
-import type { GlassOpticsSettings } from '../../types/portfolio';
-import { GlassOpticsHud } from './GlassOpticsHud';
-
-export interface NavbarProps {
-  optics: GlassOpticsSettings;
-  onOpticsChange: (next: GlassOpticsSettings) => void;
-  onOpticsReset: () => void;
-}
 
 const NAV_ITEMS = [
   { value: 'home', label: 'Home' },
@@ -23,11 +15,7 @@ function prefersReducedMotion(): boolean {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
-export function Navbar({
-  optics,
-  onOpticsChange,
-  onOpticsReset,
-}: NavbarProps) {
+export function Navbar() {
   const [activeSection, setActiveSection] = useState<NavSectionId>('home');
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -200,12 +188,6 @@ export function Navbar({
               onValueChange={navigateToSection}
             />
           </div>
-
-          <GlassOpticsHud
-            settings={optics}
-            onChange={onOpticsChange}
-            onReset={onOpticsReset}
-          />
 
           <button
             ref={toggleRef}

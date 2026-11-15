@@ -6,10 +6,7 @@ import { AboutSection } from '../components/about/AboutSection';
 import { HeroSection } from '../components/hero/HeroSection';
 import { TopoCanvas } from '../components/hero/TopoCanvas';
 import { Footer } from '../components/layout/Footer';
-import { GlassOpticsHud } from '../components/layout/GlassOpticsHud';
 import { Navbar } from '../components/layout/Navbar';
-import { DEFAULT_GLASS_OPTICS } from '../data/portfolioData';
-import type { GlassOpticsSettings } from '../types/portfolio';
 
 describe('M2: Navbar & Skip-to-Content (F5)', () => {
   afterEach(() => {
@@ -50,13 +47,7 @@ describe('M2: Navbar & Skip-to-Content (F5)', () => {
   });
 
   it('supports keyboard Arrow, Home, and End navigation on nav drawer links and scroll state', () => {
-    const { container } = render(
-      <Navbar
-        optics={DEFAULT_GLASS_OPTICS}
-        onOpticsChange={vi.fn()}
-        onOpticsReset={vi.fn()}
-      />
-    );
+    const { container } = render(<Navbar />);
 
     const drawer = container.querySelector('#mobile-nav-drawer') as HTMLElement;
     const links = Array.from(drawer.querySelectorAll('a'));
@@ -80,118 +71,6 @@ describe('M2: Navbar & Skip-to-Content (F5)', () => {
     Object.defineProperty(window, 'scrollY', { value: 60, configurable: true });
     fireEvent.scroll(window);
     expect(container.querySelector('#navbar')).toHaveClass('scrolled');
-  });
-});
-
-describe('M2: GlassOpticsHud (F6)', () => {
-  afterEach(() => {
-    vi.restoreAllMocks();
-    document.documentElement.style.removeProperty('--lg-blur');
-    document.documentElement.style.removeProperty('--lg-glass-bend');
-    document.documentElement.style.removeProperty('--lg-glass-dispersion');
-  });
-
-  it('opens popover, updates sliders and CSS variables, toggles Switch, and applies Menu presets/reset', () => {
-    function Harness() {
-      const [settings, setSettings] =
-        React.useState<GlassOpticsSettings>(DEFAULT_GLASS_OPTICS);
-      return (
-        <GlassOpticsHud
-          settings={settings}
-          onChange={setSettings}
-          onReset={() => setSettings(DEFAULT_GLASS_OPTICS)}
-        />
-      );
-    }
-
-    render(<Harness />);
-
-    const trigger = screen.getByRole('button', {
-      name: 'Liquid Glass Optics HUD',
-    });
-    expect(trigger).toHaveAttribute('aria-expanded', 'false');
-
-    fireEvent.click(trigger);
-    expect(trigger).toHaveAttribute('aria-expanded', 'true');
-    expect(
-      screen.getByRole('dialog', { name: 'Liquid Glass Optics' })
-    ).toBeInTheDocument();
-
-    const blurSlider = screen.getByLabelText('Blur');
-    fireEvent.change(blurSlider, { target: { value: '20' } });
-    expect(document.documentElement.style.getPropertyValue('--lg-blur')).toBe(
-      '20px'
-    );
-
-    const bendSlider = screen.getByLabelText('Glass Bend');
-    fireEvent.change(bendSlider, { target: { value: '2.4' } });
-    expect(
-      document.documentElement.style.getPropertyValue('--lg-glass-bend')
-    ).toBe('2.4');
-
-    const dispersionSlider = screen.getByLabelText('Dispersion');
-    fireEvent.change(dispersionSlider, { target: { value: '1.1' } });
-    expect(
-      document.documentElement.style.getPropertyValue('--lg-glass-dispersion')
-    ).toBe('1.1');
-
-    const pauseSwitch = screen.getByRole('switch', { name: 'Pause Contours' });
-    expect(pauseSwitch).toHaveAttribute('aria-checked', 'false');
-    fireEvent.click(pauseSwitch);
-    expect(pauseSwitch).toHaveAttribute('aria-checked', 'true');
-
-    const presetsMenuBtn = screen.getByRole('button', {
-      name: 'Optics presets',
-    });
-    fireEvent.click(presetsMenuBtn);
-
-    const highRefractionItem = screen.getByText('High Refraction');
-    fireEvent.click(highRefractionItem);
-    expect(document.documentElement.style.getPropertyValue('--lg-blur')).toBe(
-      '22px'
-    );
-    expect(
-      document.documentElement.style.getPropertyValue('--lg-glass-bend')
-    ).toBe('2.6');
-    expect(
-      document.documentElement.style.getPropertyValue('--lg-glass-dispersion')
-    ).toBe('1.2');
-
-    fireEvent.click(presetsMenuBtn);
-    const resetItem = screen.getByText('Reset Optics');
-    fireEvent.click(resetItem);
-    expect(document.documentElement.style.getPropertyValue('--lg-blur')).toBe(
-      '14px'
-    );
-
-    fireEvent.keyDown(document, { key: 'Escape' });
-    expect(trigger).toHaveAttribute('aria-expanded', 'false');
-    expect(document.activeElement).toBe(trigger);
-  });
-
-  it('does not steal focus from GlassOpticsHud sliders to nav-tabbar on Arrow/Home/End keys', () => {
-    const { container } = render(
-      <Navbar
-        optics={DEFAULT_GLASS_OPTICS}
-        onOpticsChange={vi.fn()}
-        onOpticsReset={vi.fn()}
-      />
-    );
-
-    const trigger = screen.getByRole('button', {
-      name: 'Liquid Glass Optics HUD',
-    });
-    fireEvent.click(trigger);
-
-    const blurSlider = screen.getByLabelText('Blur');
-    blurSlider.focus();
-    expect(document.activeElement).toBe(blurSlider);
-
-    for (const key of ['ArrowRight', 'ArrowLeft', 'Home', 'End']) {
-      fireEvent.keyDown(blurSlider, { key });
-      expect(document.activeElement).toBe(blurSlider);
-      expect(container.querySelector('.nav-tabbar')?.contains(document.activeElement)).toBe(false);
-    }
   });
 });
 
