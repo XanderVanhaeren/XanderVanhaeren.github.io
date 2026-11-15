@@ -58,7 +58,7 @@
     --radius-pill: 9999px;
 
     --max-width: 1160px;
-    --nav-height: 68px;
+    --nav-height: 80px;
 
     /* glisse@0.6.0 Liquid Glass Tokens harmonized with Aerospace Dark Theme */
     --lg-foreground: #F2F5F8;
@@ -85,11 +85,13 @@
     --lg-on: #3A95D8;
     --lg-fill: #3A95D8;
     --lg-ring: rgba(94, 176, 236, 0.65);
-    --lg-lens-shine: 1;
-    --lg-rim-shine: 0.18;
-    --lg-blur: 14px;
-    --lg-glass-bend: 1.6;
-    --lg-glass-dispersion: 0.6;
+    --lg-lens-shine: 0;
+    --lg-rim-shine: 0;
+    --lg-blur: 8px;
+    --lg-glass-bend: 0.8;
+    --lg-glass-dispersion: 1.6;
+    --lg-lens-grow-x: 12px;
+    --lg-lens-grow-y: 8px
 }
 
 html {
