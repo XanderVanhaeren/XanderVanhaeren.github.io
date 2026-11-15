@@ -48,22 +48,14 @@ export function Navbar({
   }, []);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 24);
-    };
-    handleScroll();
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  useEffect(() => {
     const sections = NAV_ITEMS.map((item) =>
       document.getElementById(item.value)
     ).filter((el): el is HTMLElement => el !== null);
 
-    if (sections.length === 0) return;
+    const updateFromScroll = () => {
+      setScrolled(window.scrollY > 24);
+      if (sections.length === 0) return;
 
-    const updateActiveSectionFromScroll = () => {
       const docHeight = document.documentElement.scrollHeight;
       const viewportHeight = window.innerHeight;
       if (
@@ -86,27 +78,38 @@ export function Navbar({
       setActiveSection(current);
     };
 
-    updateActiveSectionFromScroll();
-    window.addEventListener('scroll', updateActiveSectionFromScroll, {
-      passive: true,
-    });
+    let rafId: number | null = null;
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 24);
+      if (rafId !== null) return;
+      rafId = window.requestAnimationFrame(() => {
+        rafId = null;
+        updateFromScroll();
+      });
+    };
+
+    updateFromScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
 
     let observer: IntersectionObserver | undefined;
-    if (typeof IntersectionObserver !== 'undefined') {
+    if (typeof IntersectionObserver !== 'undefined' && sections.length > 0) {
       observer = new IntersectionObserver(
         () => {
-          updateActiveSectionFromScroll();
+          handleScroll();
         },
         {
           rootMargin: '-25% 0px -55% 0px',
-          threshold: [0, 0.1, 0.25, 0.5, 0.75],
+          threshold: [0, 0.25, 0.5],
         }
       );
       sections.forEach((section) => observer!.observe(section));
     }
 
     return () => {
-      window.removeEventListener('scroll', updateActiveSectionFromScroll);
+      window.removeEventListener('scroll', handleScroll);
+      if (rafId !== null) {
+        window.cancelAnimationFrame(rafId);
+      }
       observer?.disconnect();
     };
   }, []);

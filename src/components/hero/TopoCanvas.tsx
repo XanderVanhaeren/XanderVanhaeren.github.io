@@ -5,7 +5,8 @@ export interface TopoCanvasProps {
 }
 
 const CONTOUR_LEVELS = 14;
-const CELL_SIZE = 16;
+const CELL_SIZE = 22;
+const FRAME_INTERVAL_MS = 1000 / 30;
 
 function lerpIso(a: number, b: number, iso: number): number {
   const denom = b - a;
@@ -229,7 +230,7 @@ export function TopoCanvas({ paused = false }: TopoCanvasProps) {
       const rect = canvas.getBoundingClientRect();
       width = rect.width > 0 ? rect.width : 800;
       height = rect.height > 0 ? rect.height : 500;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -259,15 +260,18 @@ export function TopoCanvas({ paused = false }: TopoCanvasProps) {
       if (lastTimestamp === 0) {
         lastTimestamp = timestamp;
       }
-      const dt = Math.min((timestamp - lastTimestamp) / 1000, 0.05);
-      lastTimestamp = timestamp;
-      time += dt;
+      const elapsed = timestamp - lastTimestamp;
+      if (elapsed >= FRAME_INTERVAL_MS) {
+        const dt = Math.min(elapsed / 1000, 0.05);
+        lastTimestamp = timestamp;
+        time += dt;
 
-      pointer.x += (pointer.targetX - pointer.x) * 0.12;
-      pointer.y += (pointer.targetY - pointer.y) * 0.12;
-      pointer.strength += (pointer.targetStrength - pointer.strength) * 0.12;
+        pointer.x += (pointer.targetX - pointer.x) * 0.16;
+        pointer.y += (pointer.targetY - pointer.y) * 0.16;
+        pointer.strength += (pointer.targetStrength - pointer.strength) * 0.16;
 
-      renderFrame();
+        renderFrame();
+      }
       animationFrameId = window.requestAnimationFrame(tick);
     };
 

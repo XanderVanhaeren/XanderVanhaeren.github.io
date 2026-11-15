@@ -670,6 +670,17 @@ button {
     border-radius: var(--radius-lg);
 }
 
+.education-item.lg-glass,
+.interests-card.lg-glass,
+.project-card.lg-glass,
+.proof-slot.lg-glass,
+.skill-category.lg-glass,
+.filter-empty.lg-glass {
+    -webkit-backdrop-filter: blur(10px) saturate(1.4);
+    backdrop-filter: blur(10px) saturate(1.4);
+    contain: layout style;
+}
+
 /* ===== About ===== */
 .about-grid {
     display: grid;
