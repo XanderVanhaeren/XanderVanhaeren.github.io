@@ -669,8 +669,8 @@ button {
 .proof-slot.lg-glass,
 .skill-category.lg-glass,
 .filter-empty.lg-glass {
-    -webkit-backdrop-filter: blur(10px) saturate(1.4);
-    backdrop-filter: blur(10px) saturate(1.4);
+    -webkit-backdrop-filter: blur(var(--lg-blur, 10px)) saturate(1.4);
+    backdrop-filter: blur(var(--lg-blur, 10px)) saturate(1.4);
     contain: layout style;
 }
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { AboutSection } from './components/about/AboutSection';
 import { HeroSection } from './components/hero/HeroSection';
 import { Footer } from './components/layout/Footer';
@@ -32,9 +32,19 @@ export default function App() {
     'projects/typhoon.html'
   );
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     syncGlassOpticsCssVars(optics);
   }, [optics]);
+
+  const handleOpticsChange = (next: GlassOpticsSettings) => {
+    syncGlassOpticsCssVars(next);
+    setOptics(next);
+  };
+
+  const handleOpticsReset = () => {
+    syncGlassOpticsCssVars(DEFAULT_GLASS_OPTICS);
+    setOptics(DEFAULT_GLASS_OPTICS);
+  };
 
   useEffect(() => {
     let active = true;
@@ -95,8 +105,8 @@ export default function App() {
 
       <Navbar
         optics={optics}
-        onOpticsChange={setOptics}
-        onOpticsReset={() => setOptics(DEFAULT_GLASS_OPTICS)}
+        onOpticsChange={handleOpticsChange}
+        onOpticsReset={handleOpticsReset}
       />
 
       <main id="main">
