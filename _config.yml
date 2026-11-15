@@ -1,0 +1,5 @@
+# GitHub Pages (Jekyll) settings: keep design sources and editor files off the live site
+exclude:
+  - assets/Affinity
+  - README.md
+  - .idea

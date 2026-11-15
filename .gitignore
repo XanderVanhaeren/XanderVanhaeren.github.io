@@ -1,0 +1,13 @@
+.idea
+.agents
+.agents/
+node_modules
+node_modules/
+dist
+dist/
+coverage
+coverage/
+playwright-report
+playwright-report/
+test-results
+test-results/
