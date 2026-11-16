@@ -21,6 +21,7 @@ export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const toggleRef = useRef<HTMLButtonElement | null>(null);
   const drawerRef = useRef<HTMLUListElement | null>(null);
+  const tabBarWrapperRef = useRef<HTMLDivElement | null>(null);
 
   const navigateToSection = useCallback((sectionId: string) => {
     const valid = NAV_ITEMS.find((item) => item.value === sectionId);
@@ -116,6 +117,89 @@ export function Navbar() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [mobileOpen]);
 
+  useEffect(() => {
+    const wrapper = tabBarWrapperRef.current;
+    if (!wrapper) return;
+
+    let pending: {
+      id: number;
+      x: number;
+      y: number;
+      pointerType: string;
+      target: EventTarget;
+    } | null = null;
+    let bypassing = false;
+
+    const clearPending = (event?: PointerEvent) => {
+      if (!pending) return;
+      if (event && event.pointerId !== pending.id) return;
+      pending = null;
+    };
+
+    const onBlur = () => {
+      pending = null;
+    };
+
+    const onPointerDownCapture = (event: PointerEvent) => {
+      if (bypassing || !event.isTrusted) return;
+      if (!event.isPrimary || event.button !== 0) return;
+      if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const target = event.target;
+      if (!(target instanceof Element) || !target.closest('.lg-tab')) return;
+
+      pending = {
+        id: event.pointerId,
+        x: event.clientX,
+        y: event.clientY,
+        pointerType: event.pointerType,
+        target,
+      };
+      event.stopPropagation();
+    };
+
+    const onPointerMoveCapture = (event: PointerEvent) => {
+      if (!pending || event.pointerId !== pending.id) return;
+      if (Math.abs(event.clientX - pending.x) <= 6) return;
+
+      const info = pending;
+      pending = null;
+      if (typeof PointerEvent !== 'function') return;
+
+      bypassing = true;
+      try {
+        info.target.dispatchEvent(
+          new PointerEvent('pointerdown', {
+            bubbles: true,
+            cancelable: true,
+            pointerId: info.id,
+            pointerType: info.pointerType,
+            isPrimary: true,
+            button: 0,
+            buttons: 1,
+            clientX: info.x,
+            clientY: info.y,
+          })
+        );
+      } finally {
+        bypassing = false;
+      }
+    };
+
+    wrapper.addEventListener('pointerdown', onPointerDownCapture, { capture: true });
+    window.addEventListener('pointermove', onPointerMoveCapture, { capture: true });
+    window.addEventListener('pointerup', clearPending, { capture: true });
+    window.addEventListener('pointercancel', clearPending, { capture: true });
+    window.addEventListener('blur', onBlur);
+
+    return () => {
+      wrapper.removeEventListener('pointerdown', onPointerDownCapture, { capture: true });
+      window.removeEventListener('pointermove', onPointerMoveCapture, { capture: true });
+      window.removeEventListener('pointerup', clearPending, { capture: true });
+      window.removeEventListener('pointercancel', clearPending, { capture: true });
+      window.removeEventListener('blur', onBlur);
+    };
+  }, []);
+
   const handleNavKeyDown = (
     event: React.KeyboardEvent<HTMLElement>,
     selector: string
@@ -172,6 +256,7 @@ export function Navbar() {
 
       <nav className="nav-actions" aria-label="Primary">
         <div
+          ref={tabBarWrapperRef}
           onKeyDown={(e) => handleNavKeyDown(e, '[role="tab"], button')}
         >
           <TabBar

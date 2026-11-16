@@ -69,9 +69,6 @@ export function SkillsSection({ skillsData }: SkillsSectionProps) {
               {skillsSection.title}
             </h2>
           </div>
-          <p className="section-subtitle">
-            Synced from <code>assets/data/skills.csv</code>.
-          </p>
         </div>
 
         <div className="section-toolbar">

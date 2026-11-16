@@ -15,7 +15,6 @@ export function AboutSection() {
               {about.name}
             </h2>
           </div>
-          <p className="section-subtitle">{about.subtitle}</p>
         </div>
 
         <div className="about-grid">

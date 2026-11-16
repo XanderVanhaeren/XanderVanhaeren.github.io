@@ -69,7 +69,6 @@ export function ProjectsSection({
               {projectsSection.title}
             </h2>
           </div>
-          <p className="section-subtitle">{projectsSection.subtitle}</p>
         </div>
 
         <div className="section-toolbar">

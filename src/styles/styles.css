@@ -12,25 +12,24 @@
     --bg-surface: #2b2b2b;                   /* Secondary solid surface */
 
     /* ===== Translucent Panel & Card Surfaces ===== */
-    --surface-nav: rgba(11, 13, 17, 0.35);           /* Top navbar background before scrolling */
-    --surface-card: rgba(18, 22, 30, 0.52);          /* Project, skill, about, approach, and education cards */
-    --surface-elevated: rgba(14, 18, 25, 0.68);      /* Hero fieldnotes card, secondary buttons, and article topbar */
-    --surface-overlay: rgba(14, 18, 25, 0.86);       /* Scrolled navbar, Optics HUD popover, modals, and mobile nav drawer */
-    --scrim-backdrop: rgba(4, 6, 10, 0.72);          /* Full-screen backdrop behind open project modals */
-    --media-well-bg: rgba(0, 0, 0, 0.24);            /* Dark backing behind project images, diagrams, and article figures */
+    --surface-nav: #1b1b1baa;           /* Top navbar background before scrolling */
+    --surface-card: #2b2b2b88;          /* Project, skill, about, approach, and education cards */
+    --surface-elevated: #2b2b2bbb;      /* Hero fieldnotes card, secondary buttons, and article topbar */
+    --surface-overlay: #1b1b1baa;       /* Scrolled navbar, Optics HUD popover, modals, and mobile nav drawer */
+    --scrim-backdrop: #1b1b1bcc;          /* Full-screen backdrop behind open project modals */
+    --media-well-bg: #121212aa;            /* Dark backing behind project images, diagrams, and article figures */
 
     /* ===== Liquid Glass Fills, Borders & Highlights ===== */
     --glass-bg-subtle: rgba(255, 255, 255, 0.03);    /* Subtle pill/tag fills (eyebrow, coordinates, interests, subgallery) */
     --glass-bg: rgba(255, 255, 255, 0.045);          /* Standard glass container fill (nav pill bar, article specs, close button) */
     --glass-bg-hover: rgba(255, 255, 255, 0.075);    /* Hover fill for glass links, secondary buttons, and clickable cards */
     --border-subtle: rgba(255, 255, 255, 0.07);      /* Quiet section dividers, card borders, and list row separators */
-    --glass-border: rgba(255, 255, 255, 0.1);        /* Standard glass border (navbar, modals, figures, footer) */
-    --glass-border-strong: rgba(255, 255, 255, 0.18);/* Emphasized borders on hover, popovers, and primary buttons */
-    --specular-highlight: rgba(255, 255, 255, 0.14); /* Top-edge inner glass highlight and inactive skill dots */
-    --specular-strong: rgba(255, 255, 255, 0.24);    /* Brighter top-edge highlight on primary CTA buttons */
+    --glass-border: rgba(255, 255, 255, 0.05);        /* Standard glass border (navbar, modals, figures, footer) */
+    --glass-border-strong: rgba(255, 255, 255, 0.1);/* Emphasized borders on hover, popovers, and primary buttons */
+    --specular-highlight: rgba(255, 255, 255, 0.1); /* Top-edge inner glass highlight and inactive skill dots */
+    --specular-strong: rgba(255, 255, 255, 0.2);    /* Brighter top-edge highlight on primary CTA buttons */
     --glass-specular: inset 0 1px 0 var(--specular-highlight);
     --glass-blur: blur(8px) saturate(100%);
-    --ease: cubic-bezier(0.22, 1, 0.36, 1);
 
     /* ===== Shadows & Canvas Masks ===== */
     --shadow-sm: rgba(0, 0, 0, 0.25);                /* Subtle drop shadow (scrolled navbar, glisse controls) */
@@ -43,7 +42,7 @@
     --text-primary: #f1f1f1;                 /* Headings, primary body values, and active nav links */
     --text-secondary: #a1a1a1;               /* Descriptions, paragraphs, and default nav links */
     --text-muted: #818181;                   /* Kickers, labels, tags, captions, and footer metadata */
-    --text-on-accent: #ffffff;               /* Text on solid accent buttons and skip-to-content link */
+    --text-on-accent: #f1f1f1;               /* Text on solid accent buttons and skip-to-content link */
 
     /* ===== Accent Colors — Aerospace Blue ===== */
     --accent: #3a9ada;                       /* Primary brand accent (glisse active switches, sliders) */
@@ -114,8 +113,8 @@
     --lg-blur: 8px;
     --lg-glass-bend: 0.8;
     --lg-glass-dispersion: 1.6;
-    --lg-lens-grow-x: 10px;
-    --lg-lens-grow-y: 6px;
+    --lg-lens-grow-x: 8px;
+    --lg-lens-grow-y: 4px;
 }
 
 html {
@@ -137,7 +136,6 @@ body {
 a {
     text-decoration: none;
     color: inherit;
-    transition: color 0.22s var(--ease), border-color 0.22s var(--ease), background-color 0.22s var(--ease);
 }
 
 ul, ol {
@@ -228,18 +226,6 @@ button {
     color: var(--text-primary);
 }
 
-.section-subtitle {
-    max-width: 420px;
-    font-size: var(--text-sm);
-    color: var(--text-muted);
-    line-height: 1.6;
-}
-
-.section-subtitle code {
-    font-family: var(--font-mono);
-    font-size: 0.8em;
-    color: var(--text-secondary);
-}
 
 /* ===== Navigation (Floating Liquid Glass) ===== */
 .navbar {
@@ -258,10 +244,6 @@ button {
     -webkit-backdrop-filter: blur(var(--lg-blur, 22px)) var(--lg-filter, saturate(180%));
     border-bottom: 1px solid var(--border-subtle);
     box-shadow: none;
-    transition:
-        background-color 0.38s var(--ease),
-        border-color 0.38s var(--ease),
-        box-shadow 0.38s var(--ease);
 }
 
 .navbar.scrolled {
@@ -277,7 +259,6 @@ button {
     letter-spacing: -0.035em;
     line-height: 1;
     color: var(--text-primary);
-    transition: color 0.22s var(--ease);
 }
 
 .logo-accent {
@@ -306,22 +287,6 @@ button {
     box-shadow: var(--glass-specular);
 }
 
-.nav-indicator {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: 0;
-    pointer-events: none;
-    border-radius: var(--radius-pill);
-    background-color: var(--accent-soft);
-    box-shadow: inset 0 0 0 1px var(--accent-border), inset 0 1px 0 var(--specular-highlight);
-    transition:
-        transform 0.38s var(--ease),
-        width 0.38s var(--ease),
-        height 0.38s var(--ease);
-    will-change: transform, width;
-}
-
 .nav-links a {
     position: relative;
     z-index: 1;
@@ -331,10 +296,6 @@ button {
     color: var(--text-secondary);
     padding: 7px 14px;
     border-radius: var(--radius-pill);
-    transition:
-        color 0.22s var(--ease),
-        background-color 0.22s var(--ease),
-        box-shadow 0.22s var(--ease);
 }
 
 .nav-links a:hover {
@@ -373,7 +334,6 @@ button {
     height: 1.5px;
     background-color: var(--text-primary);
     border-radius: 2px;
-    transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
 .nav-toggle[aria-expanded="true"] span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
@@ -640,11 +600,6 @@ button {
     cursor: pointer;
     backdrop-filter: blur(var(--lg-blur, 22px)) var(--lg-filter, saturate(180%));
     -webkit-backdrop-filter: blur(var(--lg-blur, 22px)) var(--lg-filter, saturate(180%));
-    transition: background-color 0.22s var(--ease), border-color 0.22s var(--ease), transform 0.16s var(--ease);
-}
-
-.btn:active {
-    transform: scale(0.98);
 }
 
 .btn-primary {
@@ -847,6 +802,14 @@ button {
     border-radius: var(--radius-pill);
 }
 
+.lg-input-clear:hover {
+    background-color: color-mix(in srgb, var(--lg-destructive) 22%, transparent);
+    box-shadow:
+        inset 0 0 0 1px color-mix(in srgb, var(--lg-destructive) 45%, transparent),
+        inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    color: var(--lg-destructive);
+}
+
 @media (max-width: 640px) {
     .section-toolbar {
         flex-direction: column;
@@ -878,7 +841,6 @@ button {
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    transition: border-color 0.22s var(--ease), background-color 0.22s var(--ease), transform 0.16s var(--ease);
 }
 
 .project-card.is-featured {
@@ -894,10 +856,6 @@ button {
 .project-card.is-clickable:hover {
     background-color: var(--glass-bg-hover);
     border-color: var(--glass-border-strong);
-}
-
-.project-card.is-clickable:active {
-    transform: scale(0.996);
 }
 
 .project-showcase {
@@ -1264,13 +1222,13 @@ button {
     cursor: pointer;
     display: grid;
     place-items: center;
-    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
 .project-modal-close:hover {
-    background-color: var(--accent-soft);
-    border-color: var(--accent-border);
-    color: var(--text-primary);
+    background-color: color-mix(in srgb, var(--lg-destructive) 22%, transparent);
+    border-color: color-mix(in srgb, var(--lg-destructive) 45%, transparent);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    color: var(--lg-destructive);
 }
 
 .project-modal-body {
@@ -1584,10 +1542,5 @@ button {
     *, *::before, *::after {
         animation-duration: 0.01ms !important;
         transition-duration: 0.01ms !important;
-    }
-
-    .btn:hover,
-    .project-card.is-clickable:hover {
-        transform: none;
     }
 }
