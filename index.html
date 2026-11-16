@@ -6,7 +6,18 @@
     <title>Xander Vanhaeren — Engineering Student & Aerospace Portfolio</title>
     <meta name="description" content="Portfolio of Xander Vanhaeren, engineering student at KU Leuven focused on aerospace: aerodynamics, flight dynamics, CAD, embedded systems and RC aircraft projects.">
     <meta name="author" content="Xander Vanhaeren">
-    <meta name="theme-color" content="#0B0D10">
+    <meta name="theme-color" content="#1b1b1b">
+    <script>
+        try {
+            var savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light' || savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                document.documentElement.style.colorScheme = savedTheme;
+                var metaTheme = document.querySelector('meta[name="theme-color"]');
+                if (metaTheme) metaTheme.setAttribute('content', savedTheme === 'light' ? '#f5f7fa' : '#1b1b1b');
+            }
+        } catch (e) {}
+    </script>
     <link rel="canonical" href="https://xandervanhaeren.github.io/">
 
     <!-- Social previews -->

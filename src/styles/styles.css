@@ -115,6 +115,112 @@
     --lg-glass-dispersion: 1.6;
     --lg-lens-grow-x: 8px;
     --lg-lens-grow-y: 4px;
+
+    /* ===== Skill Dots & Diagram Tokens ===== */
+    --dot-inactive: var(--specular-highlight);
+    --diagram-grid: rgba(255, 255, 255, 0.05);
+    --diagram-line: rgba(255, 255, 255, 0.22);
+    --diagram-line-strong: rgba(255, 255, 255, 0.28);
+    --diagram-contour: rgba(255, 255, 255, 0.14);
+    --diagram-surface: rgba(12, 16, 23, 0.55);
+    --diagram-surface-alt: rgba(255, 255, 255, 0.04);
+    --diagram-text: rgba(255, 255, 255, 0.62);
+    --diagram-accent: #5eb0ec;
+    --diagram-accent-soft: rgba(94, 176, 236, 0.24);
+    --diagram-accent-mid: rgba(94, 176, 236, 0.26);
+    --diagram-accent-strong: rgba(94, 176, 236, 0.55);
+    --diagram-accent-fade: rgba(94, 176, 236, 0.02);
+    --diagram-node-stroke: #0c1017;
+}
+
+[data-theme="light"] {
+    /* ===== Base Backgrounds ===== */
+    --bg-primary: #f5f7fa;
+    --bg-surface: #ffffff;
+
+    /* ===== Translucent Panel & Card Surfaces ===== */
+    --surface-nav: rgba(245, 247, 250, 0.8);
+    --surface-card: rgba(255, 255, 255, 0.74);
+    --surface-elevated: rgba(255, 255, 255, 0.88);
+    --surface-overlay: rgba(248, 250, 252, 0.9);
+    --scrim-backdrop: rgba(15, 23, 42, 0.36);
+    --media-well-bg: #edf2f7;
+
+    /* ===== Liquid Glass Fills, Borders & Highlights ===== */
+    --glass-bg-subtle: rgba(15, 23, 42, 0.035);
+    --glass-bg: rgba(255, 255, 255, 0.68);
+    --glass-bg-hover: rgba(15, 23, 42, 0.06);
+    --border-subtle: rgba(15, 23, 42, 0.08);
+    --glass-border: rgba(15, 23, 42, 0.09);
+    --glass-border-strong: rgba(15, 23, 42, 0.16);
+    --specular-highlight: rgba(255, 255, 255, 0.85);
+    --specular-strong: rgba(255, 255, 255, 0.95);
+    --glass-specular: inset 0 1px 0 var(--specular-highlight);
+
+    /* ===== Shadows & Canvas Masks ===== */
+    --shadow-sm: rgba(15, 23, 42, 0.07);
+    --shadow-lg: rgba(15, 23, 42, 0.16);
+
+    /* ===== Text Colors (all >= 4.5:1 on --bg-primary) ===== */
+    --text-primary: #111827;
+    --text-secondary: #475569;
+    --text-muted: #596577;
+    --text-on-accent: #ffffff;
+
+    /* ===== Accent Colors — Aerospace Blue ===== */
+    --accent: #1d7ac2;
+    --accent-light: #186fb3;
+    --accent-soft: rgba(29, 122, 194, 0.14);
+    --accent-tint: rgba(29, 122, 194, 0.08);
+    --accent-border: rgba(29, 122, 194, 0.28);
+    --accent-btn: #1d7ac2;
+    --accent-btn-hover: #1765a3;
+    --accent-glow: rgba(29, 122, 194, 0.28);
+    --destructive: #dc2626;
+
+    /* ===== glisse@0.6.0 Liquid Glass Tokens ===== */
+    --lg-foreground: var(--text-primary);
+    --lg-muted: var(--text-muted);
+    --lg-glass: rgba(255, 255, 255, 0.64);
+    --lg-glass-active: rgba(235, 240, 246, 0.88);
+    --lg-edge: var(--glass-border);
+    --lg-drop: var(--shadow-sm);
+    --lg-selection: var(--accent-soft);
+    --lg-lens: var(--accent-tint);
+    --lg-lens-drop: rgba(15, 23, 42, 0.12);
+    --lg-segment-track: rgba(15, 23, 42, 0.06);
+    --lg-segment-thumb: rgba(255, 255, 255, 0.94);
+    --lg-segment-label: var(--text-primary);
+    --lg-segment-lens: rgba(255, 255, 255, 0.45);
+    --lg-surface: rgba(250, 251, 253, 0.9);
+    --lg-surface-edge: rgba(15, 23, 42, 0.1);
+    --lg-shadow: var(--shadow-lg);
+    --lg-highlight: rgba(15, 23, 42, 0.06);
+    --lg-separator: var(--border-subtle);
+    --lg-destructive: var(--destructive);
+    --lg-track: rgba(15, 23, 42, 0.18);
+    --lg-rail: rgba(15, 23, 42, 0.1);
+    --lg-on: var(--accent);
+    --lg-fill: var(--accent);
+    --lg-ring: rgba(29, 122, 194, 0.55);
+    --lg-lens-shine: -1.2;
+    --lg-rim-shine: 0.25;
+
+    /* ===== Skill Dots & Diagram Tokens ===== */
+    --dot-inactive: rgba(15, 23, 42, 0.12);
+    --diagram-grid: rgba(15, 23, 42, 0.06);
+    --diagram-line: rgba(15, 23, 42, 0.2);
+    --diagram-line-strong: rgba(15, 23, 42, 0.28);
+    --diagram-contour: rgba(15, 23, 42, 0.14);
+    --diagram-surface: rgba(255, 255, 255, 0.85);
+    --diagram-surface-alt: rgba(15, 23, 42, 0.035);
+    --diagram-text: rgba(15, 23, 42, 0.62);
+    --diagram-accent: #186fb3;
+    --diagram-accent-soft: rgba(24, 111, 179, 0.18);
+    --diagram-accent-mid: rgba(24, 111, 179, 0.24);
+    --diagram-accent-strong: rgba(24, 111, 179, 0.52);
+    --diagram-accent-fade: rgba(24, 111, 179, 0.03);
+    --diagram-node-stroke: #ffffff;
 }
 
 html {
@@ -269,6 +375,69 @@ button {
     display: flex;
     align-items: center;
     gap: var(--space-3);
+}
+
+/* ===== Sun / Moon Theme Switch ===== */
+.theme-switch {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 74px;
+    height: 42px;
+    padding: 4px;
+    border-radius: var(--radius-pill);
+    background-color: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-specular);
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.theme-switch:hover {
+    background-color: var(--glass-bg-hover);
+    border-color: var(--glass-border-strong);
+}
+
+.theme-switch-thumb {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-pill);
+    background-color: var(--accent-soft);
+    box-shadow: inset 0 0 0 1px var(--accent-border), inset 0 1px 0 var(--specular-highlight);
+    pointer-events: none;
+    transform: translateX(0);
+    transition:
+        transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+        background-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.theme-switch[data-theme-mode="dark"] .theme-switch-thumb {
+    transform: translateX(32px);
+}
+
+.theme-switch-icon {
+    position: relative;
+    z-index: 1;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    color: var(--text-muted);
+    transition: color 0.2s ease, transform 0.25s ease;
+}
+
+.theme-switch-icon.is-active {
+    color: var(--accent-light);
+}
+
+.theme-switch:hover .theme-switch-icon:not(.is-active) {
+    color: var(--text-secondary);
 }
 
 .nav-tabbar.lg-tab-bar {
@@ -1253,6 +1422,13 @@ button {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: var(--space-4);
+}
+
+.article-topbar-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
 }
 
 .article-standalone {

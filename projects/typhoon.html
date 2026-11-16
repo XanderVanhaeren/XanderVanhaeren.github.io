@@ -6,7 +6,18 @@
     <title>Project Typhoon — Xander Vanhaeren</title>
     <meta name="description" content="Project Typhoon: custom 3D-printed delta-wing RC jet, SolidWorks CFD validation, and ESP32-C6 flight controller studying how airfoil choice affects maneuverability.">
     <meta name="author" content="Xander Vanhaeren">
-    <meta name="theme-color" content="#0B0D10">
+    <meta name="theme-color" content="#1b1b1b">
+    <script>
+        try {
+            var savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light' || savedTheme === 'dark') {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+                document.documentElement.style.colorScheme = savedTheme;
+                var metaTheme = document.querySelector('meta[name="theme-color"]');
+                if (metaTheme) metaTheme.setAttribute('content', savedTheme === 'light' ? '#f5f7fa' : '#1b1b1b');
+            }
+        } catch (e) {}
+    </script>
     <link rel="canonical" href="https://xandervanhaeren.github.io/projects/typhoon.html">
 
     <meta property="og:type" content="article">

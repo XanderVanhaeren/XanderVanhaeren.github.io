@@ -2,10 +2,12 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import 'glisse/styles.css';
 import './styles/styles.css';
+import { ThemeSwitch } from './components/layout/ThemeSwitch';
 import { TyphoonArticle } from './components/projects/TyphoonArticle';
 import { PERSONAL_DATA } from './data/portfolioData';
+import { applyTheme, getInitialTheme } from './utils/theme';
 
-document.documentElement.setAttribute('data-theme', 'dark');
+applyTheme(getInitialTheme(), false);
 
 export function TyphoonStandalonePage() {
   return (
@@ -15,9 +17,12 @@ export function TyphoonStandalonePage() {
           <a href="../index.html#projects" className="article-back">
             ← Back to Portfolio
           </a>
-          <a href="../index.html" className="logo" aria-label="Xander Vanhaeren home">
-            XV<span className="logo-accent">.</span>
-          </a>
+          <div className="article-topbar-actions">
+            <ThemeSwitch />
+            <a href="../index.html" className="logo" aria-label="Xander Vanhaeren home">
+              XV<span className="logo-accent">.</span>
+            </a>
+          </div>
         </div>
       </header>
 

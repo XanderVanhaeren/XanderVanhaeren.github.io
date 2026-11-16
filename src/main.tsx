@@ -3,8 +3,9 @@ import ReactDOM from 'react-dom/client';
 import 'glisse/styles.css';
 import './styles/styles.css';
 import App from './App';
+import { applyTheme, getInitialTheme } from './utils/theme';
 
-document.documentElement.setAttribute('data-theme', 'dark');
+applyTheme(getInitialTheme(), false);
 
 const rootElement = document.getElementById('root');
 if (rootElement) {

@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { TabBar } from 'glisse';
+import { ThemeSwitch } from './ThemeSwitch';
 
 const NAV_ITEMS = [
   { value: 'home', label: 'Home' },
@@ -255,6 +256,8 @@ export function Navbar() {
       </a>
 
       <nav className="nav-actions" aria-label="Primary">
+        <ThemeSwitch />
+
         <div
           ref={tabBarWrapperRef}
           onKeyDown={(e) => handleNavKeyDown(e, '[role="tab"], button')}

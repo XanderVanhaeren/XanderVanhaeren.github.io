@@ -62,7 +62,8 @@ export function drawMarchingSquaresContours(
   time: number,
   pointerX: number,
   pointerY: number,
-  pointerStrength: number
+  pointerStrength: number,
+  isLightTheme = false
 ): void {
   if (width <= 0 || height <= 0) return;
 
@@ -96,10 +97,17 @@ export function drawMarchingSquaresContours(
     const iso =
       minIso + (levelIdx / (CONTOUR_LEVELS - 1)) * (maxIso - minIso);
     const isMajor = levelIdx % 4 === 0;
-    const alpha = isMajor ? 0.34 : 0.16 + (levelIdx / CONTOUR_LEVELS) * 0.12;
+    const alpha = isLightTheme
+      ? isMajor
+        ? 0.36
+        : 0.16 + (levelIdx / CONTOUR_LEVELS) * 0.12
+      : isMajor
+        ? 0.34
+        : 0.16 + (levelIdx / CONTOUR_LEVELS) * 0.12;
+    const strokeRgb = isLightTheme ? '24, 111, 179' : '94, 176, 236';
 
     ctx.beginPath();
-    ctx.strokeStyle = `rgba(94, 176, 236, ${alpha.toFixed(3)})`;
+    ctx.strokeStyle = `rgba(${strokeRgb}, ${alpha.toFixed(3)})`;
     ctx.lineWidth = isMajor ? 1.25 : 0.85;
 
     for (let row = 0; row < rows - 1; row++) {
@@ -376,6 +384,17 @@ export function TopoCanvas({ paused = false }: TopoCanvasProps) {
 
     mediaQuery?.addEventListener?.('change', handleMediaChange);
 
+    let themeObserver: MutationObserver | null = null;
+    if (typeof MutationObserver !== 'undefined' && typeof document !== 'undefined') {
+      themeObserver = new MutationObserver(() => {
+        renderFrame();
+      });
+      themeObserver.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['data-theme'],
+      });
+    }
+
     return () => {
       stopLoop();
       window.removeEventListener('pointermove', handlePointerMove);
@@ -383,6 +402,7 @@ export function TopoCanvas({ paused = false }: TopoCanvasProps) {
       window.removeEventListener('resize', handleResize);
       resizeObserver?.disconnect();
       intersectionObserver?.disconnect();
+      themeObserver?.disconnect();
       mediaQuery?.removeEventListener?.('change', handleMediaChange);
     };
   }, [paused]);
