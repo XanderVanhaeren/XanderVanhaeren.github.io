@@ -8,8 +8,8 @@
 :root,
 [data-theme="dark"] {
     /* Cool dark ground */
-    --bg-primary: #0B0D11;
-    --bg-surface: #12151B;
+    --bg-primary: #1b1b1b;
+    --bg-surface: #2b2b2b;
 
     /* Liquid glass surfaces */
     --glass-bg: rgba(255, 255, 255, 0.045);
@@ -17,19 +17,19 @@
     --glass-border: rgba(255, 255, 255, 0.1);
     --glass-border-strong: rgba(255, 255, 255, 0.18);
     --glass-specular: inset 0 1px 0 rgba(255, 255, 255, 0.14);
-    --glass-blur: blur(22px) saturate(180%);
+    --glass-blur: blur(8px) saturate(100%);
     --ease: cubic-bezier(0.22, 1, 0.36, 1);
 
     /* Text (all >= 4.5:1 on --bg-primary) */
-    --text-primary: #F2F5F8;
-    --text-secondary: #A6B0BD;
-    --text-muted: #848F9E;
+    --text-primary: #f1f1f1;
+    --text-secondary: #a1a1a1;
+    --text-muted: #818181;
 
     /* Single locked accent — Aerospace Blue */
-    --accent: #3A95D8;
-    --accent-light: #5EB0EC;
-    --accent-soft: rgba(58, 149, 216, 0.14);
-    --accent-border: rgba(94, 176, 236, 0.38);
+    --accent: #3a9ada;
+    --accent-light: #4aaaea;
+    --accent-soft: #a8aca99;
+    --accent-border: #1a3a7a66;
 
     /* Typography */
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -61,37 +61,37 @@
     --nav-height: 80px;
 
     /* glisse@0.6.0 Liquid Glass Tokens harmonized with Aerospace Dark Theme */
-    --lg-foreground: #F2F5F8;
-    --lg-muted: #A6B0BD;
-    --lg-glass: rgba(18, 22, 30, 0.58);
-    --lg-glass-active: rgba(34, 44, 58, 0.72);
+    --lg-foreground: #f1f1f1;
+    --lg-muted: #818181;
+    --lg-glass: #2b2b2b66;
+    --lg-glass-active: #2b2b2b77;
     --lg-edge: rgba(255, 255, 255, 0.11);
     --lg-drop: rgba(0, 0, 0, 0.28);
     --lg-selection: rgba(58, 149, 216, 0.24);
-    --lg-lens: rgba(94, 176, 236, 0.08);
+    --lg-lens: rgba(58, 149, 216, 0.1);
     --lg-lens-drop: rgba(0, 0, 0, 0.35);
     --lg-segment-track: rgba(255, 255, 255, 0.03);
-    --lg-segment-thumb: rgba(58, 149, 216, 0.32);
-    --lg-segment-label: #F2F5F8;
-    --lg-segment-lens: rgba(94, 176, 236, 0.08);
-    --lg-surface: rgba(15, 18, 25, 0.9);
-    --lg-surface-edge: rgba(255, 255, 255, 0.14);
+    --lg-segment-thumb: rgba(58, 149, 216, 0.24);
+    --lg-segment-label: #f1f1f1;
+    --lg-segment-lens: rgba(58, 149, 216, 0.1);
+    --lg-surface: #2b2b2baa;
+    --lg-surface-edge: #f1f1f155;
     --lg-shadow: rgba(0, 0, 0, 0.45);
-    --lg-highlight: rgba(58, 149, 216, 0.18);
+    --lg-highlight: #2b2b2b66;
     --lg-separator: rgba(255, 255, 255, 0.1);
     --lg-destructive: #ff4245;
     --lg-track: rgba(255, 255, 255, 0.18);
     --lg-rail: rgba(255, 255, 255, 0.12);
-    --lg-on: #3A95D8;
-    --lg-fill: #3A95D8;
-    --lg-ring: rgba(94, 176, 236, 0.65);
+    --lg-on: #3a9ada;
+    --lg-fill: #3a9ada;
+    --lg-ring: #2a8aca99;
     --lg-lens-shine: 0;
     --lg-rim-shine: 0;
     --lg-blur: 8px;
     --lg-glass-bend: 0.8;
     --lg-glass-dispersion: 1.6;
-    --lg-lens-grow-x: 12px;
-    --lg-lens-grow-y: 8px
+    --lg-lens-grow-x: 10px;
+    --lg-lens-grow-y: 6px
 }
 
 html {
@@ -227,6 +227,8 @@ button {
     height: 76px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    padding: 0 max(24px, calc((100% - var(--max-width)) / 2 + 24px));
     background-color: rgba(11, 13, 17, 0.35);
     backdrop-filter: blur(var(--lg-blur, 22px)) var(--lg-filter, saturate(180%));
     -webkit-backdrop-filter: blur(var(--lg-blur, 22px)) var(--lg-filter, saturate(180%));
@@ -242,16 +244,6 @@ button {
     background-color: rgba(14, 17, 23, 0.82);
     border-bottom-color: var(--glass-border);
     box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05), 0 8px 24px rgba(0, 0, 0, 0.25);
-}
-
-.nav-container {
-    width: 100%;
-    max-width: var(--max-width);
-    margin: 0 auto;
-    padding: 0 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
 }
 
 .logo {
@@ -633,7 +625,7 @@ button {
 
 .btn-primary {
     background-color: rgba(34, 110, 168, 0.96);
-    color: #fff;
+    color: #ffffff;
     border: 1px solid rgba(255, 255, 255, 0.18);
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24);
 }
@@ -1539,7 +1531,7 @@ button {
 
 @media (max-width: 480px) {
     .container,
-    .nav-container {
+    .navbar {
         padding: 0 16px;
     }
 

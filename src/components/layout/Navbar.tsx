@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Glass, TabBar } from 'glisse';
+import { TabBar } from 'glisse';
 
 const NAV_ITEMS = [
   { value: 'home', label: 'Home' },
@@ -158,76 +158,71 @@ export function Navbar() {
 
   return (
     <header className={scrolled ? 'navbar scrolled' : 'navbar'} id="navbar">
-      <Glass
-        className="nav-container"
-        style={{ borderRadius: 'var(--radius-pill)' }}
+      <a
+        href="#home"
+        className="logo"
+        aria-label="Xander Vanhaeren home"
+        onClick={(e) => {
+          e.preventDefault();
+          navigateToSection('home');
+        }}
       >
-        <a
-          href="#home"
-          className="logo"
-          aria-label="Xander Vanhaeren home"
-          onClick={(e) => {
-            e.preventDefault();
-            navigateToSection('home');
-          }}
+        XV<span className="logo-accent">.</span>
+      </a>
+
+      <nav className="nav-actions" aria-label="Primary">
+        <div
+          onKeyDown={(e) => handleNavKeyDown(e, '[role="tab"], button')}
         >
-          XV<span className="logo-accent">.</span>
-        </a>
+          <TabBar
+            className="nav-tabbar"
+            items={NAV_ITEMS.map((item) => ({
+              value: item.value,
+              label: item.label,
+            }))}
+            value={activeSection}
+            onValueChange={navigateToSection}
+          />
+        </div>
 
-        <nav className="nav-actions" aria-label="Primary">
-          <div
-            onKeyDown={(e) => handleNavKeyDown(e, '[role="tab"], button')}
-          >
-            <TabBar
-              className="nav-tabbar"
-              items={NAV_ITEMS.map((item) => ({
-                value: item.value,
-                label: item.label,
-              }))}
-              value={activeSection}
-              onValueChange={navigateToSection}
-            />
-          </div>
-
-          <button
-            ref={toggleRef}
-            className="nav-toggle"
-            type="button"
-            aria-label="Toggle navigation"
-            aria-expanded={mobileOpen}
-            aria-controls="mobile-nav-drawer"
-            onClick={() => setMobileOpen((prev) => !prev)}
-          >
-            <span></span>
-            <span></span>
-            <span></span>
-          </button>
-        </nav>
-
-        <ul
-          ref={drawerRef}
-          id="mobile-nav-drawer"
-          className={`nav-links mobile-drawer${mobileOpen ? ' open' : ''}`}
-          aria-label="Mobile navigation"
-          onKeyDown={(e) => handleNavKeyDown(e, 'a')}
+        <button
+          ref={toggleRef}
+          className="nav-toggle"
+          type="button"
+          aria-label="Toggle navigation"
+          aria-expanded={mobileOpen}
+          aria-controls="mobile-nav-drawer"
+          onClick={() => setMobileOpen((prev) => !prev)}
         >
-          {NAV_ITEMS.map((item) => (
-            <li key={item.value}>
-              <a
-                href={`#${item.value}`}
-                className={activeSection === item.value ? 'active' : undefined}
-                aria-current={activeSection === item.value ? 'page' : undefined}
-                onClick={(e) => {
-                  e.preventDefault();
-                  navigateToSection(item.value);
-                }}
-              >
-                {item.label}
-              </a>
-            </li>
-          ))}
-        </ul>
-      </Glass>
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </nav>
+
+      <ul
+        ref={drawerRef}
+        id="mobile-nav-drawer"
+        className={`nav-links mobile-drawer${mobileOpen ? ' open' : ''}`}
+        aria-label="Mobile navigation"
+        onKeyDown={(e) => handleNavKeyDown(e, 'a')}
+      >
+        {NAV_ITEMS.map((item) => (
+          <li key={item.value}>
+            <a
+              href={`#${item.value}`}
+              className={activeSection === item.value ? 'active' : undefined}
+              aria-current={activeSection === item.value ? 'page' : undefined}
+              onClick={(e) => {
+                e.preventDefault();
+                navigateToSection(item.value);
+              }}
+            >
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
     </header>
   );
 }
