@@ -7,31 +7,56 @@
 
 :root,
 [data-theme="dark"] {
-    /* Cool dark ground */
-    --bg-primary: #1b1b1b;
-    --bg-surface: #2b2b2b;
+    /* ===== Base Backgrounds ===== */
+    --bg-primary: #1b1b1b;                   /* Main page background */
+    --bg-surface: #2b2b2b;                   /* Secondary solid surface */
 
-    /* Liquid glass surfaces */
-    --glass-bg: rgba(255, 255, 255, 0.045);
-    --glass-bg-hover: rgba(255, 255, 255, 0.075);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --glass-border-strong: rgba(255, 255, 255, 0.18);
-    --glass-specular: inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    /* ===== Translucent Panel & Card Surfaces ===== */
+    --surface-nav: rgba(11, 13, 17, 0.35);           /* Top navbar background before scrolling */
+    --surface-card: rgba(18, 22, 30, 0.52);          /* Project, skill, about, approach, and education cards */
+    --surface-elevated: rgba(14, 18, 25, 0.68);      /* Hero fieldnotes card, secondary buttons, and article topbar */
+    --surface-overlay: rgba(14, 18, 25, 0.86);       /* Scrolled navbar, Optics HUD popover, modals, and mobile nav drawer */
+    --scrim-backdrop: rgba(4, 6, 10, 0.72);          /* Full-screen backdrop behind open project modals */
+    --media-well-bg: rgba(0, 0, 0, 0.24);            /* Dark backing behind project images, diagrams, and article figures */
+
+    /* ===== Liquid Glass Fills, Borders & Highlights ===== */
+    --glass-bg-subtle: rgba(255, 255, 255, 0.03);    /* Subtle pill/tag fills (eyebrow, coordinates, interests, subgallery) */
+    --glass-bg: rgba(255, 255, 255, 0.045);          /* Standard glass container fill (nav pill bar, article specs, close button) */
+    --glass-bg-hover: rgba(255, 255, 255, 0.075);    /* Hover fill for glass links, secondary buttons, and clickable cards */
+    --border-subtle: rgba(255, 255, 255, 0.07);      /* Quiet section dividers, card borders, and list row separators */
+    --glass-border: rgba(255, 255, 255, 0.1);        /* Standard glass border (navbar, modals, figures, footer) */
+    --glass-border-strong: rgba(255, 255, 255, 0.18);/* Emphasized borders on hover, popovers, and primary buttons */
+    --specular-highlight: rgba(255, 255, 255, 0.14); /* Top-edge inner glass highlight and inactive skill dots */
+    --specular-strong: rgba(255, 255, 255, 0.24);    /* Brighter top-edge highlight on primary CTA buttons */
+    --glass-specular: inset 0 1px 0 var(--specular-highlight);
     --glass-blur: blur(8px) saturate(100%);
     --ease: cubic-bezier(0.22, 1, 0.36, 1);
 
-    /* Text (all >= 4.5:1 on --bg-primary) */
-    --text-primary: #f1f1f1;
-    --text-secondary: #a1a1a1;
-    --text-muted: #818181;
+    /* ===== Shadows & Canvas Masks ===== */
+    --shadow-sm: rgba(0, 0, 0, 0.25);                /* Subtle drop shadow (scrolled navbar, glisse controls) */
+    --shadow-lg: rgba(0, 0, 0, 0.5);                 /* Deep drop shadow (project modal, Optics HUD popover) */
+    --mask-opaque: rgba(0, 0, 0, 0.92);              /* Topographic canvas mask center opacity (desktop) */
+    --mask-mid: rgba(0, 0, 0, 0.6);                  /* Topographic canvas mask opacity (mobile) */
+    --mask-soft: rgba(0, 0, 0, 0.36);                /* Topographic canvas mask outer fade (desktop) */
 
-    /* Single locked accent — Aerospace Blue */
-    --accent: #3a9ada;
-    --accent-light: #4aaaea;
-    --accent-soft: #a8aca99;
-    --accent-border: #1a3a7a66;
+    /* ===== Text Colors (all >= 4.5:1 on --bg-primary) ===== */
+    --text-primary: #f1f1f1;                 /* Headings, primary body values, and active nav links */
+    --text-secondary: #a1a1a1;               /* Descriptions, paragraphs, and default nav links */
+    --text-muted: #818181;                   /* Kickers, labels, tags, captions, and footer metadata */
+    --text-on-accent: #ffffff;               /* Text on solid accent buttons and skip-to-content link */
 
-    /* Typography */
+    /* ===== Accent Colors — Aerospace Blue ===== */
+    --accent: #3a9ada;                       /* Primary brand accent (glisse active switches, sliders) */
+    --accent-light: #4aaaea;                 /* Text accents (logo dot, hero title, links, advanced skill dots, focus ring) */
+    --accent-soft: rgba(58, 154, 218, 0.22); /* Soft translucent accent fill (active nav pill, modal close hover) */
+    --accent-tint: rgba(58, 154, 218, 0.1);  /* Very subtle accent lens tint for glisse controls */
+    --accent-border: #1a3a7a66;              /* Border around active nav pill and modal close hover */
+    --accent-btn: rgba(34, 110, 168, 0.96);  /* Primary CTA button background */
+    --accent-btn-hover: rgba(37, 114, 174, 1); /* Primary CTA button hover background */
+    --accent-glow: rgba(94, 176, 236, 0.45); /* Glow around advanced skill indicator dots */
+    --destructive: #ff4245;                  /* Destructive/error action color */
+
+    /* ===== Typography ===== */
     --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
@@ -41,7 +66,7 @@
     --text-lg: 1.125rem;
     --text-xl: 1.25rem;
 
-    /* Spacing */
+    /* ===== Spacing & Layout ===== */
     --space-1: 0.25rem;
     --space-2: 0.5rem;
     --space-3: 0.75rem;
@@ -52,7 +77,6 @@
     --space-12: 3rem;
     --space-16: 4rem;
 
-    /* Shape scale */
     --radius-md: 12px;
     --radius-lg: 20px;
     --radius-pill: 9999px;
@@ -60,38 +84,38 @@
     --max-width: 1160px;
     --nav-height: 80px;
 
-    /* glisse@0.6.0 Liquid Glass Tokens harmonized with Aerospace Dark Theme */
-    --lg-foreground: #f1f1f1;
-    --lg-muted: #818181;
-    --lg-glass: #2b2b2b66;
-    --lg-glass-active: #2b2b2b77;
-    --lg-edge: rgba(255, 255, 255, 0.11);
-    --lg-drop: rgba(0, 0, 0, 0.28);
-    --lg-selection: rgba(58, 149, 216, 0.24);
-    --lg-lens: rgba(58, 149, 216, 0.1);
-    --lg-lens-drop: rgba(0, 0, 0, 0.35);
-    --lg-segment-track: rgba(255, 255, 255, 0.03);
-    --lg-segment-thumb: rgba(58, 149, 216, 0.24);
-    --lg-segment-label: #f1f1f1;
-    --lg-segment-lens: rgba(58, 149, 216, 0.1);
-    --lg-surface: #2b2b2baa;
-    --lg-surface-edge: #f1f1f155;
-    --lg-shadow: rgba(0, 0, 0, 0.45);
-    --lg-highlight: #2b2b2b66;
-    --lg-separator: rgba(255, 255, 255, 0.1);
-    --lg-destructive: #ff4245;
-    --lg-track: rgba(255, 255, 255, 0.18);
-    --lg-rail: rgba(255, 255, 255, 0.12);
-    --lg-on: #3a9ada;
-    --lg-fill: #3a9ada;
-    --lg-ring: #2a8aca99;
+    /* ===== glisse@0.6.0 Liquid Glass Tokens (mapped to theme colors above) ===== */
+    --lg-foreground: var(--text-primary);
+    --lg-muted: var(--text-muted);
+    --lg-glass: #2b2b2b66;                   /* Glisse resting glass surface */
+    --lg-glass-active: #2b2b2b77;            /* Glisse pressed/active glass surface */
+    --lg-edge: var(--glass-border);
+    --lg-drop: var(--shadow-sm);
+    --lg-selection: var(--accent-soft);
+    --lg-lens: var(--accent-tint);
+    --lg-lens-drop: var(--shadow-sm);
+    --lg-segment-track: var(--glass-bg-subtle);
+    --lg-segment-thumb: var(--accent-soft);
+    --lg-segment-label: var(--text-primary);
+    --lg-segment-lens: var(--accent-tint);
+    --lg-surface: #2b2b2baa;                 /* Glisse elevated popover/menu surface */
+    --lg-surface-edge: #f1f1f155;            /* Glisse elevated surface rim edge */
+    --lg-shadow: var(--shadow-lg);
+    --lg-highlight: var(--lg-glass);
+    --lg-separator: var(--glass-border);
+    --lg-destructive: var(--destructive);
+    --lg-track: var(--glass-border-strong);
+    --lg-rail: var(--glass-border);
+    --lg-on: var(--accent);
+    --lg-fill: var(--accent);
+    --lg-ring: #2a8aca99;                    /* Glisse focus/active ring */
     --lg-lens-shine: 0;
     --lg-rim-shine: 0;
     --lg-blur: 8px;
     --lg-glass-bend: 0.8;
     --lg-glass-dispersion: 1.6;
     --lg-lens-grow-x: 10px;
-    --lg-lens-grow-y: 6px
+    --lg-lens-grow-y: 6px;
 }
 
 html {
@@ -145,7 +169,7 @@ button {
     z-index: 2000;
     padding: var(--space-2) var(--space-4);
     background-color: var(--accent);
-    color: #fff;
+    color: var(--text-on-accent);
     border-radius: var(--radius-pill);
     font-family: var(--font-sans);
     font-size: var(--text-xs);
@@ -175,7 +199,7 @@ button {
 
 .section {
     padding: clamp(3.5rem, 6vw, 5rem) 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    border-top: 1px solid var(--border-subtle);
 }
 
 .section-header {
@@ -229,10 +253,10 @@ button {
     align-items: center;
     justify-content: space-between;
     padding: 0 max(24px, calc((100% - var(--max-width)) / 2 + 24px));
-    background-color: rgba(11, 13, 17, 0.35);
+    background-color: var(--surface-nav);
     backdrop-filter: blur(var(--lg-blur, 22px)) var(--lg-filter, saturate(180%));
     -webkit-backdrop-filter: blur(var(--lg-blur, 22px)) var(--lg-filter, saturate(180%));
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--border-subtle);
     box-shadow: none;
     transition:
         background-color 0.38s var(--ease),
@@ -241,9 +265,9 @@ button {
 }
 
 .navbar.scrolled {
-    background-color: rgba(14, 17, 23, 0.82);
+    background-color: var(--surface-overlay);
     border-bottom-color: var(--glass-border);
-    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05), 0 8px 24px rgba(0, 0, 0, 0.25);
+    box-shadow: 0 1px 0 var(--border-subtle), 0 8px 24px var(--shadow-sm);
 }
 
 .logo {
@@ -290,7 +314,7 @@ button {
     pointer-events: none;
     border-radius: var(--radius-pill);
     background-color: var(--accent-soft);
-    box-shadow: inset 0 0 0 1px var(--accent-border), inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    box-shadow: inset 0 0 0 1px var(--accent-border), inset 0 1px 0 var(--specular-highlight);
     transition:
         transform 0.38s var(--ease),
         width 0.38s var(--ease),
@@ -321,7 +345,7 @@ button {
 .nav-links a.active {
     color: var(--text-primary);
     background-color: var(--accent-soft);
-    box-shadow: inset 0 0 0 1px var(--accent-border), inset 0 1px 0 rgba(255, 255, 255, 0.16);
+    box-shadow: inset 0 0 0 1px var(--accent-border), inset 0 1px 0 var(--specular-highlight);
 }
 
 .nav-links.has-indicator a:hover,
@@ -385,9 +409,9 @@ button {
     width: min(92vw, 320px);
     padding: var(--space-5);
     border-radius: var(--radius-lg);
-    background-color: rgba(14, 18, 26, 0.88);
+    background-color: var(--surface-overlay);
     border: 1px solid var(--glass-border-strong);
-    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.55);
+    box-shadow: 0 20px 48px var(--shadow-lg);
     display: flex;
     flex-direction: column;
     gap: var(--space-4);
@@ -398,7 +422,7 @@ button {
     justify-content: space-between;
     align-items: center;
     padding-bottom: var(--space-2);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid var(--border-subtle);
 }
 
 .optics-hud-title {
@@ -436,7 +460,7 @@ button {
     align-items: center;
     gap: var(--space-3);
     padding-top: var(--space-2);
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    border-top: 1px solid var(--border-subtle);
 }
 
 /* ===== Hero ===== */
@@ -453,8 +477,8 @@ button {
     height: 100%;
     pointer-events: none;
     z-index: 0;
-    -webkit-mask-image: radial-gradient(ellipse 68% 84% at 78% 48%, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.36) 52%, transparent 86%);
-    mask-image: radial-gradient(ellipse 68% 84% at 78% 48%, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.36) 52%, transparent 86%);
+    -webkit-mask-image: radial-gradient(ellipse 68% 84% at 78% 48%, var(--mask-opaque) 0%, var(--mask-soft) 52%, transparent 86%);
+    mask-image: radial-gradient(ellipse 68% 84% at 78% 48%, var(--mask-opaque) 0%, var(--mask-soft) 52%, transparent 86%);
 }
 
 .hero-inner {
@@ -479,10 +503,10 @@ button {
     gap: 10px;
     padding: 5px 12px;
     margin-bottom: var(--space-5);
-    background-color: rgba(255, 255, 255, 0.03);
+    background-color: var(--glass-bg-subtle);
     backdrop-filter: blur(var(--lg-blur, 22px)) var(--lg-filter, saturate(180%));
     -webkit-backdrop-filter: blur(var(--lg-blur, 22px)) var(--lg-filter, saturate(180%));
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border-subtle);
     border-radius: var(--radius-pill);
     font-size: var(--text-xs);
     color: var(--text-secondary);
@@ -529,10 +553,10 @@ button {
 }
 
 .hero-fieldnotes {
-    background-color: rgba(16, 19, 25, 0.72);
+    background-color: var(--surface-elevated);
     backdrop-filter: blur(var(--lg-blur, 22px)) var(--lg-filter, saturate(180%));
     -webkit-backdrop-filter: blur(var(--lg-blur, 22px)) var(--lg-filter, saturate(180%));
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border-subtle);
     border-radius: var(--radius-lg);
     padding: var(--space-6);
 }
@@ -545,7 +569,7 @@ button {
     gap: var(--space-3);
     padding-bottom: var(--space-4);
     margin-bottom: var(--space-4);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    border-bottom: 1px solid var(--border-subtle);
 }
 
 .fieldnotes-title {
@@ -560,8 +584,8 @@ button {
     font-family: var(--font-mono);
     font-size: 0.6875rem;
     color: var(--text-secondary);
-    background-color: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background-color: var(--glass-bg-subtle);
+    border: 1px solid var(--border-subtle);
     padding: 3px 9px;
     border-radius: var(--radius-pill);
     white-space: nowrap;
@@ -579,7 +603,7 @@ button {
     align-items: baseline;
     gap: var(--space-4);
     padding-bottom: var(--space-3);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid var(--border-subtle);
 }
 
 .fieldnotes-row:last-child {
@@ -624,18 +648,18 @@ button {
 }
 
 .btn-primary {
-    background-color: rgba(34, 110, 168, 0.96);
-    color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24);
+    background-color: var(--accent-btn);
+    color: var(--text-on-accent);
+    border: 1px solid var(--glass-border-strong);
+    box-shadow: inset 0 1px 0 var(--specular-strong);
 }
 
 .btn-primary:hover {
-    background-color: rgba(37, 114, 174, 1);
+    background-color: var(--accent-btn-hover);
 }
 
 .btn-secondary {
-    background-color: rgba(14, 17, 23, 0.68);
+    background-color: var(--surface-elevated);
     color: var(--text-primary);
     border: 1px solid var(--glass-border);
     box-shadow: var(--glass-specular);
@@ -652,8 +676,8 @@ button {
 .project-card,
 .proof-slot,
 .skill-category {
-    background-color: rgba(18, 22, 30, 0.52);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background-color: var(--surface-card);
+    border: 1px solid var(--border-subtle);
     border-radius: var(--radius-lg);
 }
 
@@ -692,8 +716,8 @@ button {
 .approach-card {
     padding: var(--space-5);
     border-radius: var(--radius-lg);
-    background-color: rgba(18, 22, 30, 0.48);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background-color: var(--surface-card);
+    border: 1px solid var(--border-subtle);
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
@@ -775,8 +799,8 @@ button {
 .interest-tag {
     font-size: 0.8125rem;
     padding: 5px 12px;
-    background-color: rgba(255, 255, 255, 0.035);
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    background-color: var(--glass-bg-subtle);
+    border: 1px solid var(--border-subtle);
     color: var(--text-secondary);
     border-radius: var(--radius-pill);
     font-weight: 500;
@@ -868,8 +892,8 @@ button {
 }
 
 .project-card.is-clickable:hover {
-    background-color: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.16);
+    background-color: var(--glass-bg-hover);
+    border-color: var(--glass-border-strong);
 }
 
 .project-card.is-clickable:active {
@@ -879,14 +903,14 @@ button {
 .project-showcase {
     display: flex;
     flex-direction: column;
-    background-color: rgba(0, 0, 0, 0.18);
-    border-right: 1px solid rgba(255, 255, 255, 0.06);
+    background-color: var(--media-well-bg);
+    border-right: 1px solid var(--border-subtle);
 }
 
 .project-image {
     aspect-ratio: 16 / 10;
-    background-color: rgba(0, 0, 0, 0.18);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background-color: var(--media-well-bg);
+    border-bottom: 1px solid var(--border-subtle);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -919,8 +943,8 @@ button {
 }
 
 .subgallery-item {
-    background-color: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    background-color: var(--glass-bg-subtle);
+    border: 1px solid var(--border-subtle);
     border-radius: 10px;
     overflow: hidden;
     display: flex;
@@ -938,7 +962,7 @@ button {
     color: var(--text-muted);
     padding: 6px 10px;
     font-weight: 500;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid var(--border-subtle);
 }
 
 .project-info {
@@ -982,8 +1006,8 @@ button {
     gap: var(--space-3);
     margin-bottom: var(--space-5);
     padding: var(--space-3) 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.07);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    border-top: 1px solid var(--border-subtle);
+    border-bottom: 1px solid var(--border-subtle);
 }
 
 .project-spec-item dt {
@@ -1012,7 +1036,7 @@ button {
     font-size: var(--text-xs);
     padding: 3px 9px;
     background-color: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border-subtle);
     color: var(--text-muted);
     border-radius: var(--radius-pill);
     font-weight: 500;
@@ -1024,7 +1048,7 @@ button {
     gap: var(--space-4);
     margin-top: var(--space-4);
     padding-top: var(--space-4);
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    border-top: 1px solid var(--border-subtle);
 }
 
 .project-link {
@@ -1053,8 +1077,8 @@ button {
 
 .proof-media {
     aspect-ratio: 16 / 10;
-    background-color: rgba(255, 255, 255, 0.015);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    background-color: var(--glass-bg-subtle);
+    border-bottom: 1px solid var(--border-subtle);
     overflow: hidden;
 }
 
@@ -1111,7 +1135,7 @@ button {
     font-size: var(--text-sm);
     color: var(--text-primary);
     padding: 11px 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    border-top: 1px solid var(--border-subtle);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -1158,7 +1182,7 @@ button {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background-color: rgba(255, 255, 255, 0.14);
+    background-color: var(--specular-highlight);
 }
 
 .skill-dot.is-active {
@@ -1168,7 +1192,7 @@ button {
 .skill-level-badge.advanced ~ .skill-dots .skill-dot.is-active,
 .skill-dots.advanced .skill-dot.is-active {
     background-color: var(--accent-light);
-    box-shadow: 0 0 6px rgba(94, 176, 236, 0.45);
+    box-shadow: 0 0 6px var(--accent-glow);
 }
 
 /* ===== Project Article Modal & Standalone Page ===== */
@@ -1189,13 +1213,13 @@ button {
     flex-direction: column;
     max-height: 90vh;
     overflow-y: auto;
-    background-color: rgba(15, 18, 24, 0.84);
+    background-color: var(--surface-overlay);
     border-radius: var(--radius-lg);
-    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 20px 50px var(--shadow-lg);
 }
 
 .project-modal::backdrop {
-    background-color: rgba(4, 6, 10, 0.72);
+    background-color: var(--scrim-backdrop);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
 }
@@ -1208,7 +1232,7 @@ button {
     align-items: center;
     justify-content: space-between;
     padding: var(--space-3) var(--space-6);
-    background-color: rgba(14, 18, 25, 0.78);
+    background-color: var(--surface-overlay);
     backdrop-filter: blur(var(--lg-blur, 22px)) var(--lg-filter, saturate(180%));
     -webkit-backdrop-filter: blur(var(--lg-blur, 22px)) var(--lg-filter, saturate(180%));
     border-bottom: 1px solid var(--glass-border);
@@ -1261,7 +1285,7 @@ button {
 
 .article-topbar {
     border-bottom: 1px solid var(--glass-border);
-    background-color: rgba(10, 14, 20, 0.65);
+    background-color: var(--surface-elevated);
     backdrop-filter: blur(var(--lg-blur, 22px)) var(--lg-filter, saturate(180%));
     -webkit-backdrop-filter: blur(var(--lg-blur, 22px)) var(--lg-filter, saturate(180%));
     padding: var(--space-4) 0;
@@ -1301,7 +1325,7 @@ button {
 .article-hero-figure,
 .article-figure {
     margin: var(--space-6) 0;
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: var(--media-well-bg);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-lg);
     overflow: hidden;
@@ -1389,7 +1413,7 @@ button {
 }
 
 .article-gallery figure {
-    background-color: rgba(0, 0, 0, 0.3);
+    background-color: var(--media-well-bg);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-lg);
     overflow: hidden;
@@ -1453,8 +1477,8 @@ button {
 
     .topo-canvas {
         opacity: 0.35;
-        -webkit-mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.6) 65%, transparent 100%);
-        mask-image: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.6) 65%, transparent 100%);
+        -webkit-mask-image: linear-gradient(to bottom, transparent 0%, var(--mask-mid) 65%, transparent 100%);
+        mask-image: linear-gradient(to bottom, transparent 0%, var(--mask-mid) 65%, transparent 100%);
     }
 
     .hero-grid,
@@ -1499,7 +1523,7 @@ button {
         align-items: stretch;
         gap: var(--space-1);
         padding: var(--space-3);
-        background-color: rgba(14, 18, 25, 0.92);
+        background-color: var(--surface-overlay);
         backdrop-filter: blur(var(--lg-blur, 22px)) var(--lg-filter, saturate(180%));
         -webkit-backdrop-filter: blur(var(--lg-blur, 22px)) var(--lg-filter, saturate(180%));
         border: 1px solid var(--glass-border);
