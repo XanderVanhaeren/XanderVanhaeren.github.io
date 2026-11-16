@@ -28,7 +28,7 @@ beforeAll(() => {
 });
 
 describe('M3 ProjectsSection & ProjectDiagrams', () => {
-  it('renders all 3 projects, inline SVG diagrams for RCXD & BikeySens, and proof-of-work grid', () => {
+  it('renders all 4 projects, inline SVG diagrams, Goodnotes PDF Prep link, and proof-of-work grid', () => {
     const onOpen = vi.fn();
     const { container } = render(
       <ProjectsSection onOpenProjectArticle={onOpen} />
@@ -38,6 +38,7 @@ describe('M3 ProjectsSection & ProjectDiagrams', () => {
     expect(within(grid as HTMLElement).getByText('Project Typhoon')).toBeInTheDocument();
     expect(within(grid as HTMLElement).getByText('RCXD')).toBeInTheDocument();
     expect(within(grid as HTMLElement).getByText('BikeySens')).toBeInTheDocument();
+    expect(within(grid as HTMLElement).getByText('Goodnotes PDF Prep')).toBeInTheDocument();
 
     expect(
       screen.getByRole('img', { name: /RCXD autonomous rover terrain contour/i })
@@ -48,6 +49,19 @@ describe('M3 ProjectsSection & ProjectDiagrams', () => {
       screen.getByRole('img', { name: /BikeySens elevation ridge/i })
     ).toBeInTheDocument();
     expect(screen.getByText('ELEVATION RIDGE // BLE TELEMETRY')).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('img', { name: /Goodnotes PDF Prep margin expansion/i })
+    ).toBeInTheDocument();
+    expect(screen.getByText('PDF MARGIN // GRID & OUTLINE PREP')).toBeInTheDocument();
+
+    const goodnotesLink = screen.getByRole('link', {
+      name: 'Open Goodnotes PDF Prep ↗',
+    });
+    expect(goodnotesLink).toHaveAttribute(
+      'href',
+      'https://xandervanhaeren.github.io/goodnotes-pdf-prep/'
+    );
 
     const proofSlots = container.querySelectorAll('.proof-grid .proof-slot.lg-glass');
     expect(proofSlots).toHaveLength(2);

@@ -63,10 +63,10 @@ describe('Portfolio Data Layer (portfolioData.ts)', () => {
     ]);
   });
 
-  it('contains all 3 projects (Project Typhoon, RCXD, BikeySens) with specs, tags, and filter groups', () => {
-    expect(PROJECTS_DATA).toHaveLength(3);
+  it('contains all 4 projects (Project Typhoon, RCXD, BikeySens, Goodnotes PDF Prep) with specs, tags, and filter groups', () => {
+    expect(PROJECTS_DATA).toHaveLength(4);
 
-    const [typhoon, rcxd, bikeysens] = PROJECTS_DATA;
+    const [typhoon, rcxd, bikeysens, goodnotes] = PROJECTS_DATA;
     expect(typhoon.id).toBe('typhoon');
     expect(typhoon.featured).toBe(true);
     expect(typhoon.filterGroup).toBe('aerospace');
@@ -90,6 +90,16 @@ describe('Portfolio Data Layer (portfolioData.ts)', () => {
       { label: 'Link', value: 'BLE Telemetry' },
       { label: 'Interface', value: 'Mobile Companion' },
     ]);
+
+    expect(goodnotes.id).toBe('goodnotes-pdf-prep');
+    expect(goodnotes.filterGroup).toBe('software');
+    expect(goodnotes.diagram).toBe('pdf');
+    expect(goodnotes.demoUrl).toBe(
+      'https://xandervanhaeren.github.io/goodnotes-pdf-prep/'
+    );
+    expect(goodnotes.githubUrl).toBe(
+      'https://github.com/XanderVanhaeren/goodnotes-pdf-prep'
+    );
   });
 
   it('includes proof-of-work gallery items and complete 5-section Project Typhoon article', () => {

@@ -1,10 +1,136 @@
 import React from 'react';
 
 export interface ProjectDiagramProps {
-  kind: 'rover' | 'telemetry';
+  kind: 'rover' | 'telemetry' | 'pdf';
 }
 
 export function ProjectDiagram({ kind }: ProjectDiagramProps) {
+  if (kind === 'pdf') {
+    return (
+      <svg
+        className="diagram-svg"
+        viewBox="0 0 400 200"
+        role="img"
+        aria-label="Goodnotes PDF Prep margin expansion, grid paper, and chapter outline diagram"
+      >
+        <defs>
+          <linearGradient id="pdf-margin-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="rgba(94, 176, 236, 0.22)" />
+            <stop offset="100%" stopColor="rgba(94, 176, 236, 0.04)" />
+          </linearGradient>
+          <pattern
+            id="pdf-grid-pattern"
+            width="12"
+            height="12"
+            patternUnits="userSpaceOnUse"
+          >
+            <path
+              d="M 12 0 L 0 0 0 12"
+              fill="none"
+              stroke="rgba(94, 176, 236, 0.24)"
+              strokeWidth="0.8"
+            />
+          </pattern>
+        </defs>
+
+        {/* Subtle coordinate grid */}
+        <g stroke="rgba(255, 255, 255, 0.05)" strokeWidth="1">
+          <line x1="80" y1="0" x2="80" y2="200" />
+          <line x1="160" y1="0" x2="160" y2="200" />
+          <line x1="240" y1="0" x2="240" y2="200" />
+          <line x1="320" y1="0" x2="320" y2="200" />
+          <line x1="0" y1="50" x2="400" y2="50" />
+          <line x1="0" y1="100" x2="400" y2="100" />
+          <line x1="0" y1="150" x2="400" y2="150" />
+        </g>
+
+        {/* Outer PDF sheet */}
+        <rect
+          x="52"
+          y="40"
+          width="296"
+          height="136"
+          rx="4"
+          fill="rgba(12, 16, 23, 0.55)"
+          stroke="rgba(255, 255, 255, 0.22)"
+          strokeWidth="1.2"
+        />
+
+        {/* Original slide / page area */}
+        <rect
+          x="64"
+          y="50"
+          width="156"
+          height="116"
+          rx="2"
+          fill="rgba(255, 255, 255, 0.04)"
+          stroke="rgba(255, 255, 255, 0.28)"
+          strokeWidth="1"
+        />
+
+        {/* Simulated slide content lines */}
+        <g stroke="rgba(255, 255, 255, 0.28)" strokeWidth="2" strokeLinecap="round">
+          <line x1="78" y1="68" x2="152" y2="68" />
+          <line x1="78" y1="84" x2="202" y2="84" />
+          <line x1="78" y1="96" x2="188" y2="96" />
+          <line x1="78" y1="108" x2="196" y2="108" />
+        </g>
+
+        {/* Chapter outline tree markers */}
+        <g fill="#5eb0ec">
+          <circle cx="80" cy="132" r="2.5" />
+          <circle cx="88" cy="146" r="2" />
+        </g>
+        <g stroke="rgba(94, 176, 236, 0.55)" strokeWidth="1.5" strokeLinecap="round">
+          <line x1="88" y1="132" x2="148" y2="132" />
+          <line x1="96" y1="146" x2="164" y2="146" />
+        </g>
+
+        {/* Added Goodnotes grid-paper note margin */}
+        <rect
+          x="228"
+          y="50"
+          width="108"
+          height="116"
+          rx="2"
+          fill="url(#pdf-margin-grad)"
+        />
+        <rect
+          x="228"
+          y="50"
+          width="108"
+          height="116"
+          rx="2"
+          fill="url(#pdf-grid-pattern)"
+          stroke="#5eb0ec"
+          strokeWidth="1.4"
+          strokeDasharray="4 3"
+        />
+
+        {/* Margin expansion arrow */}
+        <path
+          d="M 212 108 L 236 108 M 231 103 L 236 108 L 231 113"
+          fill="none"
+          stroke="#5eb0ec"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+
+        <text
+          x="18"
+          y="24"
+          fill="rgba(255, 255, 255, 0.62)"
+          fontFamily="ui-monospace, SFMono-Regular, Menlo, monospace"
+          fontSize="10"
+          letterSpacing="1.2"
+        >
+          PDF MARGIN // GRID &amp; OUTLINE PREP
+        </text>
+      </svg>
+    );
+  }
+
   if (kind === 'rover') {
     return (
       <svg

@@ -173,6 +173,23 @@ export const PROJECTS_DATA: ProjectItem[] = [
     technologies: ['Arduino', 'Bluetooth LE', 'Sensor Fusion', 'Mobile App'],
     diagram: 'telemetry',
   },
+  {
+    id: 'goodnotes-pdf-prep',
+    title: 'Goodnotes PDF Prep',
+    featured: false,
+    filterGroup: 'software',
+    category: 'Web Utility & PDF Processing',
+    description:
+      'Client-side web app for preparing lecture slides and textbooks for Goodnotes by adding configurable note margins, grid paper, borders, and chapter outlines.',
+    specs: [
+      { label: 'Processing', value: '100% Client-Side' },
+      { label: 'Engine', value: 'pdf-lib + PDF.js' },
+    ],
+    technologies: ['React', 'pdf-lib', 'PDF.js', 'Vite'],
+    diagram: 'pdf',
+    demoUrl: 'https://xandervanhaeren.github.io/goodnotes-pdf-prep/',
+    githubUrl: 'https://github.com/XanderVanhaeren/goodnotes-pdf-prep',
+  },
 ];
 
 export const PROOF_OF_WORK_ITEMS: ProofOfWorkItem[] = [

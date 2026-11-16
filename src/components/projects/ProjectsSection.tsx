@@ -16,6 +16,7 @@ const PROJECT_FILTER_ITEMS: Array<{ value: ProjectFilter; label: string }> = [
   { value: 'aerospace', label: 'Aerospace' },
   { value: 'robotics', label: 'Robotics' },
   { value: 'telemetry', label: 'Telemetry' },
+  { value: 'software', label: 'Software' },
 ];
 
 export interface ProjectsSectionProps {
@@ -206,29 +207,53 @@ export function ProjectsSection({
                         </li>
                       ))}
                     </ul>
-                    {project.articleUrl && (
+                    {(project.articleUrl || project.demoUrl || project.githubUrl) && (
                       <div className="project-links">
-                        <a
-                          href={project.articleUrl}
-                          className="project-link project-read-more"
-                          onClick={(e) => {
-                            if (
-                              e.metaKey ||
-                              e.ctrlKey ||
-                              e.shiftKey ||
-                              e.altKey ||
-                              e.button !== 0
-                            ) {
+                        {project.articleUrl && (
+                          <a
+                            href={project.articleUrl}
+                            className="project-link project-read-more"
+                            onClick={(e) => {
+                              if (
+                                e.metaKey ||
+                                e.ctrlKey ||
+                                e.shiftKey ||
+                                e.altKey ||
+                                e.button !== 0
+                              ) {
+                                e.stopPropagation();
+                                return;
+                              }
+                              e.preventDefault();
                               e.stopPropagation();
-                              return;
-                            }
-                            e.preventDefault();
-                            e.stopPropagation();
-                            onOpenProjectArticle(project.articleUrl);
-                          }}
-                        >
-                          Read full engineering article →
-                        </a>
+                              onOpenProjectArticle(project.articleUrl);
+                            }}
+                          >
+                            Read full engineering article →
+                          </a>
+                        )}
+                        {project.demoUrl && (
+                          <a
+                            href={project.demoUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="project-link"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            Open {project.title} ↗
+                          </a>
+                        )}
+                        {project.githubUrl && (
+                          <a
+                            href={project.githubUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="project-link"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            GitHub ↗
+                          </a>
+                        )}
                       </div>
                     )}
                   </div>
