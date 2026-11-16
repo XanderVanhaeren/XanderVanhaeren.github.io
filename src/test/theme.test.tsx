@@ -1,6 +1,7 @@
 import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { FilterBar } from '../components/common/FilterBar';
 import { Navbar } from '../components/layout/Navbar';
 import { ThemeSwitch } from '../components/layout/ThemeSwitch';
 import {
@@ -93,5 +94,48 @@ describe('ThemeSwitch & Theme Persistence', () => {
     const toggle = screen.getByRole('switch', { name: 'Switch to dark mode' });
     expect(toggle).toHaveAttribute('aria-checked', 'false');
     expect(document.documentElement.getAttribute('data-theme')).toBe('light');
+  });
+});
+
+describe('FilterBar responsive radiogroup', () => {
+  it('supports click and Arrow/Home/End keyboard navigation across filter pills', () => {
+    const onValueChange = vi.fn();
+    render(
+      <FilterBar
+        items={[
+          { value: 'all', label: 'All' },
+          { value: 'aerospace', label: 'Aerospace' },
+          { value: 'robotics', label: 'Robotics' },
+        ]}
+        value="all"
+        onValueChange={onValueChange}
+        aria-label="Filter items"
+      />
+    );
+
+    const group = screen.getByRole('radiogroup', { name: 'Filter items' });
+    const allRadio = screen.getByRole('radio', { name: 'All' });
+    const aeroRadio = screen.getByRole('radio', { name: 'Aerospace' });
+    const roboRadio = screen.getByRole('radio', { name: 'Robotics' });
+
+    expect(allRadio).toHaveAttribute('aria-checked', 'true');
+    expect(aeroRadio).toHaveAttribute('aria-checked', 'false');
+
+    allRadio.focus();
+    fireEvent.keyDown(group, { key: 'ArrowRight' });
+    expect(onValueChange).toHaveBeenLastCalledWith('aerospace');
+    expect(document.activeElement).toBe(aeroRadio);
+
+    fireEvent.keyDown(group, { key: 'End' });
+    expect(onValueChange).toHaveBeenLastCalledWith('robotics');
+    expect(document.activeElement).toBe(roboRadio);
+
+    fireEvent.keyDown(group, { key: 'Home' });
+    expect(onValueChange).toHaveBeenLastCalledWith('all');
+    expect(document.activeElement).toBe(allRadio);
+
+    fireEvent.keyDown(group, { key: 'ArrowLeft' });
+    expect(onValueChange).toHaveBeenLastCalledWith('robotics');
+    expect(document.activeElement).toBe(roboRadio);
   });
 });

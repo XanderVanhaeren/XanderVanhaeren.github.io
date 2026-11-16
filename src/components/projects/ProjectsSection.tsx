@@ -1,11 +1,12 @@
 import React, { useMemo, useState } from 'react';
-import { Button, Glass, SearchField, SegmentedControl } from 'glisse';
+import { Button, Glass, SearchField } from 'glisse';
 import {
   PORTFOLIO_DATA,
   PROJECTS_DATA,
   PROOF_OF_WORK_ITEMS,
 } from '../../data/portfolioData';
 import type { ProjectItem } from '../../types/portfolio';
+import { FilterBar } from '../common/FilterBar';
 import { ProjectDiagram } from './ProjectDiagrams';
 import { resolveAssetPath } from './TyphoonArticle';
 
@@ -72,7 +73,7 @@ export function ProjectsSection({
         </div>
 
         <div className="section-toolbar">
-          <SegmentedControl
+          <FilterBar
             items={PROJECT_FILTER_ITEMS}
             value={filterGroup}
             onValueChange={(value) => setFilterGroup(value as ProjectFilter)}

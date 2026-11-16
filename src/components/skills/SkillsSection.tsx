@@ -1,7 +1,8 @@
 import React, { useMemo, useState } from 'react';
-import { Button, Glass, SearchField, SegmentedControl } from 'glisse';
+import { Button, Glass, SearchField } from 'glisse';
 import { PORTFOLIO_DATA } from '../../data/portfolioData';
 import type { SkillCategory, SkillLevel } from '../../types/portfolio';
+import { FilterBar } from '../common/FilterBar';
 
 function getSkillDotCount(level: SkillLevel): number {
   if (level === 'advanced') return 3;
@@ -72,7 +73,7 @@ export function SkillsSection({ skillsData }: SkillsSectionProps) {
         </div>
 
         <div className="section-toolbar">
-          <SegmentedControl
+          <FilterBar
             className="skills-segmented"
             items={categoryItems}
             value={selectedCategory}
