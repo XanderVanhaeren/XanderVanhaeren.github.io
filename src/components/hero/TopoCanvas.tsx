@@ -5,8 +5,8 @@ export interface TopoCanvasProps {
 }
 
 const CONTOUR_LEVELS = 14;
-const CELL_SIZE = 22;
-const FRAME_INTERVAL_MS = 1000 / 30;
+const CELL_SIZE = 10;
+const FRAME_INTERVAL_MS = 1000 / 60;
 
 function lerpIso(a: number, b: number, iso: number): number {
   const denom = b - a;
@@ -24,24 +24,24 @@ function evaluateScalarField(
   pointerStrength: number
 ): number {
   // Primary aerodynamic pressure peak centered in the right-hand hero backdrop
-  const dx1 = nx - 0.76;
-  const dy1 = ny - 0.46;
+  const dx1 = nx - (0.76 + 0.032 * Math.sin(time * 0.42));
+  const dy1 = ny - (0.46 + 0.028 * Math.cos(time * 0.34));
   const peak1 = 0.78 * Math.exp(-(dx1 * dx1 * 6.5 + dy1 * dy1 * 9.0));
 
   // Secondary ridge
-  const dx2 = nx - 0.54;
-  const dy2 = ny - 0.72;
+  const dx2 = nx - (0.54 + 0.026 * Math.cos(time * 0.37));
+  const dy2 = ny - (0.72 + 0.024 * Math.sin(time * 0.48));
   const peak2 = 0.42 * Math.exp(-(dx2 * dx2 * 9.0 + dy2 * dy2 * 11.0));
 
   // Subtle upper-left counter-ridge
-  const dx3 = nx - 0.88;
-  const dy3 = ny - 0.22;
+  const dx3 = nx - (0.88 + 0.022 * Math.sin(time * 0.51 + 1.2));
+  const dy3 = ny - (0.22 + 0.024 * Math.cos(time * 0.39 + 0.7));
   const peak3 = 0.34 * Math.exp(-(dx3 * dx3 * 12.0 + dy3 * dy3 * 12.0));
 
   // Time-varying harmonic isobar wave
   const wave =
-    0.09 * Math.sin(nx * 7.2 + time * 0.45) * Math.cos(ny * 5.8 - time * 0.32) +
-    0.045 * Math.cos((nx + ny) * 9.5 - time * 0.28);
+    0.105 * Math.sin(nx * 7.2 + time * 0.85) * Math.cos(ny * 5.8 - time * 0.62) +
+    0.055 * Math.cos((nx + ny) * 9.5 - time * 0.54);
 
   // Pointer-reactive Gaussian ridge
   let pointerRidge = 0;
@@ -68,6 +68,8 @@ export function drawMarchingSquaresContours(
   if (width <= 0 || height <= 0) return;
 
   ctx.clearRect(0, 0, width, height);
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
 
   const cols = Math.max(2, Math.ceil(width / CELL_SIZE) + 1);
   const rows = Math.max(2, Math.ceil(height / CELL_SIZE) + 1);
