@@ -1,4 +1,4 @@
-import { expect, type Locator, type Page } from '@playwright/test';
+import { expect, type Locator, type Page, type Request } from '@playwright/test';
 
 export type ProjectSlug = 'typhoon' | 'bikeysens' | 'rcxd' | 'team-214';
 
@@ -48,6 +48,7 @@ export function attachDiagnostics(page: Page): DiagnosticsTracker {
   const failedRequests: string[] = [];
   const httpErrors: Array<{ status: number; url: string }> = [];
   const requestedUrls: string[] = [];
+  const mediaPartialRequests = new WeakSet<Request>();
 
   page.on('console', (msg) => {
     if (msg.type() === 'error') {
@@ -64,10 +65,18 @@ export function attachDiagnostics(page: Page): DiagnosticsTracker {
   });
 
   page.on('requestfailed', (req) => {
-    failedRequests.push(`${req.method()} ${req.url()} (${req.failure()?.errorText ?? 'failed'})`);
+    const errorText = req.failure()?.errorText ?? 'failed';
+    // Chromium with <video preload="metadata"> aborts the rest of an HTTP 206 byte-range transfer after parsing moov.
+    if (req.resourceType() === 'media' && errorText === 'net::ERR_ABORTED' && mediaPartialRequests.has(req)) {
+      return;
+    }
+    failedRequests.push(`${req.method()} ${req.url()} (${errorText})`);
   });
 
   page.on('response', (res) => {
+    if (res.status() === 206 && res.request().resourceType() === 'media') {
+      mediaPartialRequests.add(res.request());
+    }
     if (res.status() >= 400) {
       httpErrors.push({ status: res.status(), url: res.url() });
     }
@@ -135,6 +144,71 @@ export async function gotoHomeReady(
   await waitForTilesSettled(page);
 }
 
+function getScopePage(scope: Page | Locator): Page {
+  return typeof (scope as Locator).page === 'function' ? (scope as Locator).page() : (scope as Page);
+}
+
+async function ensureScopeImagesLoaded(scope: Page | Locator): Promise<void> {
+  const page = getScopePage(scope);
+  const imgs = scope.locator('img');
+  const count = await imgs.count();
+  expect(count, 'Expected at least 1 <img> element in scope').toBeGreaterThanOrEqual(1);
+
+  const hasIncomplete = await imgs.evaluateAll((els) =>
+    els.some((el) => !(el as HTMLImageElement).complete),
+  );
+  if (!hasIncomplete) return;
+
+  const prevScroll = await page.evaluate(() => ({ x: window.scrollX, y: window.scrollY }));
+  try {
+    await page.evaluate(async () => {
+      const step = Math.max(200, Math.floor(window.innerHeight * 0.75));
+      for (let y = 0; ; y += step) {
+        const maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+        const targetY = Math.min(y, maxY);
+        window.scrollTo({ left: 0, top: targetY, behavior: 'instant' });
+        await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+        if (targetY >= maxY) break;
+      }
+    });
+
+    for (let i = 0; i < count; i++) {
+      const img = imgs.nth(i);
+      const needsScrollIntoView = await img.evaluate((el: HTMLImageElement) => {
+        if (el.complete || el.getClientRects().length === 0) return false;
+        const r = el.getBoundingClientRect();
+        return r.bottom < 0 || r.top > window.innerHeight || r.right < 0 || r.left > window.innerWidth;
+      });
+      if (needsScrollIntoView) {
+        await img.scrollIntoViewIfNeeded();
+      }
+    }
+
+    await expect
+      .poll(
+        async () =>
+          imgs.evaluateAll((els) =>
+            els
+              .filter((el) => !(el as HTMLImageElement).complete)
+              .map((el) => el.getAttribute('src') ?? '<no-src>'),
+          ),
+        {
+          timeout: 15_000,
+          intervals: [50, 100, 200],
+          message: 'All <img> elements in scope must finish loading',
+        },
+      )
+      .toEqual([]);
+  } finally {
+    await page.evaluate(
+      ({ x, y }) => {
+        window.scrollTo({ left: x, top: y, behavior: 'instant' });
+      },
+      prevScroll,
+    );
+  }
+}
+
 export async function gotoArticleReady(
   page: Page,
   slug: ProjectSlug,
@@ -153,15 +227,7 @@ export async function gotoArticleReady(
   const heading = articleRoot.locator('h1').first();
   await expect(heading).toBeVisible();
 
-  await page.waitForFunction(
-    (s) => {
-      const root = document.querySelector(`[data-article="${s}"]`);
-      if (!root) return false;
-      const imgs = Array.from(root.querySelectorAll<HTMLImageElement>('img'));
-      return imgs.length >= 1 && imgs.every((img) => img.complete);
-    },
-    slug,
-  );
+  await ensureScopeImagesLoaded(articleRoot);
 
   const imgCheck = await articleRoot.evaluate((root) => {
     const imgs = Array.from(root.querySelectorAll<HTMLImageElement>('img'));
@@ -180,6 +246,8 @@ export async function gotoArticleReady(
 }
 
 export async function assertAllImagesLoaded(scope: Page | Locator): Promise<void> {
+  await ensureScopeImagesLoaded(scope);
+
   const imgs = scope.locator('img');
   const count = await imgs.count();
   expect(count, 'Expected at least 1 <img> element in scope').toBeGreaterThanOrEqual(1);

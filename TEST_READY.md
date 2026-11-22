@@ -1,22 +1,39 @@
-# E2E Test Suite Ready (`TEST_READY.md`)
+﻿# E2E Test Suite Ready
 
-- **Status**: `READY`
-- **Published At**: `2026-11-14T23:52:00Z`
-- **Orchestrator**: `sub_orch_e2e`
-- **Total E2E Tests (Tiers 1–4)**: **149 Playwright E2E tests**
+## Test Runner
+- Command (POSIX / CMD): `npm run build && npx playwright test`
+- Command (Windows PowerShell): `npm.cmd run build; npx.cmd playwright test`
+- Individual Tier Commands:
+  - Tier 1: `npx.cmd playwright test e2e/tier1-features.spec.ts`
+  - Tier 2: `npx.cmd playwright test e2e/tier2-boundaries.spec.ts`
+  - Tier 3: `npx.cmd playwright test e2e/tier3-combinations.spec.ts`
+  - Tier 4: `npx.cmd playwright test e2e/tier4-scenarios.spec.ts`
+- Expected: all 89 tests pass with exit code 0
 
-## Suite Breakdown
+## Coverage Summary
+| Tier | Count | Description |
+|------|------:|-------------|
+| 1. Feature Coverage | 36 | 6 per feature across F1–F6 (`>= 30` min) |
+| 2. Boundary & Corner | 36 | 6 per feature across F1–F6 (`>= 30` min) |
+| 3. Cross-Feature | 10 | Pairwise cross-feature combinations (`>= 6` min) |
+| 4. Real-World Application | 7 | End-to-end recruiter/mobile/tablet/keyboard/media scenarios (`>= 5` min) |
+| **Total** | **89** | **Tiers 1–4 complete (`>= 71` min)** |
 
-| Tier | File | Test Count | Scope & Coverage |
-|------|------|-----------:|------------------|
-| Shared Helpers | `e2e/helpers.ts` | — | Opaque-box locators (`getNavTab`, `navigateViaNavbar`, `selectCategorySegment`, `setSectionSearchQuery`, `clearSectionSearch`, `openGlassOpticsHud`, `setSliderValue`, `openTyphoonModal`, `closeTyphoonModal`, `getActiveGlassOpticsVars`, `attachConsoleErrorTracker`) |
-| **Tier 1** | `e2e/tier1-features.spec.ts` | **60** | 5 tests per feature across all 12 features (`F1`–`F12`: Build/Multi-Page, Static Assets & SEO/Meta, Typed Portfolio & `skills.csv` Data Layer, Liquid Glass Design Tokens & `border-radius > 0`, Floating Navbar & `TabBar`, `GlassOpticsHud` Sliders/Switch, Hero & Telemetry Fieldnotes, Interactive `TopoCanvas`, About & Engineering Loop + Footer, Projects Showcase & `SegmentedControl`/`SearchField` + SVG Diagrams, `ProjectModal` & `/projects/typhoon.html`, Skills & Instruments 3-dot Matrix) |
-| **Tier 2** | `e2e/tier2-boundaries.spec.ts` | **64** | 5–6 boundary & corner-case tests per feature across `F1`–`F12` (empty/whitespace/special-char/no-match queries, clear button, rapid `SegmentedControl` & `TabBar` switching, `Escape` & backdrop clicks on `#project-modal` and mobile menu, viewports `320×568`, `375×667`, `768×1024`, `1440×900`, `1920×400`, `prefers-reduced-motion: reduce`, slider min/max bounds, direct `/projects/typhoon.html` & deep links, HTTP 500/offline/malformed `skills.csv` fallback, keyboard navigation) |
-| **Tier 3** | `e2e/tier3-combinations.spec.ts` | **16** | Cross-feature combinations (`SegmentedControl` + `SearchField` in Projects & Skills, `GlassOpticsHud` live tuning across `.lg-glass` cards + `#project-modal` + `#topo-canvas`, desktop/mobile `TabBar` navigation with active filters, filtered card → modal → standalone `/projects/typhoon.html` → `← Back to Portfolio`) |
-| **Tier 4** | `e2e/tier4-scenarios.spec.ts` | **9** | Real-world end-to-end journeys (Aerospace Recruiter walkthrough, KU Leuven Peer Hardware/Robotics walkthrough, Mobile `375×667` Commuter walkthrough, Keyboard-only Accessibility journey, Live Liquid Glass Optics & TopoCanvas telemetry journey, Multi-page resilience, Offline `skills.csv` resilience, Reduced-motion journey, and Full Asset Integrity `complete && naturalWidth > 0` + Zero Console/Page Error + `.agents/` & `Logo.af` Exclusion Audit) |
+## Feature Checklist
+| Feature | Tier 1 | Tier 2 | Tier 3 | Tier 4 |
+|---------|:------:|:------:|:------:|:------:|
+| F1: Home Dark Minimal Layout & Identity + Legacy Removal | 6 | 6 | ✓ | ✓ |
+| F2: Bundled High-Res Tile Imagery & Zero Errors | 6 | 6 | ✓ | ✓ |
+| F3: Desktop Even 2×2 Grid & Hover Grow/Shrink Geometry | 6 | 6 | ✓ | ✓ |
+| F4: Tablet Reference Proportions (`56:44` / `52:48`) & Phone 1-Col Stack | 6 | 6 | ✓ | ✓ |
+| F5: Interactive `<dialog>` Article Overlay (`×` / `Escape` / backdrop / link) | 6 | 6 | ✓ | ✓ |
+| F6: Four Full-Page Project Articles (`/projects/{typhoon,bikeysens,rcxd,team-214}.html`) | 6 | 6 | ✓ | ✓ |
 
-## Execution Command
-```bash
-npx playwright test
-```
-(See `TEST_INFRA.md` for full server and configuration details.)
+## Verification Gate Summary
+- `npx.cmd tsc -p e2e/tsconfig.json --noEmit` -> exit `0`
+- `npx.cmd playwright test --list` -> `Total: 89 tests in 4 files` (`36 + 36 + 10 + 7`), exit `0`
+- `npm.cmd run typecheck` -> exit `0`
+- Cross-platform `playwright.config.ts` headless Chromium launch (`chromium-1254`, `158.0.8127.18`) -> exit `0`
+- Contract-compliant mock DOM full-suite run (`e2e_challenger_r2_1`): `89 passed, 0 failed` (`32.0s`), plus `9 / 9` adversarial mutants rejected
+- `TEST_INFRA.md` (repo root & shared scratch root) SHA-256 byte-identical (`E0CA939F649AEE04BEDAE558C7968FADCC8D71B43A9AF92301D6AE317DB8F0F7`)
+- Forensic Audit (`e2e_auditor_r2`): **CLEAN**; Reviewers (`e2e_reviewer_r2_1`, `e2e_reviewer_r2_2`): **APPROVE**; Challengers (`e2e_challenger_r2_1`, `e2e_challenger_r2_2`): **APPROVE**

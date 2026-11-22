@@ -136,13 +136,13 @@ export default function ArticlePage({ project, slug }: ArticlePageProps) {
         <article className="article-container">
           <header className="article-header">
             {(resolvedProject.status === 'in-progress' || resolvedProject.statusLabel) && (
-              <p className="article-status" data-status={resolvedProject.status}>
+              <div className="article-status" data-status={resolvedProject.status}>
                 <span className="article-status-dot" aria-hidden="true" />
                 <span>
                   {resolvedProject.statusLabel ??
                     (resolvedProject.status === 'in-progress' ? 'In Progress' : 'Completed')}
                 </span>
-              </p>
+              </div>
             )}
 
             <h1>{resolvedProject.title}</h1>
@@ -190,7 +190,7 @@ export default function ArticlePage({ project, slug }: ArticlePageProps) {
                   playsInline
                   muted
                   loop
-                  preload="metadata"
+                  preload="none"
                   poster={resolvedProject.video.poster}
                   src={resolvedProject.video.src}
                   width={1500}

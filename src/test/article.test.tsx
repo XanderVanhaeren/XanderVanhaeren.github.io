@@ -159,7 +159,7 @@ describe('ArticlePage and multi-page article wiring', () => {
         expect(video).toHaveAttribute('controls');
         expect(video).toHaveAttribute('playsinline');
         expect(video).toHaveAttribute('loop');
-        expect(video).toHaveAttribute('preload', 'metadata');
+        expect(video).toHaveAttribute('preload', 'none');
         expect(video).toHaveAttribute('width', '1500');
         expect(video).toHaveAttribute('height', '1000');
         expect(video).toHaveAttribute('aria-label', project.video!.title);
