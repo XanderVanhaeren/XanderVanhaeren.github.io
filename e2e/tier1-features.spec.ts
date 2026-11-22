@@ -222,7 +222,7 @@ test.describe('Tier 1 — Feature Coverage (F1–F12, 60 Tests)', () => {
       for (const imgPath of [
         '/assets/images/projects/Typhoon/VelocitySolidworks.png',
         '/assets/images/projects/Typhoon/typhoon-v3.jpg',
-        '/assets/images/projects/Typhoon/tars-v2.jpg',
+        '/assets/images/projects/Typhoon/tars-v2.png',
         '/assets/images/projects/Typhoon/Fuselage%20Flowsim.png',
       ]) {
         const res = await page.request.get(imgPath);
@@ -1017,7 +1017,7 @@ test.describe('Tier 1 — Feature Coverage (F1–F12, 60 Tests)', () => {
 
       await expect(typhoonCard.locator('img[src*="VelocitySolidworks.png"]')).toBeVisible();
       await expect(typhoonCard.locator('img[src*="typhoon-v3.jpg"]')).toBeVisible();
-      await expect(typhoonCard.locator('img[src*="tars-v2.jpg"]')).toBeVisible();
+      await expect(typhoonCard.locator('img[src*="tars-v2.png"]')).toBeVisible();
       await expect(typhoonCard).toContainText('Read full engineering article');
     });
 
@@ -1083,7 +1083,7 @@ test.describe('Tier 1 — Feature Coverage (F1–F12, 60 Tests)', () => {
       }
     });
 
-    test('F11.3 — Modal renders all 4 engineering figures (typhoon-v3.jpg, VelocitySolidworks.png, Fuselage Flowsim.png, tars-v2.jpg) with captions', async ({
+    test('F11.3 — Modal renders all 4 engineering figures (typhoon-v3.jpg, VelocitySolidworks.png, Fuselage Flowsim.png, tars-v2.png) with captions', async ({
       page,
     }) => {
       await gotoHomeReady(page);

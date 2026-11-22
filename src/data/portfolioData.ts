@@ -134,7 +134,7 @@ export const PROJECTS_DATA: ProjectItem[] = [
         caption: 'V3 Airframe CAD',
       },
       {
-        src: 'assets/images/projects/Typhoon/tars-v2.jpg',
+        src: 'assets/images/projects/Typhoon/tars-v2.png',
         width: 1200,
         height: 704,
         alt: 'TARS V2 flight controller hardware assembly',
@@ -301,7 +301,7 @@ export const TYPHOON_ARTICLE_DATA: TyphoonArticleData = {
         'Because standard Arduino servo libraries conflicted with the ESP32-C6 hardware, I wrote a custom 50 Hz, 12-bit LEDC PWM driver in C++ (Saturn OS) to mix the canards, elevons, and steerable nose gear. Attitude estimation uses a complementary filter (α = 0.9875) feeding three selectable flight modes:',
       ],
       figure: {
-        src: 'assets/images/projects/Typhoon/tars-v2.jpg',
+        src: 'assets/images/projects/Typhoon/tars-v2.png',
         width: 1200,
         height: 704,
         alt: 'TARS V2 custom flight controller with ESP32-C6, MPU-6050 IMU, and dual ExpressLRS antennas',

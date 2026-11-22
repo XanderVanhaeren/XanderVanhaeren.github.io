@@ -126,7 +126,10 @@ export function ProjectsSection({
                   }
                   onClick={
                     isClickable
-                      ? () => onOpenProjectArticle(project.articleUrl)
+                      ? () => {
+                          if (window.getSelection()?.toString()) return;
+                          onOpenProjectArticle(project.articleUrl);
+                        }
                       : undefined
                   }
                   onKeyDown={

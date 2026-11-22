@@ -143,7 +143,7 @@ test.describe('Tier 2 — Boundary & Corner Cases (F1–F12, 64 Tests)', () => {
       const assets = [
         '/assets/images/projects/Typhoon/VelocitySolidworks.png',
         '/assets/images/projects/Typhoon/typhoon-v3.jpg',
-        '/assets/images/projects/Typhoon/tars-v2.jpg',
+        '/assets/images/projects/Typhoon/tars-v2.png',
         '/assets/images/projects/Typhoon/Fuselage%20Flowsim.png',
         '/assets/images/projects/Typhoon/typhoon-hero-render.png',
       ];

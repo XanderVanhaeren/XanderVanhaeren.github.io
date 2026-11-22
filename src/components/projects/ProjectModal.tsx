@@ -8,6 +8,16 @@ export interface ProjectModalProps {
   articleUrl?: string;
 }
 
+function isOutsideDialog(clientX: number, clientY: number, dialog: HTMLDialogElement): boolean {
+  const rect = dialog.getBoundingClientRect();
+  return (
+    clientX < rect.left ||
+    clientX > rect.right ||
+    clientY < rect.top ||
+    clientY > rect.bottom
+  );
+}
+
 export function ProjectModal({
   isOpen,
   onClose,
@@ -16,6 +26,7 @@ export function ProjectModal({
   const dialogRef = useRef<HTMLDialogElement>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
   const closingProgrammaticallyRef = useRef(false);
+  const pressedOutsideRef = useRef(false);
 
   useEffect(() => {
     const dialog = dialogRef.current;
@@ -38,6 +49,7 @@ export function ProjectModal({
       id="project-modal"
       className="project-modal"
       aria-label="Project article"
+      {...({ closedby: 'any' } as Record<string, string>)}
       onCancel={(e) => {
         e.preventDefault();
         onClose();
@@ -54,8 +66,28 @@ export function ProjectModal({
           onClose();
         }
       }}
+      onPointerDown={(e) => {
+        if ('closedBy' in HTMLDialogElement.prototype) return;
+        const dialog = dialogRef.current;
+        if (!dialog) return;
+        pressedOutsideRef.current = isOutsideDialog(e.clientX, e.clientY, dialog);
+      }}
+      onPointerUp={(e) => {
+        if ('closedBy' in HTMLDialogElement.prototype) return;
+        const dialog = dialogRef.current;
+        const wasPressedOutside = pressedOutsideRef.current;
+        pressedOutsideRef.current = false;
+        if (dialog && wasPressedOutside && isOutsideDialog(e.clientX, e.clientY, dialog)) {
+          onClose();
+        }
+      }}
       onClick={(e) => {
-        if (e.target === dialogRef.current) {
+        if ('closedBy' in HTMLDialogElement.prototype) return;
+        const dialog = dialogRef.current;
+        if (!dialog || e.target !== dialog) return;
+        // Fallback for synthetic clicks in test environments where layout rects are 0x0
+        const rect = dialog.getBoundingClientRect();
+        if (rect.width === 0 && rect.height === 0) {
           onClose();
         }
       }}

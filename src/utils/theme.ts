@@ -41,6 +41,11 @@ export function applyTheme(theme: Theme, persist = true): void {
     if (metaThemeColor) {
       metaThemeColor.setAttribute('content', THEME_COLORS[theme]);
     }
+
+    const metaColorScheme = document.querySelector('meta[name="color-scheme"]');
+    if (metaColorScheme) {
+      metaColorScheme.setAttribute('content', theme);
+    }
   }
 
   if (persist && typeof window !== 'undefined') {

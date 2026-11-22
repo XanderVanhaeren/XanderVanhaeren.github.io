@@ -7,6 +7,7 @@
     <meta name="description" content="Project Typhoon: custom 3D-printed delta-wing RC jet, SolidWorks CFD validation, and ESP32-C6 flight controller studying how airfoil choice affects maneuverability.">
     <meta name="author" content="Xander Vanhaeren">
     <meta name="theme-color" content="#1b1b1b">
+    <meta name="color-scheme" content="dark light">
     <script>
         try {
             var savedTheme = localStorage.getItem('theme');
@@ -15,6 +16,8 @@
                 document.documentElement.style.colorScheme = savedTheme;
                 var metaTheme = document.querySelector('meta[name="theme-color"]');
                 if (metaTheme) metaTheme.setAttribute('content', savedTheme === 'light' ? '#f5f7fa' : '#1b1b1b');
+                var metaScheme = document.querySelector('meta[name="color-scheme"]');
+                if (metaScheme) metaScheme.setAttribute('content', savedTheme);
             }
         } catch (e) {}
     </script>

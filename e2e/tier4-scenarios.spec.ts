@@ -112,7 +112,7 @@ test.describe('Tier 4 — Real-World Application Scenarios (9 Tests)', () => {
     await expect(modal).toContainText('0.001');
     await expect(modal).toContainText('0.035');
     await expect(modal).toContainText('0.9875');
-    await expect(modal.locator('img[src*="tars-v2.jpg"]')).toBeVisible();
+    await expect(modal.locator('img[src*="tars-v2.png"]')).toBeVisible();
     await closeTyphoonModal(page, 'escape');
 
     // Check Embedded skills

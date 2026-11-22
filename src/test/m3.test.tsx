@@ -177,7 +177,7 @@ describe('M3 TyphoonArticle & TyphoonStandalonePage', () => {
       '/assets/images/projects/Typhoon/typhoon-v3.jpg',
       '/assets/images/projects/Typhoon/VelocitySolidworks.png',
       '/assets/images/projects/Typhoon/Fuselage Flowsim.png',
-      '/assets/images/projects/Typhoon/tars-v2.jpg',
+      '/assets/images/projects/Typhoon/tars-v2.png',
     ]);
   });
 

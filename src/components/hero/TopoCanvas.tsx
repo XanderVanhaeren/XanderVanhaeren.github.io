@@ -2,11 +2,14 @@ import React, { useEffect, useRef } from 'react';
 
 export interface TopoCanvasProps {
   paused?: boolean;
+  /** Multiplier for contour animation speed (1 = normal, 0.5 = half speed, 2 = double speed). */
+  speed?: number;
 }
 
-const CONTOUR_LEVELS = 14;
-const CELL_SIZE = 10;
-const FRAME_INTERVAL_MS = 1000 / 60;
+export const DEFAULT_TOPO_SPEED = 0.7;
+const CONTOUR_LEVELS = 10;
+const CELL_SIZE = 12;
+const MIN_FRAME_INTERVAL_MS = 15;
 
 function lerpIso(a: number, b: number, iso: number): number {
   const denom = b - a;
@@ -204,10 +207,15 @@ export function drawMarchingSquaresContours(
   }
 }
 
-export function TopoCanvas({ paused = false }: TopoCanvasProps) {
+export function TopoCanvas({
+  paused = false,
+  speed = DEFAULT_TOPO_SPEED,
+}: TopoCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const pausedRef = useRef(paused);
   pausedRef.current = paused;
+  const speedRef = useRef(speed);
+  speedRef.current = speed;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -271,10 +279,10 @@ export function TopoCanvas({ paused = false }: TopoCanvasProps) {
         lastTimestamp = timestamp;
       }
       const elapsed = timestamp - lastTimestamp;
-      if (elapsed >= FRAME_INTERVAL_MS) {
+      if (elapsed >= MIN_FRAME_INTERVAL_MS) {
         const dt = Math.min(elapsed / 1000, 0.05);
         lastTimestamp = timestamp;
-        time += dt;
+        time += dt * speedRef.current;
 
         pointer.x += (pointer.targetX - pointer.x) * 0.16;
         pointer.y += (pointer.targetY - pointer.y) * 0.16;
