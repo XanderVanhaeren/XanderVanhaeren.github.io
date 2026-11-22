@@ -1,43 +1,25 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Typhoon — Xander Vanhaeren</title>
-    <meta name="description" content="Project Typhoon: custom 3D-printed delta-wing RC jet, SolidWorks CFD validation, and ESP32-C6 flight controller studying how airfoil choice affects maneuverability.">
-    <meta name="author" content="Xander Vanhaeren">
-    <meta name="theme-color" content="#1b1b1b">
-    <meta name="color-scheme" content="dark light">
-    <script>
-        try {
-            var savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'light' || savedTheme === 'dark') {
-                document.documentElement.setAttribute('data-theme', savedTheme);
-                document.documentElement.style.colorScheme = savedTheme;
-                var metaTheme = document.querySelector('meta[name="theme-color"]');
-                if (metaTheme) metaTheme.setAttribute('content', savedTheme === 'light' ? '#f5f7fa' : '#1b1b1b');
-                var metaScheme = document.querySelector('meta[name="color-scheme"]');
-                if (metaScheme) metaScheme.setAttribute('content', savedTheme);
-            }
-        } catch (e) {}
-    </script>
-    <link rel="canonical" href="https://xandervanhaeren.github.io/projects/typhoon.html">
-
-    <meta property="og:type" content="article">
-    <meta property="og:title" content="Project Typhoon — Xander Vanhaeren">
-    <meta property="og:description" content="Project Typhoon: custom 3D-printed delta-wing RC jet, SolidWorks CFD validation, and ESP32-C6 flight controller studying how airfoil choice affects maneuverability.">
-    <meta property="og:url" content="https://xandervanhaeren.github.io/projects/typhoon.html">
-    <meta property="og:image" content="https://xandervanhaeren.github.io/assets/images/projects/Typhoon/typhoon-v3.jpg">
-    <meta name="twitter:card" content="summary_large_image">
-
-    <link rel="icon" href="/assets/Logo/favicon.svg" type="image/svg+xml">
-    <link rel="icon" href="/assets/Logo/favicon.ico" sizes="any">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project Typhoon — Xander Vanhaeren</title>
+  <meta name="description" content="Project Typhoon: 821 g twin-50 mm EDF delta-wing RC jet, SolidWorks CFD envelope, and custom ESP32-C6 Saturn OS flight controller studying airfoil maneuverability.">
+  <meta name="author" content="Xander Vanhaeren">
+  <meta name="theme-color" content="#1b1b1b">
+  <meta name="color-scheme" content="dark">
+  <link rel="canonical" href="https://xandervanhaeren.github.io/projects/typhoon.html">
+  <link rel="icon" href="/assets/Logo/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/assets/Logo/favicon.ico" sizes="any">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body class="article-page">
-    <div id="root"></div>
-    <script type="module" src="/src/typhoonMain.tsx"></script>
+<body style="margin:0;background:#1b1b1b;color:#ffffff;">
+  <div id="root" data-article="typhoon"></div>
+  <noscript>
+    <p><a href="/" style="color:#ffffff;">&larr; Back to projects</a></p>
+  </noscript>
+  <script type="module" src="/src/articleMain.tsx"></script>
 </body>
 </html>

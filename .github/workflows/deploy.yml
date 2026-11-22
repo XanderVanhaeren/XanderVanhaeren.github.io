@@ -3,6 +3,7 @@ name: Deploy Portfolio to GitHub Pages
 on:
   push:
     branches:
+      - Renew
       - React
       - main
   workflow_dispatch:

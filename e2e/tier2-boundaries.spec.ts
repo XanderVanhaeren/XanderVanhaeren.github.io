@@ -1,1048 +1,568 @@
-import { test, expect } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import {
-  attachConsoleErrorTracker,
+  PROJECTS_CONTRACT,
+  VIEWPORTS,
+  assertAllImagesLoaded,
+  assertDesktopEvenGrid,
+  assertHoverGrowShrink,
+  assertNoHorizontalOverflow,
+  assertPhoneSingleColumnStack,
+  assertTabletReferenceGrid,
+  attachDiagnostics,
+  closeProjectOverlay,
+  getCanvasBackgroundColor,
+  getTile,
+  getTileBoxes,
+  gotoArticleReady,
   gotoHomeReady,
-  getNavTab,
-  selectCategorySegment,
-  getSectionSearchInput,
-  setSectionSearchQuery,
-  clearSectionSearch,
-  openGlassOpticsHud,
-  setSliderValue,
-  openTyphoonModal,
-  closeTyphoonModal,
-  getActiveGlassOpticsVars,
+  hoverAndSettle,
+  openProjectOverlay,
+  resetHoverToRest,
+  waitForTilesSettled,
 } from './helpers';
 
-test.describe('Tier 2 — Boundary & Corner Cases (F1–F12, 64 Tests)', () => {
-  test.describe('F1: Build, Multi-Page Routing & Restricted Path Boundaries', () => {
-    test('F1-B1: Direct navigation to /index.html vs / parity', async ({ page }) => {
-      await page.goto('/index.html', { waitUntil: 'domcontentloaded' });
-      await expect(page.locator('#root')).not.toBeEmpty();
-      const indexHasTheme = await page.evaluate(
-        () => document.documentElement.getAttribute('data-theme') === 'dark'
-      );
-      expect(indexHasTheme).toBe(true);
-
-      await page.goto('/', { waitUntil: 'domcontentloaded' });
-      await expect(page.locator('#root')).not.toBeEmpty();
-      const rootHasTheme = await page.evaluate(
-        () => document.documentElement.getAttribute('data-theme') === 'dark'
-      );
-      expect(rootHasTheme).toBe(true);
-    });
-
-    test('F1-B2: Unknown hash fragment on root (/#non-existent-section-xyz) graceful handling', async ({
-      page,
-    }) => {
-      const tracker = attachConsoleErrorTracker(page);
-      await page.goto('/#non-existent-section-xyz', { waitUntil: 'domcontentloaded' });
-
-      await expect(page.locator('#home')).toBeVisible();
-      await expect(page.locator('#about')).toBeVisible();
-      await expect(page.locator('#projects')).toBeVisible();
-      await expect(page.locator('#skills')).toBeVisible();
-      tracker.assertClean();
-    });
-
-    test('F1-B3: Unknown query parameters (/?unknown=123&project=invalid_slug) graceful handling', async ({
-      page,
-    }) => {
-      const tracker = attachConsoleErrorTracker(page);
-      await page.goto('/?unknown=123&project=invalid_slug', { waitUntil: 'domcontentloaded' });
-
-      await expect(page.locator('#home')).toBeVisible();
-      const modal = page.locator('dialog#project-modal');
-      await expect(modal).toBeHidden();
-      tracker.assertClean();
-    });
-
-    test('F1-B4: Restricted .agents/ directory and Logo.af are not referenced in DOM', async ({
-      page,
-    }) => {
-      await gotoHomeReady(page);
-      const leakedRefs = await page.evaluate(() => {
-        return Array.from(document.querySelectorAll('[href], [src]')).filter((el) => {
-          const val = (el.getAttribute('href') || '') + (el.getAttribute('src') || '');
-          return val.includes('.agents') || val.includes('Logo.af');
-        }).length;
-      });
-      expect(leakedRefs).toBe(0);
-    });
-
-    test('F1-B5: Multi-page entry /projects/typhoon.html with query string & hash (/projects/typhoon.html?ref=test#cfd)', async ({
-      page,
-    }) => {
-      const tracker = attachConsoleErrorTracker(page);
-      await page.goto('/projects/typhoon.html?ref=test#cfd', { waitUntil: 'domcontentloaded' });
-
-      await expect(page.getByRole('heading', { level: 1, name: 'Project Typhoon' })).toBeVisible();
-      await expect(page.locator('.lg-glass').first()).toBeVisible();
-      tracker.assertClean();
-    });
+test.describe('Tier 2 — F1 Boundaries: Routing, Landmarks & Viewport Bounds', () => {
+  test('T2-F1-01: direct /index.html navigation matches / home layout', async ({ page }) => {
+    const diag = attachDiagnostics(page);
+    await gotoHomeReady(page, VIEWPORTS.desktopLarge, '/index.html');
+    const boxes = await getTileBoxes(page);
+    assertDesktopEvenGrid(boxes);
+    diag.assertClean();
   });
 
-  test.describe('F2: Static Assets, Fonts & Metadata Corner Cases', () => {
-    test('F2-B1: URL-encoded space in asset filename (/assets/images/projects/Typhoon/Fuselage%20Flowsim.png) loads with HTTP 200', async ({
-      page,
-    }) => {
-      const res = await page.request.get(
-        '/assets/images/projects/Typhoon/Fuselage%20Flowsim.png'
-      );
-      expect(res.status()).toBe(200);
-      expect(res.headers()['content-type']).toContain('image/png');
-      const body = await res.body();
-      expect(body.byteLength).toBeGreaterThan(50000);
-    });
-
-    test('F2-B2: Favicon assets (/assets/Logo/favicon.svg, /assets/Logo/favicon.ico, /assets/Logo/Logo.svg) boundary check on both routes', async ({
-      page,
-    }) => {
-      for (const path of [
-        '/assets/Logo/favicon.svg',
-        '/assets/Logo/favicon.ico',
-        '/assets/Logo/Logo.svg',
-      ]) {
-        const res = await page.request.get(path);
-        expect(res.status()).toBe(200);
-        expect((await res.body()).byteLength).toBeGreaterThan(100);
-      }
-
-      await page.goto('/projects/typhoon.html', { waitUntil: 'domcontentloaded' });
-      const iconCount = await page.locator('head link[rel*="icon"]').count();
-      expect(iconCount).toBeGreaterThanOrEqual(1);
-    });
-
-    test('F2-B3: Google Fonts offline/blocked network graceful fallback', async ({ page }) => {
-      const tracker = attachConsoleErrorTracker(page, { ignoreNetworkErrors: true });
-      await page.route('**/*fonts.googleapis.com/**', (route) => route.abort());
-      await page.route('**/*fonts.gstatic.com/**', (route) => route.abort());
-
-      await gotoHomeReady(page);
-      const fontFamily = await page.evaluate(() => getComputedStyle(document.body).fontFamily);
-      expect(fontFamily.length).toBeGreaterThan(0);
-      tracker.assertClean();
-    });
-
-    test('F2-B4: SEO & OpenGraph metadata completeness on root vs standalone /projects/typhoon.html', async ({
-      page,
-    }) => {
-      await gotoHomeReady(page);
-      const rootTitle = await page.title();
-      expect(rootTitle).toContain('Xander Vanhaeren');
-
-      await page.goto('/projects/typhoon.html', { waitUntil: 'domcontentloaded' });
-      const typhoonTitle = await page.title();
-      expect(typhoonTitle).toContain('Project Typhoon');
-      expect(typhoonTitle).not.toBe(rootTitle);
-    });
-
-    test('F2-B5: Key high-res Typhoon image assets in /assets/images/projects/Typhoon/ are reachable via HTTP GET', async ({
-      page,
-    }) => {
-      const assets = [
-        '/assets/images/projects/Typhoon/VelocitySolidworks.png',
-        '/assets/images/projects/Typhoon/typhoon-v3.jpg',
-        '/assets/images/projects/Typhoon/tars-v2.png',
-        '/assets/images/projects/Typhoon/Fuselage%20Flowsim.png',
-        '/assets/images/projects/Typhoon/typhoon-hero-render.png',
-      ];
-      for (const url of assets) {
-        const res = await page.request.get(url);
-        expect(res.status(), `${url} must return 200`).toBe(200);
-      }
-    });
+  test('T2-F1-02: all 4 tiles are <button> elements with accessible project titles', async ({ page }) => {
+    await gotoHomeReady(page, VIEWPORTS.desktopLarge);
+    for (const project of PROJECTS_CONTRACT) {
+      const tile = getTile(page, project.slug);
+      const tagName = await tile.evaluate((el) => el.tagName.toLowerCase());
+      expect(tagName).toBe('button');
+      const label = await tile.evaluate((el) => el.getAttribute('aria-label') || el.textContent || '');
+      expect(label.toLowerCase()).toContain(project.title.toLowerCase());
+    }
   });
 
-  test.describe('F3: Typed Portfolio & skills.csv Data Layer Network Failure & Edge Cases', () => {
-    test('F3-B1: assets/data/skills.csv HTTP 500 Server Error triggers synchronous fallback', async ({
-      page,
-    }) => {
-      const tracker = attachConsoleErrorTracker(page, { ignoreNetworkErrors: true });
-      await page.route('**/assets/data/skills.csv*', (route) =>
-        route.fulfill({ status: 500, body: 'Internal Server Error' })
-      );
-
-      await gotoHomeReady(page);
-      const skills = page.locator('#skills');
-      for (const cat of [
-        'Programming',
-        'Electronics & Embedded Systems',
-        'CAD & Mechanical Design',
-        'Data Analysis & Simulation',
-        'Tools & Technologies',
-      ]) {
-        await expect(skills).toContainText(cat);
+  test('T2-F1-03: all 4 tiles remain strictly within viewport bounds on 1440x900 and 1280x800', async ({ page }) => {
+    for (const vp of [VIEWPORTS.desktopLarge, VIEWPORTS.desktopStandard]) {
+      await gotoHomeReady(page, vp);
+      const boxes = await getTileBoxes(page);
+      for (const { slug } of PROJECTS_CONTRACT) {
+        const b = boxes[slug];
+        expect(b.x).toBeGreaterThanOrEqual(0);
+        expect(b.y).toBeGreaterThanOrEqual(0);
+        expect(b.right).toBeLessThanOrEqual(vp.width + 1);
+        expect(b.bottom).toBeLessThanOrEqual(vp.height + 1);
       }
-      await expect(skills).toContainText('Python');
-      await expect(skills).toContainText('Linux');
-      tracker.assertClean();
-    });
-
-    test('F3-B2: assets/data/skills.csv network abort / offline triggers synchronous fallback', async ({
-      page,
-    }) => {
-      const tracker = attachConsoleErrorTracker(page, { ignoreNetworkErrors: true });
-      await page.route('**/assets/data/skills.csv*', (route) => route.abort('failed'));
-
-      await gotoHomeReady(page);
-      const skills = page.locator('#skills');
-      await expect(skills).toContainText('Programming');
-      await expect(skills).toContainText('Arduino / ESP32');
-      await expect(skills).toContainText('CFD / Aerodynamics');
-      tracker.assertClean();
-    });
-
-    test('F3-B3: assets/data/skills.csv empty body or header-only falls back to default 16 skills', async ({
-      page,
-    }) => {
-      await page.route('**/assets/data/skills.csv*', (route) =>
-        route.fulfill({
-          status: 200,
-          contentType: 'text/csv',
-          body: 'category;skill;level\n   \n',
-        })
-      );
-
-      await gotoHomeReady(page);
-      const skills = page.locator('#skills');
-      await expect(skills).toContainText('Programming');
-      await expect(skills).toContainText('Tools & Technologies');
-      await expect(skills).toContainText('Git / GitHub');
-    });
-
-    test('F3-B4: assets/data/skills.csv with extra whitespace, unknown proficiency level, and trailing blank lines', async ({
-      page,
-    }) => {
-      const customCsv = [
-        'category;skill;level',
-        '  Programming  ;  Python  ;  ADVANCED  ',
-        '  Programming  ;  Rust Embedded  ;  UNKNOWN_LEVEL_XYZ  ',
-        '',
-        '   ',
-      ].join('\n');
-
-      await page.route('**/assets/data/skills.csv*', (route) =>
-        route.fulfill({ status: 200, contentType: 'text/csv', body: customCsv })
-      );
-
-      await gotoHomeReady(page);
-      const skills = page.locator('#skills');
-      await expect(skills).toContainText('Programming');
-      await expect(skills).toContainText('Python');
-      await expect(skills).toContainText('Rust Embedded');
-    });
-
-    test('F3-B5: assets/data/skills.csv with malformed rows (missing semicolons / single column) falls back cleanly', async ({
-      page,
-    }) => {
-      const malformedCsv = 'category;skill;level\ncorrupted_line_without_delimiters\nonly_two;parts\n';
-      await page.route('**/assets/data/skills.csv*', (route) =>
-        route.fulfill({ status: 200, contentType: 'text/csv', body: malformedCsv })
-      );
-
-      await gotoHomeReady(page);
-      const skills = page.locator('#skills');
-      await expect(skills).toContainText('Programming');
-      await expect(skills).toContainText('Python');
-    });
-
-    test('F3-B6: Verbatim V1 numerical & technical copy preservation under boundary inspection', async ({
-      page,
-    }) => {
-      await gotoHomeReady(page);
-      const bodyText = await page.locator('body').innerText();
-
-      for (const token of [
-        '50.88° N, 4.70° E',
-        'ISO // 1013.25 hPa',
-        'NACA 2412',
-        '821 g',
-        '13.7 m/s',
-        'ESP32-C6',
-        '50.8798° N, 4.7005° E',
-      ]) {
-        expect(bodyText).toContain(token);
-      }
-    });
+    }
   });
 
-  test.describe('F4: Liquid Glass Design System, Responsive Breakpoints & Reduced Motion', () => {
-    test('F4-B1: Small Mobile Viewport (320×568) — zero horizontal overflow & visible mobile toggle', async ({
-      page,
-    }) => {
-      await page.setViewportSize({ width: 320, height: 568 });
-      await gotoHomeReady(page);
+  test('T2-F1-04: non-empty document title and zero horizontal overflow on desktop', async ({ page }) => {
+    await gotoHomeReady(page, VIEWPORTS.desktopLarge);
+    const title = await page.title();
+    expect(title.trim().length).toBeGreaterThan(0);
+    await assertNoHorizontalOverflow(page);
 
-      const overflow = await page.evaluate(
-        () => document.documentElement.scrollWidth - document.documentElement.clientWidth
-      );
-      expect(overflow).toBeLessThanOrEqual(2);
-
-      const navToggle = page.locator('#navbar .nav-toggle, #navbar button[aria-label*="menu" i]').first();
-      await expect(navToggle).toBeVisible();
-    });
-
-    test('F4-B2: Standard Mobile Viewport (375×667) — mobile navigation toggle & container bounds', async ({
-      page,
-    }) => {
-      await page.setViewportSize({ width: 375, height: 667 });
-      await gotoHomeReady(page);
-
-      const navToggle = page.locator('#navbar .nav-toggle, #navbar button[aria-label*="menu" i]').first();
-      await expect(navToggle).toBeVisible();
-
-      const maxCardWidth = await page.evaluate(() => {
-        const cards = Array.from(document.querySelectorAll('.lg-glass'));
-        return Math.max(...cards.map((c) => c.getBoundingClientRect().width));
-      });
-      expect(maxCardWidth).toBeLessThanOrEqual(376);
-    });
-
-    test('F4-B3: Tablet Viewport (768×1024) — boundary at 768px media query without horizontal scroll', async ({
-      page,
-    }) => {
-      await page.setViewportSize({ width: 768, height: 1024 });
-      await gotoHomeReady(page);
-
-      const overflow = await page.evaluate(
-        () => document.documentElement.scrollWidth - document.documentElement.clientWidth
-      );
-      expect(overflow).toBeLessThanOrEqual(2);
-    });
-
-    test('F4-B4: Desktop Viewport (1440×900) — multi-column layouts & hidden .nav-toggle', async ({
-      page,
-    }) => {
-      await page.setViewportSize({ width: 1440, height: 900 });
-      await gotoHomeReady(page);
-
-      const navToggle = page.locator('#navbar .nav-toggle').first();
-      if ((await navToggle.count()) > 0) {
-        await expect(navToggle).toBeHidden();
-      }
-      await expect(getNavTab(page, 'Home')).toBeVisible();
-    });
-
-    test('F4-B5: prefers-reduced-motion: reduce media emulation on CSS transitions & scroll behavior', async ({
-      page,
-    }) => {
-      await page.emulateMedia({ reducedMotion: 'reduce' });
-      await gotoHomeReady(page);
-
-      const reduced = await page.evaluate(() => ({
-        matches: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
-        scrollBehavior: getComputedStyle(document.documentElement).scrollBehavior,
-      }));
-
-      expect(reduced.matches).toBe(true);
-      expect(reduced.scrollBehavior).toBe('auto');
-    });
-
-    test('F4-B6: Every rendered .lg-glass element across the page has computed borderTopLeftRadius > 0', async ({
-      page,
-    }) => {
-      await gotoHomeReady(page);
-      const invalidCount = await page.evaluate(() => {
-        const visibleGlasses = Array.from(document.querySelectorAll('.lg-glass')).filter((el) => {
-          const r = el.getBoundingClientRect();
-          return r.width > 0 && r.height > 0;
-        });
-        return visibleGlasses.filter(
-          (el) => parseFloat(getComputedStyle(el).borderTopLeftRadius) <= 0
-        ).length;
-      });
-      expect(invalidCount).toBe(0);
-    });
+    await page.setViewportSize(VIEWPORTS.desktopStandard);
+    await waitForTilesSettled(page);
+    await assertNoHorizontalOverflow(page);
   });
 
-  test.describe('F5: Floating Liquid Glass Navbar, Scroll-Spy & Keyboard Navigation Boundaries', () => {
-    test('F5-B1: Rapid consecutive switching of TabBar items (Home -> About -> Projects -> Skills -> Home)', async ({
-      page,
-    }) => {
-      const tracker = attachConsoleErrorTracker(page);
-      await page.setViewportSize({ width: 1280, height: 800 });
-      await gotoHomeReady(page);
-
-      for (const tab of ['About', 'Projects', 'Skills', 'Home'] as const) {
-        await getNavTab(page, tab).click();
-      }
-
-      await expect(page.locator('#home')).toBeVisible();
-      tracker.assertClean();
-    });
-
-    test('F5-B2: Keyboard navigation on navbar links (ArrowRight, ArrowLeft, Home, End)', async ({
-      page,
-    }) => {
-      const tracker = attachConsoleErrorTracker(page);
-      await page.setViewportSize({ width: 1280, height: 800 });
-      await gotoHomeReady(page);
-
-      const homeTab = getNavTab(page, 'Home');
-      await homeTab.focus();
-      await page.keyboard.press('ArrowRight');
-      await page.keyboard.press('End');
-      await page.keyboard.press('Home');
-      await page.keyboard.press('ArrowLeft');
-
-      tracker.assertClean();
-    });
-
-    test('F5-B3: Mobile menu open/close via .nav-toggle, Escape key, and link selection at 375×667', async ({
-      page,
-    }) => {
-      await page.setViewportSize({ width: 375, height: 667 });
-      await gotoHomeReady(page);
-
-      const toggle = page.locator('#navbar .nav-toggle, #navbar button[aria-label*="menu" i]').first();
-      await expect(toggle).toBeVisible();
-
-      await toggle.click();
-      await expect(toggle).toHaveAttribute('aria-expanded', 'true');
-
-      await page.keyboard.press('Escape');
-      await expect(toggle).toHaveAttribute('aria-expanded', 'false');
-
-      await toggle.click();
-      await expect(toggle).toHaveAttribute('aria-expanded', 'true');
-      const mobileProjectsLink = page
-        .locator('#navbar a, #navbar button')
-        .filter({ hasText: /^\s*Projects\s*$/i })
-        .last();
-      await mobileProjectsLink.click();
-      await expect(toggle).toHaveAttribute('aria-expanded', 'false');
-    });
-
-    test('F5-B4: Scroll-spy boundary at window.scrollY === 0 vs window.scrollY > 10 (.scrolled class toggle)', async ({
-      page,
-    }) => {
-      await gotoHomeReady(page);
-      await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
-      await expect(page.locator('#navbar')).not.toHaveClass(/scrolled/);
-
-      await page.evaluate(() => window.scrollTo({ top: 250, behavior: 'instant' }));
-      await expect(page.locator('#navbar')).toHaveClass(/scrolled/);
-
-      await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
-      await expect(page.locator('#navbar')).not.toHaveClass(/scrolled/);
-    });
-
-    test('F5-B5: Skip-to-content link (.skip-link) keyboard focus & activation', async ({
-      page,
-    }) => {
-      await gotoHomeReady(page);
-      await page.keyboard.press('Tab');
-
-      const skipLink = page.locator('a.skip-link').first();
-      await expect(skipLink).toBeFocused();
-      await expect(skipLink).toBeVisible();
-      await page.keyboard.press('Enter');
-      await expect(page.locator('main#main')).toBeVisible();
-    });
-
-    test('F5-B6: Viewport resize while mobile menu is open (375×667 -> 1440×900)', async ({
-      page,
-    }) => {
-      await page.setViewportSize({ width: 375, height: 667 });
-      await gotoHomeReady(page);
-
-      const toggle = page.locator('#navbar .nav-toggle, #navbar button[aria-label*="menu" i]').first();
-      await toggle.click();
-      await expect(toggle).toHaveAttribute('aria-expanded', 'true');
-
-      await page.setViewportSize({ width: 1440, height: 900 });
-      await expect(getNavTab(page, 'Projects')).toBeVisible();
-    });
+  test('T2-F1-05: legacy query/hash URLs do not auto-open modals or legacy views', async ({ page }) => {
+    const diag = attachDiagnostics(page);
+    for (const path of ['/?project=typhoon', '/#skills', '/#about']) {
+      await page.goto('about:blank');
+      await gotoHomeReady(page, VIEWPORTS.desktopLarge, path);
+      await expect(page.locator('dialog[open]')).toHaveCount(0);
+      await expect(page.locator('#navbar')).toHaveCount(0);
+      await expect(page.locator('#skills')).toHaveCount(0);
+    }
+    diag.assertClean();
   });
 
-  test.describe('F6: Interactive Liquid Glass Optics HUD (GlassOpticsHud) Boundaries', () => {
-    test('F6-B1: Opening and closing the Liquid Glass Optics HUD popover', async ({ page }) => {
-      await gotoHomeReady(page);
-      await openGlassOpticsHud(page);
+  test('T2-F1-06: semantic landmark and identity completeness at 1024x768', async ({ page }) => {
+    const diag = attachDiagnostics(page);
+    await gotoHomeReady(page, VIEWPORTS.desktopMin);
 
-      const slider = page.locator('input[type="range"]').first();
-      await expect(slider).toBeVisible();
+    await expect(page.locator('h1')).toHaveCount(1);
+    const h1 = page.locator('h1').first();
+    await expect(h1).toContainText(/Xander/i);
+    await expect(h1).toContainText(/Vanhaeren\./i);
 
-      await page.keyboard.press('Escape');
-    });
+    const engStudent = page.getByText(/Engineering Student/i).first();
+    const kuLeuven = page.getByText(/KU Leuven/i).first();
+    await expect(engStudent).toBeVisible();
+    await expect(kuLeuven).toBeVisible();
 
-    test('F6-B2: Blur slider (--lg-blur) minimum (0px) and maximum bounds', async ({ page }) => {
-      await gotoHomeReady(page);
-      await openGlassOpticsHud(page);
+    const h1Box = await h1.boundingBox();
+    const subBox = await kuLeuven.boundingBox();
+    expect(h1Box).not.toBeNull();
+    expect(subBox).not.toBeNull();
+    if (h1Box && subBox) {
+      expect(subBox.y).toBeGreaterThan(h1Box.y + h1Box.height);
+    }
 
-      const blurSlider = page
-        .locator('input[type="range"][aria-label*="Blur" i], .lg-slider input[type="range"]')
-        .first();
-      const minVal = Number((await blurSlider.getAttribute('min')) ?? 0);
-      const maxVal = Number((await blurSlider.getAttribute('max')) ?? 30);
+    await assertNoHorizontalOverflow(page);
+    diag.assertClean();
+  });
+});
 
-      await setSliderValue(blurSlider, minVal);
-      await expect
-        .poll(async () => (await getActiveGlassOpticsVars(page)).blur)
-        .toContain(String(minVal));
-
-      await setSliderValue(blurSlider, maxVal);
-      await expect
-        .poll(async () => (await getActiveGlassOpticsVars(page)).blur)
-        .toContain(String(maxVal));
-    });
-
-    test('F6-B3: Refraction Bend (--lg-glass-bend) and Dispersion (--lg-glass-dispersion) slider min/max bounds', async ({
-      page,
-    }) => {
-      await gotoHomeReady(page);
-      await openGlassOpticsHud(page);
-
-      const sliders = page.locator('.lg-slider input[type="range"], input[type="range"]');
-      const bendSlider = page
-        .locator('input[type="range"][aria-label*="Bend" i]')
-        .or(sliders.nth(1))
-        .first();
-      const dispSlider = page
-        .locator('input[type="range"][aria-label*="Dispersion" i]')
-        .or(sliders.nth(2))
-        .first();
-
-      const bendMin = Number((await bendSlider.getAttribute('min')) ?? 0);
-      const dispMax = Number((await dispSlider.getAttribute('max')) ?? 2);
-
-      await setSliderValue(bendSlider, bendMin);
-      await setSliderValue(dispSlider, dispMax);
-
-      const vars = await getActiveGlassOpticsVars(page);
-      expect(vars.bend).toContain(String(bendMin));
-      expect(vars.dispersion).toContain(String(dispMax));
-    });
-
-    test('F6-B4: Rapid toggling of the Contour Animation Pause <Switch> (onCheckedChange)', async ({
-      page,
-    }) => {
-      await gotoHomeReady(page);
-      await openGlassOpticsHud(page);
-
-      const switchEl = page.locator('.lg-switch[role="switch"], [role="switch"]').first();
-      const initial = (await switchEl.getAttribute('aria-checked')) === 'true';
-
-      for (let i = 0; i < 5; i++) {
-        await switchEl.click();
+test.describe('Tier 2 — F2 Boundaries: Asset Integrity, Reloads & Direct Fetch', () => {
+  test('T2-F2-01: tile images fill >= 95% of tile containers without letterboxing', async ({ page }) => {
+    await gotoHomeReady(page, VIEWPORTS.desktopLarge);
+    for (const { slug } of PROJECTS_CONTRACT) {
+      const tile = getTile(page, slug);
+      const tileBox = await tile.boundingBox();
+      const img = tile.locator('img').first();
+      const imgBox = await img.boundingBox();
+      const objectFit = await img.evaluate((el) => getComputedStyle(el).objectFit);
+      expect(
+        ['cover', 'fill'],
+        `Tile ${slug} image object-fit "${objectFit}" must be cover or fill to avoid letterboxing`,
+      ).toContain(objectFit);
+      expect(tileBox).not.toBeNull();
+      expect(imgBox).not.toBeNull();
+      if (tileBox && imgBox) {
+        expect(imgBox.width).toBeGreaterThanOrEqual(tileBox.width * 0.95);
+        expect(imgBox.height).toBeGreaterThanOrEqual(tileBox.height * 0.95);
       }
-
-      const finalState = (await switchEl.getAttribute('aria-checked')) === 'true';
-      expect(finalState).toBe(!initial);
-    });
-
-    test('F6-B5: Resetting Optics HUD parameters to defaults (blur: 14, bend: 1.6, dispersion: 0.6)', async ({
-      page,
-    }) => {
-      await gotoHomeReady(page);
-      await openGlassOpticsHud(page);
-
-      const blurSlider = page
-        .locator('input[type="range"][aria-label*="Blur" i], .lg-slider input[type="range"]')
-        .first();
-      await setSliderValue(blurSlider, 26);
-
-      const resetBtn = page
-        .locator('button:has-text("Reset"), button[aria-label*="Reset" i]')
-        .first();
-      if (await resetBtn.isVisible().catch(() => false)) {
-        await resetBtn.click();
-      } else {
-        await setSliderValue(blurSlider, 14);
-      }
-
-      await expect
-        .poll(async () => (await getActiveGlassOpticsVars(page)).blur)
-        .toContain('14');
-    });
+    }
   });
 
-  test.describe('F7: Hero Section & Telemetry Fieldnotes Boundaries', () => {
-    test('F7-B1: Hero CTA <Button variant="filled"> (Explore Projects) and <Button variant="glass"> (About & Workbench) keyboard activation', async ({
-      page,
-    }) => {
-      await gotoHomeReady(page);
-      const exploreCta = page.locator('#home').getByText('Explore Projects').first();
-      await exploreCta.focus();
-      await page.keyboard.press('Enter');
-      await expect(page.locator('#projects')).toBeVisible();
-
-      const aboutCta = page.locator('#home').getByText('About & Workbench').first();
-      await aboutCta.focus();
-      await page.keyboard.press('Enter');
-      await expect(page.locator('#about')).toBeVisible();
-    });
-
-    test('F7-B2: Hero Flight & Lab Telemetry card layout at ultra-narrow 320×568 viewport', async ({
-      page,
-    }) => {
-      await page.setViewportSize({ width: 320, height: 568 });
-      await gotoHomeReady(page);
-
-      const fieldnotes = page
-        .locator('#home aside, #home .hero-fieldnotes')
-        .filter({ hasText: 'Flight & Lab Telemetry' })
-        .first();
-      await expect(fieldnotes).toBeVisible();
-      const box = await fieldnotes.boundingBox();
-      expect(box?.width).toBeLessThanOrEqual(320);
-    });
-
-    test('F7-B3: Hero eyebrow coordinate badge & heading semantic hierarchy', async ({ page }) => {
-      await gotoHomeReady(page);
-      const h1Count = await page.locator('#home h1').count();
-      expect(h1Count).toBe(1);
-      await expect(page.locator('#home h1')).toHaveText('Xander Vanhaeren');
-      await expect(page.locator('#home aside[aria-label="Engineering field notes"]')).toBeVisible();
-    });
-
-    test('F7-B4: glisse press physics (pointerdown / pointerup) on Hero <Button> components', async ({
-      page,
-    }) => {
-      await gotoHomeReady(page);
-      const btn = page.locator('#home .lg-button').first();
-      await expect(btn).toBeVisible();
-
-      await btn.dispatchEvent('pointerdown');
-      await btn.dispatchEvent('pointerup');
-      await expect(btn).toBeEnabled();
-    });
-
-    test('F7-B5: Hero section backdrop registration (data-glisse-backdrop) integrity', async ({
-      page,
-    }) => {
-      await gotoHomeReady(page);
-      const hasBackdrop = await page.evaluate(
-        () => document.querySelector('[data-glisse-backdrop]') !== null
-      );
-      expect(hasBackdrop).toBe(true);
-    });
-  });
-
-  test.describe('F8: Interactive Topographic Isobar Canvas (TopoCanvas) Boundaries', () => {
-    test('F8-B1: TopoCanvas under prefers-reduced-motion: reduce draws static frame cleanly', async ({
-      page,
-    }) => {
-      await page.emulateMedia({ reducedMotion: 'reduce' });
-      await gotoHomeReady(page);
-
-      const canvas = page.locator('#topo-canvas');
-      await expect(canvas).toBeVisible();
-      await expect(canvas).toHaveAttribute('aria-hidden', 'true');
-      const dims = await canvas.evaluate((el: HTMLCanvasElement) => ({
-        w: el.width,
-        h: el.height,
-      }));
-      expect(dims.w).toBeGreaterThan(0);
-      expect(dims.h).toBeGreaterThan(0);
-    });
-
-    test('F8-B2: TopoCanvas pointer events at extreme canvas corners (0, 0) and (width, height) plus pointerleave', async ({
-      page,
-    }) => {
-      const tracker = attachConsoleErrorTracker(page);
-      await gotoHomeReady(page);
-
-      const home = page.locator('#home');
-      await page.mouse.move(1, 1);
-      await page.mouse.move(799, 499);
-      await home.dispatchEvent('pointerleave');
-
-      tracker.assertClean();
-    });
-
-    test('F8-B3: TopoCanvas resize handling across extreme aspect ratios (320×568 portrait -> 1920×400 ultrawide)', async ({
-      page,
-    }) => {
-      await page.setViewportSize({ width: 320, height: 568 });
-      await gotoHomeReady(page);
-      const portraitWidth = await page
-        .locator('#topo-canvas')
-        .evaluate((c: HTMLCanvasElement) => c.width);
-
-      await page.setViewportSize({ width: 1920, height: 400 });
-      await expect
-        .poll(async () =>
-          page.locator('#topo-canvas').evaluate((c: HTMLCanvasElement) => c.width)
-        )
-        .toBeGreaterThan(portraitWidth);
-    });
-
-    test('F8-B4: TopoCanvas off-screen scroll pause via IntersectionObserver and resume on scroll back', async ({
-      page,
-    }) => {
-      const tracker = attachConsoleErrorTracker(page);
-      await gotoHomeReady(page);
-
-      await page.evaluate(() =>
-        window.scrollTo({ top: document.body.scrollHeight, behavior: 'instant' })
-      );
-      await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
-
-      await expect(page.locator('#topo-canvas')).toBeVisible();
-      tracker.assertClean();
-    });
-
-    test('F8-B5: TopoCanvas renders actual non-transparent contour pixels on 2D context', async ({
-      page,
-    }) => {
-      await gotoHomeReady(page);
-      const nonEmpty = await page.locator('#topo-canvas').evaluate((c: HTMLCanvasElement) => {
-        const ctx = c.getContext('2d');
-        if (!ctx) return false;
-        const data = ctx.getImageData(0, 0, c.width, c.height).data;
-        for (let i = 3; i < data.length; i += 32) {
-          if (data[i] > 0) return true;
+  test('T2-F2-02: tile images maintain non-zero rendered boxes across desktop, tablet, and phone', async ({ page }) => {
+    for (const vp of [VIEWPORTS.desktopLarge, VIEWPORTS.tabletPortrait, VIEWPORTS.phoneCompact]) {
+      await gotoHomeReady(page, vp);
+      for (const { slug } of PROJECTS_CONTRACT) {
+        const imgBox = await getTile(page, slug).locator('img').first().boundingBox();
+        expect(imgBox).not.toBeNull();
+        if (imgBox) {
+          expect(imgBox.width).toBeGreaterThan(100);
+          expect(imgBox.height).toBeGreaterThan(80);
         }
-        return false;
+      }
+    }
+  });
+
+  test('T2-F2-03: hard reload keeps all 4 tile images loaded with zero errors', async ({ page }) => {
+    const diag = attachDiagnostics(page);
+    await gotoHomeReady(page, VIEWPORTS.desktopLarge);
+    await page.reload({ waitUntil: 'load' });
+    await page.waitForFunction(() => {
+      const imgs = Array.from(document.querySelectorAll<HTMLImageElement>('[data-project] img'));
+      return imgs.length === 4 && imgs.every((img) => img.complete && img.naturalWidth > 0);
+    });
+    diag.assertClean();
+  });
+
+  test('T2-F2-04: article images on 375x812 fit within 375px width and have non-empty alt', async ({ page }) => {
+    for (const { slug } of PROJECTS_CONTRACT) {
+      await gotoArticleReady(page, slug, VIEWPORTS.phoneCompact);
+      const imgs = page.locator(`[data-article="${slug}"] img`);
+      const count = await imgs.count();
+      expect(count).toBeGreaterThanOrEqual(1);
+      for (let i = 0; i < count; i++) {
+        const box = await imgs.nth(i).boundingBox();
+        const alt = (await imgs.nth(i).getAttribute('alt')) ?? '';
+        expect(alt.trim().length).toBeGreaterThan(0);
+        expect(box).not.toBeNull();
+        if (box) {
+          expect(box.width).toBeGreaterThan(0);
+          expect(box.width).toBeLessThanOrEqual(375);
+        }
+      }
+    }
+  });
+
+  test('T2-F2-05: zero external hotlinked images and zero HEIC/AVI sources across all routes', async ({ page }) => {
+    await gotoHomeReady(page, VIEWPORTS.desktopLarge);
+    await assertAllImagesLoaded(page);
+    for (const { slug } of PROJECTS_CONTRACT) {
+      await gotoArticleReady(page, slug, VIEWPORTS.desktopLarge);
+      await assertAllImagesLoaded(page.locator(`[data-article="${slug}"]`));
+    }
+  });
+
+  test('T2-F2-06: all <img> assets (and any <video>/<source>) across / and 4 articles respond HTTP 200 with valid MIME', async ({
+    page,
+  }) => {
+    const diag = attachDiagnostics(page);
+    const imageUrls = new Set<string>();
+    const videoUrls = new Set<string>();
+
+    const collectMedia = async () => {
+      const urls = await page.evaluate(() => {
+        const imgs = Array.from(document.querySelectorAll<HTMLImageElement>('img')).map((el) => el.currentSrc || el.src);
+        const vids = [
+          ...Array.from(document.querySelectorAll<HTMLVideoElement>('video')).map((el) => el.currentSrc || el.src),
+          ...Array.from(document.querySelectorAll<HTMLSourceElement>('video source')).map((el) => el.src),
+        ].filter(Boolean);
+        return { imgs, vids };
       });
-      expect(nonEmpty).toBe(true);
-    });
+      for (const u of urls.imgs) {
+        if (u && !u.startsWith('data:')) imageUrls.add(u);
+      }
+      for (const v of urls.vids) {
+        videoUrls.add(v);
+      }
+    };
+
+    await gotoHomeReady(page, VIEWPORTS.desktopLarge);
+    await collectMedia();
+
+    for (const { slug } of PROJECTS_CONTRACT) {
+      await gotoArticleReady(page, slug, VIEWPORTS.desktopLarge);
+      await collectMedia();
+    }
+
+    expect(imageUrls.size).toBeGreaterThanOrEqual(4);
+    for (const url of imageUrls) {
+      const res = await page.request.get(url);
+      expect(res.status(), `GET ${url} must return 200`).toBe(200);
+      const ct = res.headers()['content-type'] ?? '';
+      expect(ct, `GET ${url} content-type "${ct}" must be image/*`).toMatch(/^image\//i);
+    }
+
+    for (const url of videoUrls) {
+      const res = await page.request.get(url);
+      expect(res.status(), `GET ${url} must succeed`).toBeGreaterThanOrEqual(200);
+      expect(res.status(), `GET ${url} must not error`).toBeLessThan(400);
+    }
+
+    diag.assertClean();
+  });
+});
+
+test.describe('Tier 2 — F3 Boundaries: Desktop Hover Physics & Reduced Motion', () => {
+  test('T2-F3-01: exact desktop lower breakpoint 1024x768 renders even 2x2 grid at rest', async ({ page }) => {
+    await gotoHomeReady(page, VIEWPORTS.desktopMin);
+    const boxes = await getTileBoxes(page);
+    assertDesktopEvenGrid(boxes);
+    await assertNoHorizontalOverflow(page);
   });
 
-  test.describe('F9: About Section, Engineering Loop & Footer Boundaries', () => {
-    test('F9-B1: All 3 Engineering Loop <Glass> cards (01 // Simulate, 02 // Fabricate, 03 // Control) order & content integrity', async ({
-      page,
-    }) => {
-      await gotoHomeReady(page);
-      const aboutText = await page.locator('#about').innerText();
-      const idx1 = aboutText.indexOf('01 // Simulate');
-      const idx2 = aboutText.indexOf('02 // Fabricate');
-      const idx3 = aboutText.indexOf('03 // Control');
+  test('T2-F3-02: wide desktop 1920x1080 preserves even 2x2 rest grid and hover grow/shrink', async ({ page }) => {
+    await gotoHomeReady(page, VIEWPORTS.desktopWide);
+    const rest = await getTileBoxes(page);
+    assertDesktopEvenGrid(rest);
 
-      expect(idx1).toBeGreaterThanOrEqual(0);
-      expect(idx2).toBeGreaterThan(idx1);
-      expect(idx3).toBeGreaterThan(idx2);
-    });
-
-    test('F9-B2: All 7 Focus Areas & Hardware interest tags wrap cleanly at 320×568 without overflow', async ({
-      page,
-    }) => {
-      await page.setViewportSize({ width: 320, height: 568 });
-      await gotoHomeReady(page);
-
-      const about = page.locator('#about');
-      for (const tag of [
-        'Aerodynamics',
-        'Flight Dynamics',
-        'Control Systems',
-        'CFD Simulation',
-        '3D Printing (LW-PLA)',
-        'Custom PCBs & IoT',
-        'Robotics',
-      ]) {
-        await expect(about).toContainText(tag);
-      }
-    });
-
-    test('F9-B3: Education card boundary metadata (Bachelor of Science, KU Leuven, Expected 2027)', async ({
-      page,
-    }) => {
-      await gotoHomeReady(page);
-      const about = page.locator('#about');
-      await expect(about).toContainText('Bachelor of Science');
-      await expect(about).toContainText('Engineering Sciences (Mechanical Engineering)');
-      await expect(about).toContainText('KU Leuven · Leuven, Belgium · Expected 2027');
-    });
-
-    test('F9-B4: Footer (footer.footer) coordinates & quick navigation boundary', async ({
-      page,
-    }) => {
-      await gotoHomeReady(page);
-      const footer = page.locator('footer.footer, footer').first();
-      await footer.scrollIntoViewIfNeeded();
-
-      await expect(footer).toContainText('© 2026 Xander Vanhaeren · Built in Leuven, Belgium');
-      await expect(footer).toContainText('50.8798° N, 4.7005° E · KU Leuven Engineering Sciences');
-    });
-
-    test('F9-B5: Responsive grid collapse of .about-grid and .approach-grid below 900px (768×1024 vs 1440×900)', async ({
-      page,
-    }) => {
-      await page.setViewportSize({ width: 1440, height: 900 });
-      await gotoHomeReady(page);
-      const desktopCols = await page.evaluate(() => {
-        const grid = document.querySelector('.approach-grid, .about-grid');
-        return grid ? getComputedStyle(grid).gridTemplateColumns.split(' ').length : 3;
-      });
-      expect(desktopCols).toBeGreaterThanOrEqual(2);
-
-      await page.setViewportSize({ width: 768, height: 1024 });
-      const tabletCols = await page.evaluate(() => {
-        const grid = document.querySelector('.approach-grid, .about-grid');
-        return grid ? getComputedStyle(grid).gridTemplateColumns.split(' ').length : 1;
-      });
-      expect(tabletCols).toBe(1);
-    });
+    const hovered = await hoverAndSettle(page, 'typhoon');
+    assertHoverGrowShrink(rest, hovered, 'typhoon');
   });
 
-  test.describe('F10: Projects Showcase, SegmentedControl & SearchField Filtering Boundaries', () => {
-    test('F10-B1: Empty and whitespace-only search queries ("", "   ") in Projects SearchField', async ({
-      page,
-    }) => {
-      await gotoHomeReady(page);
-      const projects = page.locator('#projects');
+  test('T2-F3-03: unhovering restores tiles to resting 2x2 dimensions within 4px', async ({ page }) => {
+    await gotoHomeReady(page, VIEWPORTS.desktopLarge);
+    const rest = await getTileBoxes(page);
+    await hoverAndSettle(page, 'bikeysens');
+    const afterReset = await resetHoverToRest(page);
 
-      await setSectionSearchQuery(page, '#projects', '   ');
-      await expect(projects.getByRole('heading', { name: 'Project Typhoon' })).toBeVisible();
-      await expect(projects.getByRole('heading', { name: 'RCXD' })).toBeVisible();
-      await expect(projects.getByRole('heading', { name: 'BikeySens' })).toBeVisible();
-    });
-
-    test('F10-B2: Case-insensitive and partial-keyword search in Projects SearchField ("eSp32", "rOs", "bLe")', async ({
-      page,
-    }) => {
-      await gotoHomeReady(page);
-      const projects = page.locator('#projects');
-
-      await setSectionSearchQuery(page, '#projects', 'eSp32');
-      await expect(projects.getByRole('heading', { name: 'Project Typhoon' })).toBeVisible();
-      await expect(projects.getByRole('heading', { name: 'RCXD' })).toBeHidden();
-
-      await setSectionSearchQuery(page, '#projects', 'rOs');
-      await expect(projects.getByRole('heading', { name: 'RCXD' })).toBeVisible();
-      await expect(projects.getByRole('heading', { name: 'Project Typhoon' })).toBeHidden();
-
-      await setSectionSearchQuery(page, '#projects', 'bLe');
-      await expect(projects.getByRole('heading', { name: 'BikeySens' })).toBeVisible();
-      await expect(projects.getByRole('heading', { name: 'RCXD' })).toBeHidden();
-    });
-
-    test('F10-B3: Special-character and zero-match search query ("xyz_nonexistent_999!@#$%^&*()") shows empty state & recovers', async ({
-      page,
-    }) => {
-      await gotoHomeReady(page);
-      const projects = page.locator('#projects');
-
-      await setSectionSearchQuery(page, '#projects', 'xyz_nonexistent_999!@#$%^&*()');
-      await expect(projects.getByRole('heading', { name: 'Project Typhoon' })).toBeHidden();
-      await expect(projects.getByRole('heading', { name: 'RCXD' })).toBeHidden();
-      await expect(projects.getByRole('heading', { name: 'BikeySens' })).toBeHidden();
-
-      await clearSectionSearch(page, '#projects');
-      await expect(projects.getByRole('heading', { name: 'Project Typhoon' })).toBeVisible();
-      await expect(projects.getByRole('heading', { name: 'RCXD' })).toBeVisible();
-      await expect(projects.getByRole('heading', { name: 'BikeySens' })).toBeVisible();
-    });
-
-    test('F10-B4: Clearing Projects SearchField via glisse clear button and keyboard', async ({
-      page,
-    }) => {
-      await gotoHomeReady(page);
-      const projects = page.locator('#projects');
-
-      await setSectionSearchQuery(page, '#projects', 'Typhoon');
-      await expect(projects.getByRole('heading', { name: 'RCXD' })).toBeHidden();
-
-      await clearSectionSearch(page, '#projects');
-      await expect(getSectionSearchInput(page, '#projects')).toHaveValue('');
-      await expect(projects.getByRole('heading', { name: 'RCXD' })).toBeVisible();
-    });
-
-    test('F10-B5: Rapid switching across all Projects SegmentedControl tabs (All -> Aerospace -> Robotics -> Telemetry -> All)', async ({
-      page,
-    }) => {
-      await gotoHomeReady(page);
-      const projects = page.locator('#projects');
-
-      await selectCategorySegment(page, '#projects', 'Aerospace');
-      await selectCategorySegment(page, '#projects', 'Robotics');
-      await selectCategorySegment(page, '#projects', 'Telemetry');
-      await selectCategorySegment(page, '#projects', 'All');
-
-      await expect(projects.getByRole('heading', { name: 'Project Typhoon' })).toBeVisible();
-      await expect(projects.getByRole('heading', { name: 'RCXD' })).toBeVisible();
-      await expect(projects.getByRole('heading', { name: 'BikeySens' })).toBeVisible();
-    });
-
-    test('F10-B6: Inline SVG contour diagrams (rover on RCXD, telemetry on BikeySens) & .proof-grid inspection', async ({
-      page,
-    }) => {
-      await gotoHomeReady(page);
-      const projects = page.locator('#projects');
-
-      await expect(projects.locator('svg').filter({ hasText: 'TERRAIN CONTOUR // WAYPOINT NAV' })).toBeVisible();
-      await expect(projects.locator('svg').filter({ hasText: 'ELEVATION RIDGE // BLE TELEMETRY' })).toBeVisible();
-
-      const proofGrid = projects.locator('.proof-grid');
-      await expect(proofGrid).toBeVisible();
-    });
+    for (const { slug } of PROJECTS_CONTRACT) {
+      expect(Math.abs(afterReset[slug].width - rest[slug].width)).toBeLessThanOrEqual(4);
+      expect(Math.abs(afterReset[slug].height - rest[slug].height)).toBeLessThanOrEqual(4);
+    }
   });
 
-  test.describe('F11: Project Typhoon Case-Study Modal & Standalone Page Routing Boundaries', () => {
-    test('F11-B1: Closing #project-modal via .project-modal-close button, Escape key, and backdrop click', async ({
-      page,
-    }) => {
-      await gotoHomeReady(page);
+  test('T2-F3-04: rapid sequential hover across all 4 tiles settles accurately on final tile', async ({ page }) => {
+    await gotoHomeReady(page, VIEWPORTS.desktopLarge);
+    const rest = await getTileBoxes(page);
 
-      await openTyphoonModal(page);
-      await closeTyphoonModal(page, 'button');
-
-      await openTyphoonModal(page);
-      await closeTyphoonModal(page, 'escape');
-
-      await openTyphoonModal(page);
-      await closeTyphoonModal(page, 'backdrop');
-    });
-
-    test('F11-B2: Direct deep-link opening via query param /?project=typhoon and hash /#projects/typhoon', async ({
-      page,
-    }) => {
-      await page.goto('/?project=typhoon', { waitUntil: 'domcontentloaded' });
-      const modal = page.locator('dialog#project-modal, #project-modal').first();
-      await expect(modal).toBeVisible();
-      await closeTyphoonModal(page, 'escape');
-
-      await page.goto('/#projects/typhoon', { waitUntil: 'domcontentloaded' });
-      await expect(modal).toBeVisible();
-    });
-
-    test('F11-B3: Direct navigation to standalone /projects/typhoon.html renders all 5 sections, 6 specs, 5 tags & 4 figures', async ({
-      page,
-    }) => {
-      await page.goto('/projects/typhoon.html', { waitUntil: 'domcontentloaded' });
-
-      await expect(page.getByRole('heading', { level: 1, name: 'Project Typhoon' })).toBeVisible();
-      for (const spec of [
-        '680 mm × 602 mm',
-        '821 g (wings < 60 g each)',
-        'NACA 2412 (4° → 2° washout)',
-        '2 × 50 mm EDF · 12.96 N thrust',
-        '1.61 (1034 W peak)',
-        'TARS V2 (24 g, ESP32-C6 + MPU-6050)',
-      ]) {
-        await expect(page.locator('body')).toContainText(spec);
-      }
-
-      const imgs = page.locator('figure img, .article-figure img');
-      expect(await imgs.count()).toBeGreaterThanOrEqual(4);
-    });
-
-    test('F11-B4: Standalone /projects/typhoon.html navigation back to portfolio via Back to Portfolio (.article-back)', async ({
-      page,
-    }) => {
-      await page.goto('/projects/typhoon.html', { waitUntil: 'domcontentloaded' });
-      const backLink = page.locator('a.article-back, a:has-text("Back to Portfolio")').first();
-      await expect(backLink).toBeVisible();
-      await backLink.click();
-
-      await expect(page.locator('#projects')).toBeVisible();
-    });
-
-    test('F11-B5: Read full engineering article link points to projects/typhoon.html and does not hijack Ctrl+Click', async ({
-      page,
-    }) => {
-      await gotoHomeReady(page);
-      const link = page
-        .locator('#projects a:has-text("Read full engineering article")')
-        .first();
-
-      if ((await link.count()) > 0) {
-        const href = await link.getAttribute('href');
-        expect(href).toContain('typhoon.html');
-      } else {
-        const btn = page
-          .locator('#projects button:has-text("Read full engineering article")')
-          .first();
-        await expect(btn).toBeVisible();
-      }
-    });
+    await getTile(page, 'typhoon').hover();
+    await getTile(page, 'bikeysens').hover();
+    await getTile(page, 'team-214').hover();
+    const finalBoxes = await hoverAndSettle(page, 'rcxd');
+    assertHoverGrowShrink(rest, finalBoxes, 'rcxd');
   });
 
-  test.describe('F12: Skills & Instruments Interactive Matrix Boundaries', () => {
-    test('F12-B1: Empty and whitespace-only search queries ("", "   ") in Skills SearchField', async ({
-      page,
-    }) => {
-      await gotoHomeReady(page);
-      const skills = page.locator('#skills');
+  test('T2-F3-05: prefers-reduced-motion: reduce uses instant transition (<=50ms) OR disables hover-resize while keeping grid & overlay functional', async ({
+    page,
+  }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await gotoHomeReady(page, VIEWPORTS.desktopLarge);
+    const rest = await getTileBoxes(page);
+    assertDesktopEvenGrid(rest);
 
-      await setSectionSearchQuery(page, '#skills', '   ');
-      for (const cat of [
-        'Programming',
-        'Electronics & Embedded Systems',
-        'CAD & Mechanical Design',
-        'Data Analysis & Simulation',
-        'Tools & Technologies',
-      ]) {
-        await expect(skills).toContainText(cat);
-      }
-    });
-
-    test('F12-B2: Special-character Skill search queries ("C/C++", "Python (NumPy, SciPy)", "3D Printing (FDM/SLA)")', async ({
-      page,
-    }) => {
-      await gotoHomeReady(page);
-      const skills = page.locator('#skills');
-
-      for (const query of ['C/C++', 'Python (NumPy, SciPy)', '3D Printing (FDM/SLA)']) {
-        await setSectionSearchQuery(page, '#skills', query);
-        await expect(skills).toContainText(query);
-      }
-    });
-
-    test('F12-B3: No-match search query in Skills SearchField ("cobol_fortran_999") & clear button recovery', async ({
-      page,
-    }) => {
-      await gotoHomeReady(page);
-      const skills = page.locator('#skills');
-
-      await setSectionSearchQuery(page, '#skills', 'cobol_fortran_999');
-      await expect(skills).not.toContainText('Fusion 360');
-      await expect(skills).not.toContainText('JavaScript');
-
-      await clearSectionSearch(page, '#skills');
-      await expect(skills).toContainText('Fusion 360');
-      await expect(skills).toContainText('JavaScript');
-    });
-
-    test('F12-B4: Rapid switching of Skills SegmentedControl across All and all 5 categories', async ({
-      page,
-    }) => {
-      await gotoHomeReady(page);
-      const skills = page.locator('#skills');
-
-      const categoryChecks: Array<[string, string]> = [
-        ['Programming', 'JavaScript'],
-        ['Electronics & Embedded Systems', 'Raspberry Pi'],
-        ['CAD & Mechanical Design', 'SolidWorks'],
-        ['Data Analysis & Simulation', 'MATLAB Simulink'],
-        ['Tools & Technologies', 'LaTeX'],
-      ];
-
-      for (const [cat, expectedSkill] of categoryChecks) {
-        await selectCategorySegment(page, '#skills', cat);
-        await expect(skills).toContainText(expectedSkill);
-      }
-
-      await selectCategorySegment(page, '#skills', 'All');
-      await expect(skills).toContainText('JavaScript');
-      await expect(skills).toContainText('LaTeX');
-    });
-
-    test('F12-B5: 3-dot visual proficiency indicators (advanced = 3 filled dots, intermediate = 2, beginner = 1) boundary verification', async ({
-      page,
-    }) => {
-      await gotoHomeReady(page);
-      const skills = page.locator('#skills');
-
-      const checkFilledDots = async (skillName: string, expectedCount: number) => {
-        const item = skills
-          .locator('.skill-item, li')
-          .filter({ hasText: new RegExp(`^\\s*${skillName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`, 'i') })
-          .first();
-        await expect(item).toBeVisible();
-        const filled = await item.evaluate((el) => {
-          return el.querySelectorAll(
-            '.filled, .active, .skill-dot.filled, .skill-dot--filled, [data-filled="true"], [data-active="true"]'
-          ).length;
-        });
-        expect(filled).toBe(expectedCount);
+    const durationsMs = await page.evaluate(() => {
+      const parseTimeMs = (val: string): number => {
+        if (val.endsWith('ms')) return parseFloat(val) || 0;
+        if (val.endsWith('s')) return (parseFloat(val) || 0) * 1000;
+        return 0;
       };
 
-      await checkFilledDots('Python', 3);
-      await checkFilledDots('C/C++', 2);
-      await checkFilledDots('JavaScript', 1);
+      const effectiveTransitionMs = (el: Element): number => {
+        const cs = getComputedStyle(el);
+        const props = cs.transitionProperty.split(',').map((p) => p.trim().toLowerCase());
+        const durs = cs.transitionDuration.split(',').map((d) => d.trim());
+        let maxMs = 0;
+        for (let i = 0; i < props.length; i++) {
+          const prop = props[i];
+          if (!prop || prop === 'none') continue;
+          const dur = parseTimeMs(durs[i % durs.length] ?? '0s');
+          if (dur > maxMs) maxMs = dur;
+        }
+        return maxMs;
+      };
+
+      const elements = new Set<Element>();
+      for (const tile of Array.from(document.querySelectorAll('[data-project]'))) {
+        let cur: Element | null = tile;
+        while (cur && cur !== document.documentElement) {
+          elements.add(cur);
+          cur = cur.parentElement;
+        }
+        for (const desc of Array.from(tile.querySelectorAll('*'))) {
+          elements.add(desc);
+        }
+      }
+
+      return Array.from(elements).map(effectiveTransitionMs);
     });
+
+    await getTile(page, 'typhoon').hover();
+    await page.evaluate(
+      () =>
+        new Promise<void>((resolve) => {
+          requestAnimationFrame(() => resolve());
+        }),
+    );
+    const activeAnimDurationsMs = await page.evaluate(() =>
+      document
+        .getAnimations()
+        .filter((anim) => anim.playState === 'running' || anim.pending)
+        .map((anim) => {
+          const timing = anim.effect?.getComputedTiming();
+          const dur = typeof timing?.duration === 'number' ? timing.duration : 0;
+          return Number.isFinite(dur) ? dur : 0;
+        }),
+    );
+    const hovered = await waitForTilesSettled(page);
+
+    const maxDuration = Math.max(0, ...durationsMs, ...activeAnimDurationsMs);
+    const hoverDisabled = Math.abs(hovered.typhoon.area - rest.typhoon.area) < 1;
+    expect(
+      maxDuration <= 50 || hoverDisabled,
+      `Expected transition/animation duration <= 50ms (got ${maxDuration}ms) or disabled hover resize`,
+    ).toBe(true);
+
+    await openProjectOverlay(page, 'typhoon', 'click');
+    await closeProjectOverlay(page, 'button');
+  });
+
+  test('T2-F3-06: touch context tap + close does not leave tile stuck expanded', async ({ browser }) => {
+    const context = await browser.newContext({
+      viewport: VIEWPORTS.desktopLarge,
+      hasTouch: true,
+    });
+    const page = await context.newPage();
+    try {
+      await gotoHomeReady(page);
+      const rest = await getTileBoxes(page);
+      await getTile(page, 'typhoon').tap();
+      await expect(page.locator('dialog[open]')).toBeVisible();
+      await closeProjectOverlay(page, 'escape');
+      const after = await waitForTilesSettled(page);
+      for (const { slug } of PROJECTS_CONTRACT) {
+        expect(Math.abs(after[slug].width - rest[slug].width)).toBeLessThanOrEqual(4);
+        expect(Math.abs(after[slug].height - rest[slug].height)).toBeLessThanOrEqual(4);
+      }
+    } finally {
+      await context.close();
+    }
+  });
+});
+
+test.describe('Tier 2 — F4 Boundaries: Breakpoint Edges & Dynamic Resize', () => {
+  test('T2-F4-01: exact tablet lower breakpoint 640x900 renders 2x2 asymmetric grid with zero overflow', async ({
+    page,
+  }) => {
+    await gotoHomeReady(page, VIEWPORTS.tabletMin);
+    const boxes = await getTileBoxes(page);
+    assertTabletReferenceGrid(boxes);
+    await assertNoHorizontalOverflow(page);
+  });
+
+  test('T2-F4-02: exact phone upper breakpoint 639x844 renders 1-column stack with zero overflow', async ({ page }) => {
+    await gotoHomeReady(page, VIEWPORTS.phoneMax);
+    const boxes = await getTileBoxes(page);
+    await assertPhoneSingleColumnStack(page, boxes);
+  });
+
+  test('T2-F4-03: narrow phone 320x568 stacks cleanly in 1 column with scrollWidth <= clientWidth', async ({
+    page,
+  }) => {
+    await gotoHomeReady(page, VIEWPORTS.phoneNarrow);
+    const boxes = await getTileBoxes(page);
+    await assertPhoneSingleColumnStack(page, boxes);
+  });
+
+  test('T2-F4-04: tablet portrait (768x1024) and landscape (1023x768) both keep left col > right col', async ({
+    page,
+  }) => {
+    await gotoHomeReady(page, VIEWPORTS.tabletPortrait);
+    assertTabletReferenceGrid(await getTileBoxes(page));
+    await assertNoHorizontalOverflow(page);
+
+    await page.setViewportSize(VIEWPORTS.tabletMax);
+    const landscapeBoxes = await waitForTilesSettled(page);
+    assertTabletReferenceGrid(landscapeBoxes);
+    await assertNoHorizontalOverflow(page);
+  });
+
+  test('T2-F4-05: live viewport resize Desktop -> Tablet -> Phone -> Desktop adapts cleanly', async ({ page }) => {
+    await gotoHomeReady(page, VIEWPORTS.desktopLarge);
+    assertDesktopEvenGrid(await getTileBoxes(page));
+
+    await page.setViewportSize(VIEWPORTS.tabletPortrait);
+    assertTabletReferenceGrid(await waitForTilesSettled(page));
+    await assertNoHorizontalOverflow(page);
+
+    await page.setViewportSize(VIEWPORTS.phoneCompact);
+    await assertPhoneSingleColumnStack(page, await waitForTilesSettled(page));
+
+    await page.setViewportSize(VIEWPORTS.desktopLarge);
+    assertDesktopEvenGrid(await waitForTilesSettled(page));
+    await assertNoHorizontalOverflow(page);
+  });
+
+  test('T2-F4-06: phone 375x812 stacked tiles have usable tap height (>= 120px) and zero overlap', async ({
+    page,
+  }) => {
+    await gotoHomeReady(page, VIEWPORTS.phoneCompact);
+    const boxes = await getTileBoxes(page);
+    for (const { slug } of PROJECTS_CONTRACT) {
+      expect(boxes[slug].height).toBeGreaterThanOrEqual(120);
+    }
+    await assertPhoneSingleColumnStack(page, boxes);
+  });
+});
+
+test.describe('Tier 2 — F5 Boundaries: Keyboard Activation, Focus & Modal Dismissal', () => {
+  test('T2-F5-01: keyboard Tab + Enter opens typhoon <dialog> overlay', async ({ page }) => {
+    await gotoHomeReady(page, VIEWPORTS.desktopLarge);
+    const dialog = await openProjectOverlay(page, 'typhoon', 'enter');
+    await expect(dialog).toContainText('Project Typhoon');
+    await closeProjectOverlay(page, 'escape');
+  });
+
+  test('T2-F5-02: keyboard Space opens bikeysens <dialog> overlay', async ({ page }) => {
+    await gotoHomeReady(page, VIEWPORTS.desktopLarge);
+    const dialog = await openProjectOverlay(page, 'bikeysens', 'space');
+    await expect(dialog).toContainText('Bikeysens');
+    await closeProjectOverlay(page, 'escape');
+  });
+
+  test('T2-F5-03: focus moves inside open <dialog> and leaves hidden <dialog> on close', async ({ page }) => {
+    await gotoHomeReady(page, VIEWPORTS.desktopLarge);
+    await openProjectOverlay(page, 'rcxd', 'enter');
+    const focusedInsideDialog = await page.evaluate(() => {
+      const dlg = document.querySelector('dialog[open]');
+      return Boolean(dlg && document.activeElement && (dlg === document.activeElement || dlg.contains(document.activeElement)));
+    });
+    expect(focusedInsideDialog).toBe(true);
+
+    await closeProjectOverlay(page, 'escape');
+    const openCount = await page.locator('dialog[open]').count();
+    expect(openCount).toBe(0);
+  });
+
+  test('T2-F5-04: rapid open/close across all 4 projects never leaks stale title or article href', async ({ page }) => {
+    await gotoHomeReady(page, VIEWPORTS.desktopLarge);
+    for (const project of PROJECTS_CONTRACT) {
+      const dialog = await openProjectOverlay(page, project.slug, 'click');
+      await expect(dialog).toContainText(project.title);
+      await expect(dialog.locator(`a[href="${project.route}"]`).first()).toBeVisible();
+      await closeProjectOverlay(page, 'button');
+    }
+  });
+
+  test('T2-F5-05: overlay on 375x812 fits within 375px width with zero horizontal overflow', async ({ page }) => {
+    await gotoHomeReady(page, VIEWPORTS.phoneCompact);
+    const dialog = await openProjectOverlay(page, 'team-214', 'click');
+    const box = await dialog.boundingBox();
+    expect(box).not.toBeNull();
+    if (box) {
+      expect(box.width).toBeLessThanOrEqual(375);
+    }
+    await assertNoHorizontalOverflow(page);
+    await closeProjectOverlay(page, 'button');
+  });
+
+  test('T2-F5-06: clicking inside <dialog> content card does NOT dismiss the modal', async ({ page }) => {
+    await gotoHomeReady(page, VIEWPORTS.desktopLarge);
+    const dialog = await openProjectOverlay(page, 'typhoon', 'click');
+    const heading = dialog.locator('h2, h1, h3').first();
+    await expect(heading).toBeVisible();
+    await heading.click();
+    await expect(page.locator('dialog[open]')).toHaveCount(1);
+    await closeProjectOverlay(page, 'button');
+  });
+});
+
+test.describe('Tier 2 — F6 Boundaries: Articles Responsive & History Navigation', () => {
+  test('T2-F6-01: all 4 articles have zero horizontal overflow at 1440x900, 768x1024, and 375x812', async ({
+    page,
+  }) => {
+    for (const vp of [VIEWPORTS.desktopLarge, VIEWPORTS.tabletPortrait, VIEWPORTS.phoneCompact]) {
+      for (const { slug } of PROJECTS_CONTRACT) {
+        await gotoArticleReady(page, slug, vp);
+        await assertNoHorizontalOverflow(page);
+      }
+    }
+  });
+
+  test('T2-F6-02: all 4 articles maintain #1B1B1B dark canvas and readable font size (>= 14px)', async ({ page }) => {
+    for (const { slug } of PROJECTS_CONTRACT) {
+      await gotoArticleReady(page, slug, VIEWPORTS.desktopLarge);
+      const bg = await getCanvasBackgroundColor(page);
+      expect(bg).toBe('rgb(27, 27, 27)');
+
+      const bodyFontPx = await page.evaluate(() => {
+        const p = document.querySelector('article p, main p, [data-article] p') ?? document.body;
+        return parseFloat(getComputedStyle(p).fontSize || '0');
+      });
+      expect(bodyFontPx).toBeGreaterThanOrEqual(14);
+    }
+  });
+
+  test('T2-F6-03: each article has 1 <h1>, >= 2 <h2> sections, >= 400 chars prose, and >= 1 image', async ({ page }) => {
+    for (const { slug } of PROJECTS_CONTRACT) {
+      await gotoArticleReady(page, slug, VIEWPORTS.desktopLarge);
+      const root = page.locator(`[data-article="${slug}"]`);
+      await expect(root.locator('h1')).toHaveCount(1);
+      expect(await root.locator('h2').count()).toBeGreaterThanOrEqual(2);
+      const textLen = await root.evaluate((el) => (el.textContent ?? '').trim().length);
+      expect(textLen).toBeGreaterThanOrEqual(400);
+      expect(await root.locator('img').count()).toBeGreaterThanOrEqual(1);
+    }
+  });
+
+  test('T2-F6-04: browser goBack() from article navigated via overlay returns cleanly to /', async ({ page }) => {
+    const diag = attachDiagnostics(page);
+    await gotoHomeReady(page, VIEWPORTS.desktopLarge);
+    const dialog = await openProjectOverlay(page, 'bikeysens', 'click');
+    await dialog.locator('a[href="/projects/bikeysens.html"]').first().click();
+    await page.waitForURL('**/projects/bikeysens.html');
+    await expect(page.locator('[data-article="bikeysens"]')).toBeVisible();
+
+    await page.goBack({ waitUntil: 'load' });
+    await page.waitForURL((url) => url.pathname === '/' || url.pathname === '/index.html');
+    await expect(page.locator('[data-project]')).toHaveCount(4);
+    diag.assertClean();
+  });
+
+  test('T2-F6-05: direct page.reload() on each article preserves content with zero 404s', async ({ page }) => {
+    for (const { slug } of PROJECTS_CONTRACT) {
+      const diag = attachDiagnostics(page);
+      await gotoArticleReady(page, slug, VIEWPORTS.desktopLarge);
+      await page.reload({ waitUntil: 'load' });
+      await expect(page.locator(`[data-article="${slug}"] h1`)).toBeVisible();
+      await assertAllImagesLoaded(page.locator(`[data-article="${slug}"]`));
+      diag.assertClean();
+    }
+  });
+
+  test('T2-F6-06: article tables/spec grids on 375x812 do not cause page-level horizontal overflow', async ({
+    page,
+  }) => {
+    for (const { slug } of PROJECTS_CONTRACT) {
+      await gotoArticleReady(page, slug, VIEWPORTS.phoneCompact);
+      await assertNoHorizontalOverflow(page);
+    }
   });
 });

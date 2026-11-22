@@ -12,6 +12,9 @@ export default defineConfig({
       input: {
         main: resolve(__dirname, 'index.html'),
         typhoon: resolve(__dirname, 'projects/typhoon.html'),
+        bikeysens: resolve(__dirname, 'projects/bikeysens.html'),
+        rcxd: resolve(__dirname, 'projects/rcxd.html'),
+        'team-214': resolve(__dirname, 'projects/team-214.html'),
       },
     },
   },

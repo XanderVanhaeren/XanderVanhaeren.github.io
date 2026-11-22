@@ -1,11 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import 'glisse/styles.css';
-import './styles/styles.css';
+import './styles/tokens.css';
+import './styles/home.css';
 import App from './App';
-import { applyTheme, getInitialTheme } from './utils/theme';
-
-applyTheme(getInitialTheme(), false);
 
 const rootElement = document.getElementById('root');
 if (rootElement) {

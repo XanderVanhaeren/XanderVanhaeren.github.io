@@ -15,7 +15,6 @@
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
-    "glisse": "^0.6.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },
