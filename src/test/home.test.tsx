@@ -29,6 +29,12 @@ describe('Home view & project overlay', () => {
     expect(screen.getByText(/Engineering Student/i)).toBeInTheDocument();
     expect(screen.getByText(/KU Leuven/i)).toBeInTheDocument();
 
+    const pdfLink = screen.getByRole('link', { name: 'PDF Converter' });
+    expect(pdfLink).toHaveAttribute(
+      'href',
+      'https://xandervanhaeren.github.io/goodnotes-pdf-prep/'
+    );
+
     expect(screen.queryByText(/Goodnotes/i)).not.toBeInTheDocument();
     expect(screen.queryByRole('navigation')).not.toBeInTheDocument();
   });

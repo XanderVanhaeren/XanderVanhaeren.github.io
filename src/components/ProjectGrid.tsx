@@ -98,11 +98,21 @@ export function ProjectGrid({ projects, onSelectProject }: ProjectGridProps) {
           <br />
           Vanhaeren.
         </h1>
-        <p className="home-subtitle">
-          Engineering Student
-          <br />
-          KU Leuven
-        </p>
+        <div className="home-sidebar__bottom">
+          <a
+            className="home-tool-link"
+            href="https://xandervanhaeren.github.io/goodnotes-pdf-prep/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            PDF Converter
+          </a>
+          <p className="home-subtitle">
+            Engineering Student
+            <br />
+            KU Leuven
+          </p>
+        </div>
       </aside>
 
       <section className="project-grid" aria-label="Engineering projects">
