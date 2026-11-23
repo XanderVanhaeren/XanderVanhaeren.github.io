@@ -89,6 +89,19 @@
   opacity: 0.92;
 }
 
+/* Mobile (< 640px): gently expand the tile closest to the vertical center */
+@media (max-width: 639px) {
+  .project-tile[data-mobile-centered='true'] {
+    aspect-ratio: 10 / 9;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .project-tile {
+      transition: aspect-ratio var(--transition-grid);
+    }
+  }
+}
+
 /* Tablet & Desktop shared shell (>= 640px) */
 @media (min-width: 640px) {
   .home-shell {
@@ -148,23 +161,23 @@
 
 @media (hover: hover) and (pointer: fine) and (min-width: 1024px) {
   .project-grid:has(> [data-project]:nth-child(1):is(:hover, :focus-visible)) {
-    grid-template-columns: 1.45fr 0.55fr;
-    grid-template-rows: 1.4fr 0.6fr;
+    grid-template-columns: 1.29fr 0.71fr;
+    grid-template-rows: 1.26fr 0.74fr;
   }
 
   .project-grid:has(> [data-project]:nth-child(2):is(:hover, :focus-visible)) {
-    grid-template-columns: 0.55fr 1.45fr;
-    grid-template-rows: 1.4fr 0.6fr;
+    grid-template-columns: 0.71fr 1.29fr;
+    grid-template-rows: 1.26fr 0.74fr;
   }
 
   .project-grid:has(> [data-project]:nth-child(3):is(:hover, :focus-visible)) {
-    grid-template-columns: 1.45fr 0.55fr;
-    grid-template-rows: 0.6fr 1.4fr;
+    grid-template-columns: 1.29fr 0.71fr;
+    grid-template-rows: 0.74fr 1.26fr;
   }
 
   .project-grid:has(> [data-project]:nth-child(4):is(:hover, :focus-visible)) {
-    grid-template-columns: 0.55fr 1.45fr;
-    grid-template-rows: 0.6fr 1.4fr;
+    grid-template-columns: 0.71fr 1.29fr;
+    grid-template-rows: 0.74fr 1.26fr;
   }
 }
 

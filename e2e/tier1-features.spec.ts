@@ -205,6 +205,13 @@ test.describe('Tier 1 — F3: Desktop Even 2x2 Grid & Hover Grow/Shrink Geometry
     const rest = await getTileBoxes(page);
     const hovered = await hoverAndSettle(page, 'team-214');
     assertHoverGrowShrink(rest, hovered, 'team-214');
+
+    const colShare = hovered['team-214'].width / (hovered['team-214'].width + hovered.rcxd.width);
+    const rowShare = hovered['team-214'].height / (hovered['team-214'].height + hovered.bikeysens.height);
+    expect(colShare).toBeGreaterThanOrEqual(0.62);
+    expect(colShare).toBeLessThanOrEqual(0.67);
+    expect(rowShare).toBeGreaterThanOrEqual(0.60);
+    expect(rowShare).toBeLessThanOrEqual(0.66);
   });
 });
 
@@ -256,6 +263,31 @@ test.describe('Tier 1 — F4: Tablet Reference Proportions & Phone Single-Column
       expect(h1Box.y + h1Box.height).toBeLessThanOrEqual(tiles.typhoon.y + 4);
     }
     await assertNoHorizontalOverflow(page);
+  });
+
+  test('T1-F4-07: phone 375x812 gently expands the tile closest to viewport center on scroll', async ({ page }) => {
+    await gotoHomeReady(page, VIEWPORTS.phoneCompact);
+    await page.waitForTimeout(350);
+
+    const initialCentered = await page.locator('.project-tile[data-mobile-centered="true"]').getAttribute('data-project');
+    expect(initialCentered).not.toBeNull();
+
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(450);
+
+    const scrolledCentered = await page.locator('.project-tile[data-mobile-centered="true"]').getAttribute('data-project');
+    expect(scrolledCentered).not.toBeNull();
+    expect(scrolledCentered).not.toBe(initialCentered);
+
+    const boxes = await getTileBoxes(page);
+    await assertPhoneSingleColumnStack(page, boxes);
+    const centeredSlug = scrolledCentered as keyof typeof boxes;
+    const otherHeights = (Object.keys(boxes) as Array<keyof typeof boxes>)
+      .filter((slug) => slug !== centeredSlug)
+      .map((slug) => boxes[slug].height);
+    for (const h of otherHeights) {
+      expect(boxes[centeredSlug].height).toBeGreaterThan(h + 20);
+    }
   });
 });
 
