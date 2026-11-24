@@ -1,0 +1,45 @@
+---
+export interface SpecItem {
+  label: string;
+  value: string;
+  note?: string;
+}
+
+export interface Props {
+  specs: readonly SpecItem[];
+  caption: string;
+}
+
+const { specs, caption } = Astro.props;
+const captionId = `specs-${caption
+  .toLowerCase()
+  .replace(/[^a-z0-9]+/g, '-')
+  .replace(/^-|-$/g, '')}`;
+---
+
+<div class="table-wrapper" tabindex="0" role="region" aria-labelledby={captionId}>
+  <table class="specs-table">
+    <caption id={captionId} class="visually-hidden">
+      {caption}
+    </caption>
+    <thead>
+      <tr>
+        <th scope="col">Parameter</th>
+        <th scope="col">Specification</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        specs.map((spec) => (
+          <tr>
+            <th scope="row">{spec.label}</th>
+            <td>
+              <span>{spec.value}</span>
+              {spec.note ? <span class="article-spec-note">{spec.note}</span> : null}
+            </td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>

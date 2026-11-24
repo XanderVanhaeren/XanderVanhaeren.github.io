@@ -1,0 +1,348 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Figure from '../../components/mdx/Figure.astro';
+import SpecsTable from '../../components/mdx/SpecsTable.astro';
+import '../../styles/article.css';
+
+export async function getStaticPaths() {
+  const entries = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+
+  return entries.map((entry, index) => ({
+    params: { slug: entry.data.slug },
+    props: {
+      entry,
+      prevEntry: index > 0 ? entries[index - 1] : undefined,
+      nextEntry: index < entries.length - 1 ? entries[index + 1] : undefined,
+    },
+  }));
+}
+
+export interface Props {
+  entry: CollectionEntry<'projects'>;
+  prevEntry?: CollectionEntry<'projects'>;
+  nextEntry?: CollectionEntry<'projects'>;
+}
+
+const { entry, prevEntry, nextEntry } = Astro.props;
+const project = entry.data;
+const { Content, headings } = await render(entry);
+const sectionHeadings = headings.filter((h) => h.depth === 2);
+---
+
+<BaseLayout
+  title={`${project.title} — Xander Vanhaeren`}
+  description={project.subtitle}
+  canonicalPath={`/projects/${project.slug}.html`}
+  ogImage={project.heroFigure.src}
+  ogType="article"
+>
+  <div id="top" class="article-root" data-article={project.slug}>
+    <header class="article-nav-wrap">
+      <div class="article-nav-bar">
+        <nav class="article-nav" aria-label="Primary">
+          <a class="article-back-link" href="/">
+            ← Back to projects
+          </a>
+          <div class="article-nav-context">
+            <a class="article-nav-title" href="#top" title="Scroll to top">
+              {project.title}
+            </a>
+            {
+              (prevEntry || nextEntry) && (
+                <div class="article-nav-adj" aria-label="Quick project switch">
+                  {prevEntry ? (
+                    <a
+                      href={`/projects/${prevEntry.data.slug}.html`}
+                      title={`Previous: ${prevEntry.data.title}`}
+                    >
+                      ← Prev
+                    </a>
+                  ) : null}
+                  {nextEntry ? (
+                    <a
+                      href={`/projects/${nextEntry.data.slug}.html`}
+                      title={`Next: ${nextEntry.data.title}`}
+                    >
+                      Next →
+                    </a>
+                  ) : null}
+                </div>
+              )
+            }
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <main class="article-main">
+      <article class="article-container">
+        <header class="article-header">
+          {
+            (project.status === 'in-progress' || project.statusLabel) && (
+              <div class="article-status" data-status={project.status}>
+                <span class="article-status-dot" aria-hidden="true" />
+                <span>
+                  {project.statusLabel ??
+                    (project.status === 'in-progress' ? 'In Progress' : 'Completed')}
+                </span>
+              </div>
+            )
+          }
+
+          <h1>{project.title}</h1>
+          <p class="article-subtitle">{project.subtitle}</p>
+
+          <dl class="article-meta">
+            <div>
+              <dt>Period</dt>
+              <dd>{project.period}</dd>
+            </div>
+            <div>
+              <dt>Context</dt>
+              <dd>{project.context}</dd>
+            </div>
+            <div>
+              <dt>Role</dt>
+              <dd>{project.role}</dd>
+            </div>
+            {
+              project.team ? (
+                <div>
+                  <dt>Team</dt>
+                  <dd>{project.team}</dd>
+                </div>
+              ) : null
+            }
+          </dl>
+
+          <ul class="article-tags" aria-label="Technologies and methods">
+            {project.tags.map((tag) => <li>{tag}</li>)}
+          </ul>
+        </header>
+
+        <Figure
+          src={project.heroFigure.src}
+          alt={project.heroFigure.alt}
+          caption={project.heroFigure.caption}
+          width={project.heroFigure.width}
+          height={project.heroFigure.height}
+          surface={project.heroFigure.surface}
+          priority="high"
+        />
+
+        {
+          project.video ? (
+            <section class="article-section" aria-labelledby="video-heading">
+              <h2 id="video-heading">{project.video.title}</h2>
+              <figure class="article-figure article-video-figure surface-dark" data-surface="dark">
+                <video
+                  controls
+                  playsinline
+                  muted
+                  loop
+                  preload="none"
+                  poster={project.video.poster}
+                  src={project.video.src}
+                  width={1500}
+                  height={1000}
+                  aria-label={project.video.title}
+                />
+                <figcaption>{project.video.caption}</figcaption>
+              </figure>
+            </section>
+          ) : null
+        }
+
+        <section class="article-section" aria-labelledby="specs-heading">
+          <h2 id="specs-heading">Key Specifications</h2>
+          <SpecsTable specs={project.specs} caption={`${project.title} key specifications`} />
+        </section>
+
+        {
+          sectionHeadings.length > 1 && (
+            <nav class="article-toc" aria-label="On this page">
+              <p class="article-toc__title">Contents</p>
+              <ol class="article-toc__list">
+                {sectionHeadings.map((heading) => (
+                  <li>
+                    <a href={`#${heading.slug}`}>{heading.text}</a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+          )
+        }
+
+        <div class="article-body">
+          <Content />
+        </div>
+
+        <aside class="article-sources" aria-label="Verification sources">
+          <p>{project.sourcesNote}</p>
+        </aside>
+
+        <footer class="article-footer">
+          {
+            (prevEntry || nextEntry) && (
+              <nav class="article-siblings" aria-label="Adjacent projects">
+                {prevEntry ? (
+                  <a class="article-sibling-link" href={`/projects/${prevEntry.data.slug}.html`}>
+                    <span class="article-sibling-dir">← Previous</span>
+                    <span class="article-sibling-title">{prevEntry.data.title}</span>
+                  </a>
+                ) : null}
+                {nextEntry ? (
+                  <a
+                    class="article-sibling-link article-sibling-link--next"
+                    href={`/projects/${nextEntry.data.slug}.html`}
+                  >
+                    <span class="article-sibling-dir">Next →</span>
+                    <span class="article-sibling-title">{nextEntry.data.title}</span>
+                  </a>
+                ) : null}
+              </nav>
+            )
+          }
+
+          <div>
+            <a class="article-back-link" href="/">
+              ← Back to projects
+            </a>
+          </div>
+        </footer>
+      </article>
+    </main>
+  </div>
+
+  <dialog class="figure-lightbox" closedby="any" aria-label="Expanded figure view">
+    <div class="figure-lightbox__surface">
+      <div class="figure-lightbox__header">
+        <button
+          type="button"
+          class="figure-lightbox__close"
+          data-lightbox-close
+          aria-label="Close expanded figure"
+        >
+          <span aria-hidden="true">×</span>
+        </button>
+      </div>
+      <div class="figure-lightbox__stage" data-lightbox-stage data-surface="neutral"></div>
+      <p class="figure-lightbox__caption" data-lightbox-caption></p>
+    </div>
+  </dialog>
+
+  <script>
+    const SUPPORTS_CLOSED_BY =
+      typeof HTMLDialogElement !== 'undefined' && 'closedBy' in HTMLDialogElement.prototype;
+
+    function initArticleEnhancements(): void {
+      const navWrap = document.querySelector<HTMLElement>('.article-nav-wrap');
+      if (navWrap) {
+        const updateNav = () => {
+          if (window.scrollY > 8) {
+            navWrap.setAttribute('data-scrolled', 'true');
+          } else {
+            navWrap.removeAttribute('data-scrolled');
+          }
+        };
+        updateNav();
+        window.addEventListener('scroll', updateNav, { passive: true });
+      }
+
+      const lightbox = document.querySelector<HTMLDialogElement>('dialog.figure-lightbox');
+      const stage = lightbox?.querySelector<HTMLElement>('[data-lightbox-stage]');
+      const captionEl = lightbox?.querySelector<HTMLElement>('[data-lightbox-caption]');
+      const closeBtn = lightbox?.querySelector<HTMLButtonElement>('[data-lightbox-close]');
+      const zoomButtons = Array.from(
+        document.querySelectorAll<HTMLButtonElement>('[data-lightbox-src]')
+      );
+
+      if (!lightbox || !stage || !captionEl || zoomButtons.length === 0) return;
+
+      let activeTrigger: HTMLButtonElement | null = null;
+      let pressedOutside = false;
+
+      const closeLightbox = () => {
+        if (lightbox.open) {
+          lightbox.close();
+        }
+      };
+
+      for (const btn of zoomButtons) {
+        btn.addEventListener('click', () => {
+          const src = btn.dataset.lightboxSrc;
+          const alt = btn.dataset.lightboxAlt ?? '';
+          const caption = btn.dataset.lightboxCaption ?? '';
+          const surface = btn.dataset.lightboxSurface ?? 'neutral';
+          if (!src) return;
+
+          activeTrigger = btn;
+          stage.dataset.surface = surface;
+
+          const img = document.createElement('img');
+          img.className = 'figure-lightbox__img';
+          img.src = src;
+          img.alt = alt;
+          stage.replaceChildren(img);
+
+          captionEl.textContent = caption;
+          if (!lightbox.open) {
+            lightbox.showModal();
+          }
+        });
+      }
+
+      closeBtn?.addEventListener('click', closeLightbox);
+
+      lightbox.addEventListener('cancel', (event) => {
+        event.preventDefault();
+        closeLightbox();
+      });
+
+      lightbox.addEventListener('pointerdown', (event) => {
+        if (SUPPORTS_CLOSED_BY) return;
+        if (event.target !== lightbox) {
+          pressedOutside = false;
+          return;
+        }
+        const rect = lightbox.getBoundingClientRect();
+        pressedOutside =
+          (rect.width === 0 && rect.height === 0) ||
+          event.clientX < rect.left ||
+          event.clientX > rect.right ||
+          event.clientY < rect.top ||
+          event.clientY > rect.bottom;
+      });
+
+      lightbox.addEventListener('pointerup', (event) => {
+        if (SUPPORTS_CLOSED_BY) return;
+        const wasOutside = pressedOutside;
+        pressedOutside = false;
+        if (!wasOutside || event.target !== lightbox) return;
+        const rect = lightbox.getBoundingClientRect();
+        const isOutside =
+          (rect.width === 0 && rect.height === 0) ||
+          event.clientX < rect.left ||
+          event.clientX > rect.right ||
+          event.clientY < rect.top ||
+          event.clientY > rect.bottom;
+        if (isOutside) {
+          closeLightbox();
+        }
+      });
+
+      lightbox.addEventListener('close', () => {
+        pressedOutside = false;
+        stage.replaceChildren();
+        captionEl.textContent = '';
+        if (activeTrigger?.isConnected) {
+          activeTrigger.focus();
+        }
+        activeTrigger = null;
+      });
+    }
+
+    initArticleEnhancements();
+  </script>
+</BaseLayout>

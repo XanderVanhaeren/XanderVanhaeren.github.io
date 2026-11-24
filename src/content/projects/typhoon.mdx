@@ -1,0 +1,213 @@
+---
+order: 1
+slug: typhoon
+title: Project Typhoon
+subtitle: Aerodynamic airfoil study, 9.15M-cell SolidWorks CFD envelope, 3D-printed delta airframe, and custom ESP32-C6 flight controller ("TARS" / "Saturn OS").
+period: "2025–2026"
+domain: Aerospace & Avionics
+context: "Don Bosco Haacht · 6TWE GSTEMP Thesis (612TWE1)"
+role: Sole Author, Airframe Designer & Avionics Engineer
+status: completed
+statusLabel: GSTEMP Thesis & V3 Flight Test
+tileImage: /assets/images/projects/typhoon/tile.jpg
+tileAlt: Project Typhoon V3 open-frame delta-wing RC jet with carbon spine, vase-mode PLA wings, and twin 50 mm EDFs on a dark studio backdrop
+tileWidth: 1524
+tileHeight: 1032
+overlaySummary: 821 g twin-50 mm EDF delta-wing RC jet built for a 6TWE GSTEMP thesis investigating how airfoil geometry governs turn-rate maneuverability. Combines NACA 2412 washout wings, 9.15M-cell SolidWorks CFD validation, and the custom ESP32-C6 "TARS" flight controller running 100 Hz C++ stabilization.
+highlights:
+  - "NACA 2412 airfoil (CL,max = 1.29 at 12° AoA) — 34% faster theoretical turn initiation than LS013"
+  - "821 g total mass, 12.96 N static thrust from twin 50 mm EDFs (1.61 thrust-to-weight, 1,034 W)"
+  - "9,149,212-cell SolidWorks CFD & 55-point AoA/speed parametric envelope (-10° to +10°, 10–50 m/s)"
+  - "Custom ESP32-C6 (\"TARS\") + MPU-6050 + ExpressLRS CRSF flight controller running SaturnV2.ino"
+tags:
+  - SolidWorks CFD
+  - Fusion 360
+  - ESP32-C6 / C++
+  - ExpressLRS CRSF
+  - PLA / PETG / ASA
+heroFigure:
+  src: /assets/images/projects/typhoon/cutaway-render.png
+  alt: X-ray CAD cutaway render of Project Typhoon showing internal 4S LiPo battery, TARS flight controller, carbon wing spars, and twin 50 mm EDF units
+  caption: X-ray CAD assembly of Project Typhoon revealing internal 4S 1550 mAh LiPo placement, TARS flight controller bay, twin carbon spars, and rear twin 50 mm EDF ducts.
+  width: 1600
+  height: 900
+  surface: dark
+specs:
+  - label: Dimensions (L × W × H)
+    value: 602 × 680 × 223 mm
+  - label: Total Mass / Wing Loading
+    value: "821 g (8.05 N) · 84 N/m²"
+  - label: Wing Geometry
+    value: "0.09575 m² area · AR 4.83 · < 60 g/wing (12G rated)"
+  - label: Airfoil & Twist
+    value: "NACA 2412 · 4° root → 2° tip washout"
+  - label: Propulsion
+    value: "2× 50 mm EDF (60,800 RPM, 68 A peak, 1,034 W)"
+  - label: Static Thrust & T/W
+    value: "12.96 N (~1.32 kgf) · 1.61 thrust-to-weight"
+  - label: Battery & ESC
+    value: "Ovonic 1550 mAh 4S 100C LiPo (XT60) · 2× 40A ESC w/ 5V UBEC"
+  - label: Avionics ("TARS")
+    value: "nanoESP32-C6 (RISC-V) · MPU-6050 (400 kHz I²C) · RP3 ELRS (420 kbps CRSF)"
+sourcesNote: Verified from GSTEMP Scriptie VERSIE2.docx, SaturnV2.ino, SolidWorks CFD simulation exports, and V1–V3 test documentation.
+---
+import Callout from '../../components/mdx/Callout.astro';
+import Figure from '../../components/mdx/Figure.astro';
+import FigureGroup from '../../components/mdx/FigureGroup.astro';
+
+## Research Question & Airfoil Selection
+
+Project Typhoon originated as a 6TWE GSTEMP senior thesis supervised by M. Van Minsel to bridge high-school embedded engineering with TU Delft Aerospace Engineering coursework. The central research question investigated how airfoil cross-section geometry governs pitch-up turn rate and low-speed stall margin on a compact delta-wing EDF platform.
+
+Three candidate airfoils—NACA 2412, NACA 2408, and LS013—were compared across Reynolds numbers Re ∈ [100,000; 750,000] sized to the delta planform (c_mac = 0.22 m, c_gem = 0.147 m). NACA 2412 reached CL,max = 1.2907 at 12° angle of attack, outperforming NACA 2408 (1.0586 at 8.75°) and LS013 (0.9675 at 10.25°) while delaying trailing-edge separation.
+
+To protect roll authority near stall, the wings incorporate 4° root-to-2° tip geometric washout plus slight positive dihedral, ensuring the inboard section stalls first while the outboard elevons stay attached.
+
+<Callout label="Theoretical Turn Initiation (30 m/s)">
+  dγ/dt = (0.5·ρ·v²·cL·A + T·sin(α) − W·cos(γ)) / (m·v) with T = 13 N, m = 0.83 kg, A = 0.1 m² → 2.66 rad/s for NACA 2412 (+34% over LS013).
+</Callout>
+
+<FigureGroup>
+  <Figure
+    src="/assets/images/projects/typhoon/chart-airfoils.png"
+    alt="Lift coefficient CL versus angle of attack comparison chart for NACA 2412, NACA 2408, and LS013"
+    caption="Wind-tunnel/polar comparison of NACA 2412, NACA 2408, and LS013 across the Typhoon Reynolds envelope, showing NACA 2412 peaking at CL,max = 1.2907 (12° AoA)."
+    width={1600}
+    height={1250}
+    surface="dark"
+  />
+</FigureGroup>
+
+## Airframe Architecture & V1 → V3 Evolution
+
+The composite structure pairs a central carbon-fiber spine with twin underslung carbon wing spars positioned beneath the main tube so positive lift loads place the wing-root joints in compression rather than peeling tension. Internal 3D-printed PETG ribs support a single-wall vase-mode PLA skin under 60 g per wing, verified to 12G static load.
+
+Each airframe generation resolved real aerodynamic, propulsion, and landing-gear bottlenecks discovered on the bench and runway:
+
+- **Murphy Glider:** Unpowered cardboard testbed used to tune TARS complementary filtering, elevon throws, and trim polarity before risking printed wings.
+- **V1 Closed Shell:** Full Eurofighter-inspired fuselage enclosed the EDFs but choked intake mass flow, lacked landing gear, and required destructive disassembly to reach wiring.
+- **V2 Open Frame:** Switched to an open carbon/ASA truss frame for unobstructed EDF breathing and field repairability; dropped the heavy vertical rudder actuator, which exposed main-gear alignment flex.
+- **V3 Flight Configuration:** Added fixed canards, steerable nose gear on GPIO 8, widened main-gear track, and tightened total flying mass to 821 g (8.05 N).
+
+<FigureGroup>
+  <Figure
+    src="/assets/images/projects/typhoon/murphy-glider.jpg"
+    alt="Cardboard Murphy glider testbed with exposed TARS avionics on a workshop table"
+    caption="Murphy cardboard test glider used to validate TARS sensor fusion and elevon mixing prior to 3D-printed airframe flights."
+    width={1400}
+    height={1050}
+    surface="neutral"
+  />
+  <Figure
+    src="/assets/images/projects/typhoon/v1-wings-overhead.jpg"
+    alt="Overhead view of early Typhoon V1 3D-printed delta wings and fuselage section on a workbench"
+    caption="Overhead view of the early V1 closed-shell delta wings built with PETG ribs and single-wall vase-mode PLA skins."
+    width={1400}
+    height={1050}
+    surface="neutral"
+  />
+  <Figure
+    src="/assets/images/projects/typhoon/v3-frame-closeup.jpg"
+    alt="Close-up of Project Typhoon V3 open ASA fuselage frame housing the LiPo battery and TARS controller"
+    caption="V3 open carbon/ASA truss bay housing the 4S LiPo, dual 40A ESCs, and TARS avionics for rapid field servicing."
+    width={1400}
+    height={1050}
+    surface="neutral"
+  />
+</FigureGroup>
+
+## SolidWorks CFD & 55-Point Flight Envelope
+
+Full-aircraft external aerodynamics were simulated in SolidWorks Flow Simulation on a 9,149,212-cell mesh (299,597 solid-contacting cells), converging over 419 iterations across 12 hours and 17 minutes of 8-core CPU runtime.
+
+A 55-point parametric sweep crossed angles of attack from -10° to +10° in 2° steps with airspeeds from 10 to 50 m/s. At 10 m/s and +10° AoA, predicted lift reaches 8.93 N—exceeding the 8.05 N weight and corroborating the 10.1 m/s theoretical stall speed. At a 30 m/s cruise/turn point (+4° AoA), the jet produces 49.99 N of lift for 2.51 N of drag, rising to 229.0 N peak lift at 50 m/s (+10° AoA) well above the 9G = 72.4 N maneuver envelope.
+
+<FigureGroup>
+  <Figure
+    src="/assets/images/projects/typhoon/cfd-flowsim.png"
+    alt="SolidWorks Flow Simulation viewport showing mesh and aerodynamic streamlines around the Typhoon fuselage"
+    caption="SolidWorks Flow Simulation setup and streamline cut-plot across the 9.15M-cell fluid domain."
+    width={1600}
+    height={900}
+    surface="neutral"
+  />
+  <Figure
+    src="/assets/images/projects/typhoon/cfd-velocity-3d.png"
+    alt="3D translucent velocity isosurface mesh around the Typhoon delta airframe"
+    caption="3D velocity isosurface visualization highlighting wake acceleration behind the twin EDF exhausts and wingtip vortices."
+    width={920}
+    height={529}
+    surface="dark"
+  />
+  <Figure
+    src="/assets/images/projects/typhoon/chart-lift-speed.png"
+    alt="Parametric CFD chart plotting lift force against airspeed across angles of attack"
+    caption="55-point parametric CFD lift envelope from 10 to 50 m/s (-10° to +10° AoA), crossing the 8.05 N weight threshold near 10 m/s."
+    width={1600}
+    height={892}
+    surface="dark"
+  />
+  <Figure
+    src="/assets/images/projects/typhoon/chart-drag-speed.png"
+    alt="Parametric CFD chart plotting aerodynamic drag force against airspeed across angles of attack"
+    caption="Corresponding aerodynamic drag curves across the 55-point AoA and airspeed matrix, comparing against 12.96 N static EDF thrust."
+    width={1600}
+    height={904}
+    surface="dark"
+  />
+</FigureGroup>
+
+## Custom Avionics: TARS Hardware & Saturn OS Firmware
+
+The custom TARS avionics board integrates a nanoESP32-C6 RISC-V microcontroller, an MPU-6050 6-axis IMU configured for ±8g / ±500 °/s with a 21 Hz digital low-pass filter on a 400 kHz I²C bus (SDA = 20, SCL = 21), and a Radiomaster RP3 ExpressLRS receiver streaming 420 kbps CRSF frames on UART2 (RX = 4, TX = 5).
+
+Because standard servo libraries conflicted with ESP32-C6 timers, Saturn OS (SaturnV2.ino) drives custom 50 Hz 12-bit LEDC PWM channels (US_TO_DUTY = 4096 / 20000, clamped 1000–2000 µs) for left elevon (GPIO 10), right elevon (GPIO 11), nose-wheel steering (GPIO 8, repurposing the NeoPixel pin), and twin ESC throttle (GPIO 19).
+
+- **100 Hz Deterministic Loop & Bias Calibration:** Runs a fixed 10,000 µs (100 Hz) micros() loop after 500 startup gyro calibration samples while the aircraft sits level.
+- **G-Gated Complementary Filter:** Blends integrated gyro rates with accelerometer tilt using α = 0.9875, gating accelerometer updates strictly inside 0.85g–1.15g so high-G turns do not corrupt attitude estimates.
+- **Gyro-Rate D-Term PID & Proportional Elevon Mixer:** Stabilizes pitch and roll (±30° angle limit; Kp = 1.25, Ki = 0.001, Kd = 0.035, iLimit = 25.0) and scales pitch/roll commands proportionally inside writeElevons() whenever |pitchCmd| + |rollCmd| exceeds 500 − |ELEVON_TRIM| so roll authority never clips.
+- **Safety Arming & Flight Modes:** Arming requires both CH5 switch active and throttle ≤ 1050 µs; supports Manual (with CH9 +215 µs takeoff pitch boost), Angle (±30°), and Auto/Failsafe (0° wings-level + motor cutoff).
+
+<FigureGroup>
+  <Figure
+    src="/assets/images/projects/typhoon/saturn-os-architecture.png"
+    alt="Saturn OS flight controller software architecture diagram showing CRSF input, IMU fusion, PID mixer, and LEDC outputs"
+    caption="Saturn OS real-time control flow from 420 kbps CRSF radio link and 400 kHz MPU-6050 I²C sampling to proportional elevon and ESC PWM outputs."
+    width={1600}
+    height={1146}
+    surface="dark"
+  />
+  <Figure
+    src="/assets/images/projects/typhoon/tars-v2-cased.jpg"
+    alt="TARS V2 flight controller inside its 3D-printed protective enclosure"
+    caption="Cased TARS V2 flight controller module integrating the nanoESP32-C6, MPU-6050 IMU, and header pinouts."
+    width={1400}
+    height={822}
+    surface="light"
+  />
+  <Figure
+    src="/assets/images/projects/typhoon/tars-uncased.jpg"
+    alt="Uncased TARS flight controller PCB showing soldered nanoESP32-C6, MPU-6050 breakout, and servo headers"
+    caption="Internal perfboard assembly of TARS showing the nanoESP32-C6, MPU-6050 breakout, and pin wiring before enclosure assembly."
+    width={1400}
+    height={1050}
+    surface="neutral"
+  />
+</FigureGroup>
+
+## Taxi Trials & January 17, 2026 First Flight
+
+Static bench testing confirmed 12.96 N thrust (1.61 T/W) at 68 A peak and verified radio failsafe motor cutoffs. Subsequent 10 m/s (36 km/h) taxi runs on rural asphalt exposed two practical ground-handling issues: without wheel brakes, stopping distance was solved by deflecting both elevons to scrape aerodynamic drag; and after two crosswind ditchings, the main landing-gear track was widened.
+
+On January 17, 2026, Project Typhoon V3 rotated cleanly and lifted off near the 10.1 m/s predicted stall speed, validating the NACA 2412 wing and twin-EDF thrust margin. Seconds into climb-out, an unexpected uncommanded right roll forced an emergency field landing that damaged the nose gear. Testing was paused ahead of the May 9, 2026 school exhibition, identifying airspeed-based PID gain scheduling as the key control upgrade.
+
+<FigureGroup>
+  <Figure
+    src="/assets/images/projects/typhoon/runway-test.jpg"
+    alt="Project Typhoon V3 positioned on a rural asphalt road during high-speed taxi and maiden flight testing"
+    caption="Project Typhoon V3 lined up on the rural asphalt test strip during the January 2026 taxi and maiden-flight campaign."
+    width={992}
+    height={655}
+    surface="neutral"
+  />
+</FigureGroup>

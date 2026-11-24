@@ -1,0 +1,170 @@
+---
+order: 2
+slug: bikeysens
+title: Bikeysens
+subtitle: DIY €98.86 mountain bike suspension, brake-temperature, and IMU telemetry logger with handlebar OLED and 144 Hz Python replay suite.
+period: "2023–2024"
+domain: Embedded Telemetry
+context: "Don Bosco Haacht · 4th Year Engineering Project (410TEW1)"
+role: Sole Developer — Hardware, Embedded Python & Desktop Suite
+status: completed
+statusLabel: Completed & Field-Tested (4.27 h Log)
+tileImage: /assets/images/projects/bikeysens/tile.jpg
+tileAlt: Canyon Spectral 125 mountain bike equipped with Bikeysens telemetry sensors resting against a tree on a wooded trail
+tileWidth: 1600
+tileHeight: 1200
+overlaySummary: Built a sub-€100 modular mountain bike telemetry system on a Canyon Spectral 125 to rival €1,800–€2,400 commercial loggers. A Raspberry Pi Zero 2 W logs fork ToF travel, rear shock travel, 6-DOF IMU dynamics, brake actuation, and caliper temperature via dual-thread Python and Cat-5a RJ45 sensor harnesses.
+highlights:
+  - "€98.86 final build cost (€156.61 incl. spares) vs. €1,800–€2,400 commercial MTB telemetry"
+  - "Multi-threaded Raspberry Pi Zero 2 W logging ~1 ms sensor loops with 1,000-row pandas CSV flushes"
+  - "13-iteration 3D-printed VL6180X ToF fork travel sensor (140 mm Fox 36) + SLX brake lever & 36GZ caliper temp"
+  - "174,530-row (4.27-hour) field dataset capturing 7.52 g impacts and 135 mm fork bottom-outs"
+tags:
+  - Raspberry Pi Zero 2 W
+  - Python / pandas / Pyglet
+  - I²C Sensors (ToF / IMU / ADC)
+  - 3D Printing (PLA / ASA)
+  - RJ45 Modular Harness
+heroFigure:
+  src: /assets/images/projects/bikeysens/central-unit-frame.jpg
+  alt: Raspberry Pi Zero 2 W central telemetry enclosure strapped under the Canyon Spectral 125 top tube above the Fox Float rear shock
+  caption: Central Raspberry Pi Zero 2 W and perfboard hub mounted inside the Canyon Spectral 125 frame triangle with quick-disconnect Cat-5a RJ45 sensor ports.
+  width: 1400
+  height: 1050
+  surface: neutral
+specs:
+  - label: Test Platform
+    value: 'Canyon Spectral 125 (M, 29") · Fox 36 Rhythm (140 mm) · Fox Float (125 mm)'
+  - label: On-Bike Compute
+    value: Raspberry Pi Zero 2 W (Quad ARM Cortex-A53, Wi-Fi/SSH/Samba, Cron auto-boot)
+  - label: Front & Rear Travel
+    value: "VL6180X ToF laser (0x29, 5–10% err) · Rear potentiometer on ADS1115 P0"
+  - label: IMU & Braking
+    value: "GY-521 MPU-6050 (0x68) · Hall-effect magnet (GPIO 27) + 36GZ temp (ADS1115 P1)"
+  - label: Handlebar Display
+    value: SSD1306 128×64 I²C OLED (v5.64) + single GPIO 4 tab/record button
+  - label: Interconnect
+    value: Custom perfboard hub + UTP Cat-5a Ethernet / RJ45 (< 10 min install)
+  - label: Power & Runtime
+    value: Salvaged powerbank cells + €1.97 Li-ion charger (~12 h estimated runtime)
+  - label: Final Build Cost
+    value: "€98.86 on bike (€156.61 total incl. spares; target €100–€200)"
+sourcesNote: Verified from PortfolioBikeySensFinal.docx, bikey.py, ToF.py, ADC.py, GY521.py, Oled.py, CSV_Suspension.py, and recorded CSV ride logs.
+---
+import Figure from '../../components/mdx/Figure.astro';
+import FigureGroup from '../../components/mdx/FigureGroup.astro';
+import SpecsTable from '../../components/mdx/SpecsTable.astro';
+
+## Goal: Democratizing €2,000 MTB Telemetry
+
+Inspired by Canyon Cllctv downhill racer Mille Johnset’s telemetry setup, commercial mountain-bike suspension loggers typically cost €1,800–€2,400—far beyond amateur riders. Bikeysens set out to capture comparable fork, shock, braking, and chassis dynamics within a €100–€200 budget on a Canyon Spectral 125 (140 mm Fox 36 Rhythm, 125 mm Fox Float, Shimano SLX hydraulic brakes).
+
+By combining off-the-shelf I²C breakout boards, salvaged lithium cells, and 3D-printed brackets, the final on-bike hardware reached €98.86 (€156.61 including spares and prototyping materials).
+
+<div class="article-section-specs">
+  <SpecsTable
+    caption="Bikeysens bill of materials summary"
+    specs={[
+      { label: 'Compute & Storage', value: 'Raspberry Pi Zero 2 W (€20.00) + Canyon Frame Bag (€35.00)' },
+      { label: 'Filaments & Harness', value: 'PLA (€8.00) + ASA (€8.00) + Cat-5a / RJ45 plugs (€6.00)' },
+      { label: 'Sensors & Display', value: 'VL6180X (€2.84) + SSD1306 (€2.25) + ADS1115 (€1.40) + GY-521 (€0.46)' },
+      { label: 'Power & Mounting', value: 'Li-ion charger (€1.97) + EC360 thermal epoxy (€4.99) + salvaged cells/36GZ (€0)' },
+    ]}
+  />
+</div>
+
+<FigureGroup>
+  <Figure
+    src="/assets/images/projects/bikeysens/bom-table.png"
+    alt="Bikeysens bill of materials spreadsheet detailing component costs totaling €98.86 on bike"
+    caption="Complete bill of materials from PortfolioBikeySensFinal.docx breaking down the €98.86 on-bike build and €156.61 total expenditure."
+    width={372}
+    height={583}
+    surface="light"
+  />
+</FigureGroup>
+
+## Modular Sensor Architecture & 13-Version 3D Prints
+
+Early breadboard prototypes failed under trail vibration, so every sensor was wired through a soldered perfboard hub inside a 3D-printed ASA/PLA enclosure using UTP Cat-5a Ethernet cables and RJ45 connectors. The entire kit installs or detaches from the bike in under 10 minutes.
+
+Each sensing channel required custom mechanical packaging to survive mud, fork compression, and brake heat without permanently altering the bike:
+
+- **Front Fork Travel (13 Revisions):** A VL6180X time-of-flight laser sensor (0x29, offset = -10 in ToF.py, returning 140 - range in mm) rides inside a telescoping 3D-printed tube alongside the Fox 36 stanchion—evolved across 13 iterations from PVC pipe prototypes to V13 with 5–10% accuracy.
+- **Rear Shock & Brake Temperature:** A 16-bit ADS1115 I²C ADC reads a linear rear-shock potentiometer (P0, calibrated to 125 mm stroke) and an analog 36GZ brake-caliper temperature sensor (P1, (V - 0.5) × 100 °C) bonded non-destructively with removable EC360 thermal epoxy.
+- **Brake Actuation & 6-DOF IMU:** A salvaged speedometer reed/magnet switch on GPIO 27 (PUD_UP) clips onto the Shimano SLX lever via a 3D-printed linkage, paired with a frame-mounted GY-521 MPU-6050 (0x68) running 250-sample startup calibration.
+- **Handlebar OLED Cockpit (v5.64):** An SSD1306 128×64 OLED (Oled.py using MinecraftRegular.otf) and single GPIO 4 button let the rider short-press through Front, Back, Brake, and Gyro live views or long-press (> 1 s) to start/stop CSV recording.
+
+<FigureGroup>
+  <Figure
+    src="/assets/images/projects/bikeysens/cockpit-oled.jpg"
+    alt="Handlebar-mounted 3D-printed SSD1306 OLED pod displaying BikeySens v5.64 by Xander"
+    caption="Handlebar cockpit pod displaying BikeySens v5.64 firmware with tactile GPIO 4 tab/recording button."
+    width={1050}
+    height={1400}
+    surface="neutral"
+  />
+  <Figure
+    src="/assets/images/projects/bikeysens/fork-tof-sensor.jpg"
+    alt="Telescoping 3D-printed VL6180X ToF travel tube mounted next to the Fox 36 fork stanchion"
+    caption="Final 13-iteration telescoping VL6180X ToF housing strapped alongside the 140 mm Fox 36 Rhythm fork leg."
+    width={1050}
+    height={1400}
+    surface="neutral"
+  />
+  <Figure
+    src="/assets/images/projects/bikeysens/brake-lever-sensor.jpg"
+    alt="3D-printed magnet linkage mounted on a Shimano SLX hydraulic brake lever"
+    caption="Shimano SLX brake lever trigger housing the salvaged magnetic actuation switch wired to GPIO 27."
+    width={1050}
+    height={1400}
+    surface="neutral"
+  />
+  <Figure
+    src="/assets/images/projects/bikeysens/kit-flatlay.jpg"
+    alt="Complete Bikeysens modular sensor kit and RJ45 Cat-5a harnesses laid out detached from the bike"
+    caption="Full modular Bikeysens harness detached from the bike—central Pi enclosure, OLED pod, ToF fork tube, brake switch, and RJ45 cabling."
+    width={1050}
+    height={1400}
+    surface="neutral"
+  />
+  <Figure
+    src="/assets/images/projects/bikeysens/fork-cad-section.png"
+    alt="CAD cross-section of the telescoping ToF fork sensor tube and internal alignment ring"
+    caption="CAD section view of the telescoping VL6180X housing showing the internal laser path and dust-shielding overlap."
+    width={426}
+    height={276}
+    surface="dark"
+  />
+  <Figure
+    src="/assets/images/projects/bikeysens/central-unit-cad.jpg"
+    alt="Blender CAD render of the Bikeysens central enclosure with RJ45 port cutouts"
+    caption="Blender CAD render of the central Raspberry Pi Zero 2 W and perfboard hub housing."
+    width={671}
+    height={379}
+    surface="neutral"
+  />
+</FigureGroup>
+
+## Multi-Threaded Logger & 144 Hz "Bike Suite" Replay
+
+On the Raspberry Pi Zero 2 W, bikey.py splits acquisition and storage across threads via queue.Queue: the acquisition loop polls sensors at ~1 ms intervals while the logger thread batches 1,000 rows into pandas DataFrames before flushing CSV files to /home/xander/shared/ and updating the OLED.
+
+Cron auto-boots the logger headlessly on power-up, and logs sync over Wi-Fi via SSH/Samba. Back on the desktop, CSV_Suspension.py renders a 1920×1080 Pyglet "Bike Suite" telemetry player at 144 Hz—applying moving-average smoothing (roll = 15, pitch = 25, travel = 5, temp = 15) to animate layered Fox 36 fork compression, Shimano SLX lever pull, brake-temp gauge needle, and chassis pitch/roll sprites. Grafana live streaming was dropped due to school Wi-Fi restrictions after initial prototyping.
+
+<FigureGroup>
+  <Figure
+    src="/assets/images/projects/bikeysens/desktop-suite.png"
+    alt="1920x1080 Pyglet Bike Suite desktop telemetry replay showing animated Canyon bike, Fox 36 fork, SLX lever, and brake temperature gauge"
+    caption='Pyglet 144 Hz "Bike Suite" replay interface animating smoothed fork compression, rear shock travel, Shimano SLX brake input, caliper temperature, and bike lean/pitch.'
+    width={1291}
+    height={725}
+    surface="dark"
+  />
+</FigureGroup>
+
+## Pumptrack Telemetry & Field Lessons
+
+Testing progressed from garage bench calibration to street rides and full pumptrack/BMX track sessions. Three recorded ride logs—CSV_bikev2.csv (5,570 rows, ~8.1 min, 10–138 mm fork travel, 4.83 g peak), CVSDocuBrake.csv (2,530 rows, brake temperature 14.89–42.8 °C, 4.92 g peak), and CSV_FinalTesr.csv (174,530 rows spanning 15,382 s / 4.27 hours with 7.52 g peak shock)—verified end-to-end logging under trail abuse.
+
+Candidly, a heavy 7–8 g pumptrack landing that compressed the Fox 36 to 135 mm / 140 mm yanked RJ45 plugs loose mid-session; hot-gluing connectors kept testing running for the final log. Future v2 priorities include screw-locking Coax/VGA connectors, replacing the Linux Pi boot delay with an instant-on ESP32 logger, full IP-rated waterproofing, and ANT+ integration with a Garmin bike computer.

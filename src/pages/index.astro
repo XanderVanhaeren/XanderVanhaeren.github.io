@@ -1,0 +1,462 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ProjectOverlay, { type OverlayProjectItem } from '../components/ProjectOverlay.astro';
+import '../styles/home.css';
+
+const entries = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+
+const overlayProjects: OverlayProjectItem[] = entries.map((entry) => ({
+  slug: entry.data.slug,
+  title: entry.data.title,
+  subtitle: entry.data.subtitle,
+  period: entry.data.period,
+  context: entry.data.context,
+  status: entry.data.status,
+  statusLabel: entry.data.statusLabel,
+  tileImage: entry.data.tileImage,
+  tileAlt: entry.data.tileAlt,
+  tileWidth: entry.data.tileWidth,
+  tileHeight: entry.data.tileHeight,
+  overlaySummary: entry.data.overlaySummary,
+  highlights: entry.data.highlights,
+  tags: entry.data.tags,
+  route: `/projects/${entry.data.slug}.html`,
+}));
+---
+
+<BaseLayout
+  title="Xander Vanhaeren — Engineering Portfolio"
+  description="Engineering showcase portfolio of Xander Vanhaeren, KU Leuven engineering student: Project Typhoon, Bikeysens, RCXD, and Peno team 214."
+  canonicalPath="/"
+  ogImage="/assets/images/projects/typhoon/tile.jpg"
+>
+  <main class="home-shell">
+    <aside class="home-sidebar" aria-label="Identity">
+      <h1 class="home-title">
+        Xander
+        <br />
+        Vanhaeren.
+      </h1>
+      <div class="home-sidebar__bottom">
+        <div class="home-links">
+          <a
+            class="home-tool-link"
+            href="https://github.com/XanderVanhaeren"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            GitHub
+          </a>
+          <a
+            class="home-tool-link"
+            href="https://xandervanhaeren.github.io/goodnotes-pdf-prep/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            PDF Converter
+          </a>
+        </div>
+        <p class="home-subtitle">
+          Engineering Student
+          <br />
+          KU Leuven
+        </p>
+      </div>
+    </aside>
+
+    <section class="project-grid" aria-label="Engineering projects">
+      {
+        entries.map((entry, index) => {
+          const project = entry.data;
+          return (
+            <a
+              href={`/projects/${project.slug}.html`}
+              class="project-tile"
+              data-project={project.slug}
+              aria-label={`Open ${project.title} overview`}
+            >
+              <img
+                class="project-tile__img"
+                src={project.tileImage}
+                alt={project.tileAlt}
+                width={project.tileWidth}
+                height={project.tileHeight}
+                decoding="async"
+                fetchpriority={index === 0 ? 'high' : undefined}
+              />
+              <span class="project-tile__caption" aria-hidden="true">
+                <span class="project-tile__title">{project.title}</span>
+                <span class="project-tile__period">{project.period}</span>
+              </span>
+            </a>
+          );
+        })
+      }
+    </section>
+  </main>
+
+  <ProjectOverlay projects={overlayProjects} />
+
+  <script>
+    import type { OverlayProjectItem } from '../components/ProjectOverlay.astro';
+    import {
+      buildPreviewUrl,
+      getPreviewSlugFromSearch,
+      isProjectSlug,
+      stepProjectSlug,
+      type ProjectSlug,
+    } from '../lib/previewUrl';
+
+    const MOBILE_MEDIA_QUERY = '(max-width: 639px)';
+    const CENTER_SWITCH_HYSTERESIS_PX = 12;
+    const SUPPORTS_CLOSED_BY =
+      typeof HTMLDialogElement !== 'undefined' && 'closedBy' in HTMLDialogElement.prototype;
+
+    function initMobileCenterHighlight(tiles: HTMLAnchorElement[]): void {
+      if (typeof window.matchMedia !== 'function' || tiles.length === 0) return;
+
+      const mobileMql = window.matchMedia(MOBILE_MEDIA_QUERY);
+      let centeredSlug: string | null = null;
+      let rafId = 0;
+
+      const applyCentered = (nextSlug: string | null) => {
+        if (nextSlug === centeredSlug) return;
+        centeredSlug = nextSlug;
+        for (const tile of tiles) {
+          if (tile.dataset.project === centeredSlug) {
+            tile.setAttribute('data-mobile-centered', 'true');
+          } else {
+            tile.removeAttribute('data-mobile-centered');
+          }
+        }
+      };
+
+      const updateCenteredTile = () => {
+        rafId = 0;
+        if (!mobileMql.matches) {
+          applyCentered(null);
+          return;
+        }
+
+        const viewportCenter = window.innerHeight / 2;
+        let bestSlug: string | null = null;
+        let bestDist = Infinity;
+        let currentDist = Infinity;
+
+        for (const tile of tiles) {
+          const slug = tile.dataset.project;
+          if (!slug) continue;
+          const rect = tile.getBoundingClientRect();
+          if (rect.height <= 0) continue;
+          const dist = Math.abs(rect.top + rect.height / 2 - viewportCenter);
+          if (slug === centeredSlug) {
+            currentDist = dist;
+          }
+          if (dist < bestDist) {
+            bestDist = dist;
+            bestSlug = slug;
+          }
+        }
+
+        if (
+          centeredSlug !== null &&
+          bestSlug !== centeredSlug &&
+          currentDist - bestDist < CENTER_SWITCH_HYSTERESIS_PX
+        ) {
+          return;
+        }
+
+        applyCentered(bestSlug);
+      };
+
+      const scheduleUpdate = () => {
+        if (rafId !== 0) return;
+        rafId = window.requestAnimationFrame(updateCenteredTile);
+      };
+
+      updateCenteredTile();
+      window.addEventListener('scroll', scheduleUpdate, { passive: true });
+      window.addEventListener('resize', scheduleUpdate, { passive: true });
+      mobileMql.addEventListener('change', scheduleUpdate);
+    }
+
+    function isOutsideDialogBackdrop(event: PointerEvent, dialog: HTMLDialogElement): boolean {
+      if (event.target !== dialog) return false;
+      const rect = dialog.getBoundingClientRect();
+      if (rect.width === 0 && rect.height === 0) return true;
+      return (
+        event.clientX < rect.left ||
+        event.clientX > rect.right ||
+        event.clientY < rect.top ||
+        event.clientY > rect.bottom
+      );
+    }
+
+    function initHomeOverlay(): void {
+      const tiles = Array.from(document.querySelectorAll<HTMLAnchorElement>('.project-tile[data-project]'));
+      initMobileCenterHighlight(tiles);
+
+      const dialog = document.querySelector<HTMLDialogElement>('dialog.project-overlay');
+      const dataEl = document.getElementById('projects-overlay-data');
+      if (!dialog || !dataEl?.textContent) return;
+
+      const projects: OverlayProjectItem[] = JSON.parse(dataEl.textContent);
+      const projectBySlug = new Map<ProjectSlug, OverlayProjectItem>(
+        projects.map((p) => [p.slug, p])
+      );
+      const orderedSlugs = projects.map((p) => p.slug);
+      const tileBySlug = new Map<ProjectSlug, HTMLAnchorElement>();
+      for (const tile of tiles) {
+        const slug = tile.dataset.project;
+        if (isProjectSlug(slug)) {
+          tileBySlug.set(slug, tile);
+        }
+      }
+
+      const periodEl = dialog.querySelector<HTMLElement>('[data-overlay-field="period"]');
+      const contextEl = dialog.querySelector<HTMLElement>('[data-overlay-field="context"]');
+      const statusWrapEl = dialog.querySelector<HTMLElement>('[data-overlay-field="status"]');
+      const statusTextEl = dialog.querySelector<HTMLElement>('[data-overlay-field="statusText"]');
+      const titleEl = dialog.querySelector<HTMLElement>('[data-overlay-field="title"]');
+      const subtitleEl = dialog.querySelector<HTMLElement>('[data-overlay-field="subtitle"]');
+      const imgEl = dialog.querySelector<HTMLImageElement>('[data-overlay-field="img"]');
+      const summaryEl = dialog.querySelector<HTMLElement>('[data-overlay-field="summary"]');
+      const highlightsEl = dialog.querySelector<HTMLUListElement>('[data-overlay-field="highlights"]');
+      const tagsEl = dialog.querySelector<HTMLUListElement>('[data-overlay-field="tags"]');
+      const counterEl = dialog.querySelector<HTMLElement>('[data-overlay-field="counter"]');
+      const ctaEl = dialog.querySelector<HTMLAnchorElement>('[data-overlay-field="cta"]');
+      const closeBtn = dialog.querySelector<HTMLButtonElement>('[data-overlay-close]');
+      const prevBtn = dialog.querySelector<HTMLButtonElement>('[data-overlay-step="prev"]');
+      const nextBtn = dialog.querySelector<HTMLButtonElement>('[data-overlay-step="next"]');
+      const surfaceEl = dialog.querySelector<HTMLElement>('.project-overlay__surface');
+
+      let activeSlug: ProjectSlug | null = null;
+      let triggerEl: HTMLAnchorElement | null = null;
+      let closingFromPopstate = false;
+      let pressedOutside = false;
+
+      const renderProject = (slug: ProjectSlug) => {
+        const project = projectBySlug.get(slug);
+        if (!project) return;
+        activeSlug = slug;
+
+        const index = orderedSlugs.indexOf(slug);
+        const prevSlug = stepProjectSlug(slug, 'prev', orderedSlugs);
+        const nextSlug = stepProjectSlug(slug, 'next', orderedSlugs);
+        const prevProject = projectBySlug.get(prevSlug);
+        const nextProject = projectBySlug.get(nextSlug);
+
+        if (periodEl) periodEl.textContent = project.period;
+        if (contextEl) contextEl.textContent = project.context;
+        if (statusWrapEl && statusTextEl) {
+          if (project.status === 'in-progress' && project.statusLabel) {
+            statusTextEl.textContent = project.statusLabel;
+            statusWrapEl.hidden = false;
+          } else {
+            statusTextEl.textContent = '';
+            statusWrapEl.hidden = true;
+          }
+        }
+        if (titleEl) titleEl.textContent = project.title;
+        if (subtitleEl) subtitleEl.textContent = project.subtitle;
+        if (imgEl) {
+          imgEl.src = project.tileImage;
+          imgEl.alt = project.tileAlt;
+          imgEl.width = project.tileWidth;
+          imgEl.height = project.tileHeight;
+        }
+        if (summaryEl) summaryEl.textContent = project.overlaySummary;
+
+        if (highlightsEl) {
+          highlightsEl.replaceChildren(
+            ...project.highlights.map((item) => {
+              const li = document.createElement('li');
+              li.textContent = item;
+              return li;
+            })
+          );
+        }
+
+        if (tagsEl) {
+          tagsEl.replaceChildren(
+            ...project.tags.map((tag) => {
+              const li = document.createElement('li');
+              li.textContent = tag;
+              return li;
+            })
+          );
+        }
+
+        if (counterEl) {
+          counterEl.textContent = `${index + 1} / ${orderedSlugs.length}`;
+        }
+        if (prevBtn && prevProject) {
+          prevBtn.setAttribute('aria-label', `Previous project: ${prevProject.title}`);
+        }
+        if (nextBtn && nextProject) {
+          nextBtn.setAttribute('aria-label', `Next project: ${nextProject.title}`);
+        }
+        if (ctaEl) {
+          ctaEl.href = project.route;
+        }
+        if (surfaceEl) {
+          surfaceEl.scrollTop = 0;
+        }
+      };
+
+      const openOverlay = (
+        slug: ProjectSlug,
+        historyMode: 'push' | 'replace' | 'none',
+        invoker?: HTMLAnchorElement | null
+      ) => {
+        if (!projectBySlug.has(slug)) return;
+        triggerEl = invoker ?? tileBySlug.get(slug) ?? null;
+        renderProject(slug);
+
+        const nextUrl = buildPreviewUrl(window.location.pathname, window.location.search, slug);
+        if (historyMode === 'push') {
+          window.history.pushState({ preview: slug }, '', nextUrl);
+        } else if (historyMode === 'replace') {
+          window.history.replaceState({ preview: slug }, '', nextUrl);
+        }
+
+        if (!dialog.open) {
+          dialog.showModal();
+        }
+      };
+
+      const requestClose = () => {
+        if (dialog.open) {
+          dialog.close();
+        }
+      };
+
+      for (const tile of tiles) {
+        const slug = tile.dataset.project;
+        if (!isProjectSlug(slug)) continue;
+
+        tile.addEventListener('click', (event) => {
+          if (
+            event.defaultPrevented ||
+            event.button !== 0 ||
+            event.metaKey ||
+            event.ctrlKey ||
+            event.shiftKey ||
+            event.altKey
+          ) {
+            return;
+          }
+          event.preventDefault();
+          openOverlay(slug, dialog.open ? 'replace' : 'push', tile);
+        });
+
+        tile.addEventListener('keydown', (event) => {
+          if (event.key === ' ' || event.code === 'Space') {
+            event.preventDefault();
+            openOverlay(slug, dialog.open ? 'replace' : 'push', tile);
+          }
+        });
+      }
+
+      closeBtn?.addEventListener('click', requestClose);
+
+      prevBtn?.addEventListener('click', () => {
+        if (!activeSlug) return;
+        const prevSlug = stepProjectSlug(activeSlug, 'prev', orderedSlugs);
+        triggerEl = tileBySlug.get(prevSlug) ?? triggerEl;
+        openOverlay(prevSlug, 'replace', triggerEl);
+      });
+
+      nextBtn?.addEventListener('click', () => {
+        if (!activeSlug) return;
+        const nextSlug = stepProjectSlug(activeSlug, 'next', orderedSlugs);
+        triggerEl = tileBySlug.get(nextSlug) ?? triggerEl;
+        openOverlay(nextSlug, 'replace', triggerEl);
+      });
+
+      ctaEl?.addEventListener('click', () => {
+        // Strip ?preview= before navigating to the full article so Browser Back returns to the clean home grid.
+        if (getPreviewSlugFromSearch(window.location.search)) {
+          const cleanUrl = buildPreviewUrl(window.location.pathname, window.location.search, null);
+          window.history.replaceState(null, '', cleanUrl);
+        }
+      });
+
+      dialog.addEventListener('keydown', (event) => {
+        if (!dialog.open || !activeSlug) return;
+        if (event.altKey || event.ctrlKey || event.metaKey) return;
+        if (event.key === 'ArrowLeft') {
+          event.preventDefault();
+          const prevSlug = stepProjectSlug(activeSlug, 'prev', orderedSlugs);
+          triggerEl = tileBySlug.get(prevSlug) ?? triggerEl;
+          openOverlay(prevSlug, 'replace', triggerEl);
+        } else if (event.key === 'ArrowRight') {
+          event.preventDefault();
+          const nextSlug = stepProjectSlug(activeSlug, 'next', orderedSlugs);
+          triggerEl = tileBySlug.get(nextSlug) ?? triggerEl;
+          openOverlay(nextSlug, 'replace', triggerEl);
+        }
+      });
+
+      dialog.addEventListener('cancel', (event) => {
+        event.preventDefault();
+        requestClose();
+      });
+
+      dialog.addEventListener('pointerdown', (event) => {
+        if (SUPPORTS_CLOSED_BY) return;
+        pressedOutside = isOutsideDialogBackdrop(event, dialog);
+      });
+
+      dialog.addEventListener('pointerup', (event) => {
+        if (SUPPORTS_CLOSED_BY) return;
+        const wasOutside = pressedOutside;
+        pressedOutside = false;
+        if (wasOutside && isOutsideDialogBackdrop(event, dialog)) {
+          requestClose();
+        }
+      });
+
+      dialog.addEventListener('close', () => {
+        dialog.returnValue = '';
+        pressedOutside = false;
+        activeSlug = null;
+
+        if (!closingFromPopstate && getPreviewSlugFromSearch(window.location.search)) {
+          const cleanUrl = buildPreviewUrl(window.location.pathname, window.location.search, null);
+          window.history.replaceState(null, '', cleanUrl);
+        }
+        closingFromPopstate = false;
+
+        if (
+          triggerEl &&
+          triggerEl.isConnected &&
+          document.activeElement !== triggerEl &&
+          (!document.activeElement ||
+            document.activeElement === document.body ||
+            dialog.contains(document.activeElement))
+        ) {
+          triggerEl.focus();
+        }
+      });
+
+      window.addEventListener('popstate', () => {
+        const previewSlug = getPreviewSlugFromSearch(window.location.search);
+        if (previewSlug) {
+          openOverlay(previewSlug, 'none', tileBySlug.get(previewSlug));
+        } else if (dialog.open) {
+          closingFromPopstate = true;
+          requestClose();
+        }
+      });
+
+      const initialPreview = getPreviewSlugFromSearch(window.location.search);
+      if (initialPreview) {
+        openOverlay(initialPreview, 'none', tileBySlug.get(initialPreview));
+      }
+    }
+
+    initHomeOverlay();
+  </script>
+</BaseLayout>

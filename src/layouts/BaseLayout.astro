@@ -1,0 +1,68 @@
+---
+import '@fontsource-variable/inter/wght.css';
+import '@fontsource-variable/jetbrains-mono/wght.css';
+import '../styles/tokens.css';
+
+export interface Props {
+  title: string;
+  description: string;
+  canonicalPath: string;
+  ogImage?: string;
+  ogType?: 'website' | 'article';
+}
+
+const {
+  title,
+  description,
+  canonicalPath,
+  ogImage = '/assets/images/projects/typhoon/tile.jpg',
+  ogType = 'website',
+} = Astro.props;
+
+const siteOrigin = Astro.site?.origin ?? 'https://xandervanhaeren.github.io';
+const canonicalUrl = new URL(canonicalPath, siteOrigin).toString();
+const ogImageUrl = new URL(ogImage, siteOrigin).toString();
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="author" content="Xander Vanhaeren" />
+    <meta name="theme-color" content="#1b1b1b" />
+    <meta name="color-scheme" content="dark" />
+    <link rel="canonical" href={canonicalUrl} />
+
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+
+    <link rel="icon" href="/assets/Logo/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/assets/Logo/favicon.ico" sizes="any" />
+    <script is:inline>
+      for (const evt of ['pageswap', 'pagereveal']) {
+        window.addEventListener(evt, (e) => {
+          if (e && e.viewTransition) {
+            e.viewTransition.ready.catch(() => {});
+            e.viewTransition.finished.catch(() => {});
+          }
+        });
+      }
+    </script>
+    <slot name="head" />
+  </head>
+  <body>
+    <div id="root">
+      <slot />
+    </div>
+  </body>
+</html>

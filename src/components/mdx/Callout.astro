@@ -1,0 +1,12 @@
+---
+export interface Props {
+  label: string;
+}
+
+const { label } = Astro.props;
+---
+
+<aside class="article-callout">
+  <p class="article-callout__label">{label}</p>
+  <p class="article-callout__content"><slot /></p>
+</aside>

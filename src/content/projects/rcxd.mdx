@@ -1,0 +1,143 @@
+---
+order: 3
+slug: rcxd
+title: RCXD
+subtitle: Three-node Wi-Fi tracked exploration rover with 40 Hz C++ XInput differential drive, live ESP32-CAM MJPEG FPV stream, and Arduino Cloud thermal telemetry.
+period: "2024–2025"
+domain: Tracked Robotics
+context: "Don Bosco Haacht · 512 TWE Engineering Project"
+role: Hardware, Fusion 360 CAD/3D Printing, MOSFET Driver, MKR1010 Cloud & ESP-CAM Co-Dev
+team: "Xander Vanhaeren & Lois Farasyn (Teacher: W. T'Seyen)"
+status: completed
+statusLabel: Completed & Demonstrated
+tileImage: /assets/images/projects/rcxd/tile.jpg
+tileAlt: Tracked RCXD rover with carbon-textured 3D-printed front housing, yellow LED lightbar, FPV camera, and top-mounted powerbank on a wooden deck
+tileWidth: 1600
+tileHeight: 1200
+overlaySummary: >-
+  Built a Wi-Fi-controlled tracked exploration rover from a stripped Nikko chassis, a custom Fusion 360 PLA/ABS shell with heat-set inserts, and three independent Wi-Fi nodes: an ESP32-C6 TCP motor server driven by a 40 Hz C++ XInput client, an ESP32-CAM MJPEG FPV stream, and an Arduino MKR1010 Cloud telemetry/light controller.
+highlights:
+  - "Three decoupled Wi-Fi subsystems: ESP32-C6 drive (TCP :1234), ESP32-CAM MJPEG (:80), MKR1010 Arduino Cloud"
+  - "Windows C++ XInput ground client polling at 40 Hz with 128–255 PWM torque-deadzone remap"
+  - "Custom dual-IRLZ44 logic-level N-MOSFET motor driver in heat-resistant ABS shell (up to 80 °C)"
+  - "Solved throttle-induced camera brownouts via isolated USB powerbank & hardware board swap"
+tags:
+  - ESP32-C6 / ESP32-CAM
+  - Arduino MKR1010 + Cloud
+  - C++ (Winsock2 / XInput)
+  - IRLZ44 MOSFET Driver
+  - Fusion 360 (PLA / ABS)
+heroFigure:
+  src: /assets/images/projects/rcxd/outdoor-action.jpg
+  alt: Tracked RCXD rover climbing a wooden beam outdoors with its yellow 5 V LED lightbar illuminated
+  caption: RCXD field demonstration climbing a wooden obstacle outdoors with its 5 V LED headlight and carbon-textured 3D-printed nose active.
+  width: 1600
+  height: 1200
+  surface: neutral
+specs:
+  - label: Base Chassis
+    value: Gutted Nikko tracked drive + twin DC gear motors + 7.4 V battery
+  - label: Body Construction
+    value: Fusion 360 3D-printed PLA (shell) & ABS (MOSFET/LED heat zones) + heat-set inserts
+  - label: Drive Controller
+    value: ESP32-C6 TCP server (port 1234) → analogWrite(18, L) & analogWrite(9, R)
+  - label: Power Electronics
+    value: Dual IRLZ44 N-MOSFETs, flyback diodes, decoupling caps, pull-down/gate resistors
+  - label: Ground Station
+    value: Windows C++ (XInput + Winsock2), 25 ms (40 Hz) polling, 128–255 PWM remap
+  - label: FPV Video Node
+    value: AI-Thinker ESP32-CAM + external antenna, HTTP MJPEG (:80), VGA JPEG q=20
+  - label: Telemetry & Light
+    value: Arduino MKR1010 → Arduino Cloud (5 V LED bar + TMP36 MOSFET temp)
+  - label: Camera Power
+    value: Dedicated top-mounted USB powerbank (eliminated 7.4 V motor sag brownouts)
+sourcesNote: Verified from RCXD Portfolio.docx, RCXDPresentatie.pptx, arduino_RC-DC.ino, RCXD_copy_HOTSPOT.ino, Motor_calc.cpp, and tcp_client.cpp.
+---
+import Figure from '../../components/mdx/Figure.astro';
+import FigureGroup from '../../components/mdx/FigureGroup.astro';
+
+## Concept Pivot & Fusion 360 PLA/ABS Shell
+
+After pivoting away from an initial "wireless USB cable" concept, Xander Vanhaeren and teammate Lois Farasyn built the RCXD (Remote-Controlled eXploration Device) for 512 TWE under teacher W. T’Seyen. A broken Nikko RC tank was stripped down to its rubber tracks, twin DC gear motors, and 7.4 V pack.
+
+The upper body was modeled in Fusion 360 using heat-set threaded inserts for repeatable assembly. Because the dual IRLZ44 MOSFETs could reach ~80 °C—above PLA’s ~60 °C softening threshold—the MOSFET carrier and LED bezel were printed in heat-resistant ABS while the remaining upper shell used carbon-textured PLA. Retrospectively, the team noted that multi-piece shell modeling was slightly over-engineered relative to the project schedule.
+
+<FigureGroup>
+  <Figure
+    src="/assets/images/projects/rcxd/cad-chassis-render.png"
+    alt="Fusion 360 CAD render of the custom RCXD upper shell over the Nikko tracked chassis"
+    caption="Fusion 360 assembly render combining the salvaged Nikko tracked base with the multi-part 3D-printed upper shell."
+    width={1100}
+    height={661}
+    surface="neutral"
+  />
+  <Figure
+    src="/assets/images/projects/rcxd/fdm-printing.jpg"
+    alt="FDM 3D printer fabricating structural RCXD housing parts"
+    caption="FDM printing of the PLA/ABS upper body components engineered around heat-set M3 brass inserts."
+    width={656}
+    height={375}
+    surface="neutral"
+  />
+</FigureGroup>
+
+## Three-Node Wi-Fi Architecture & MOSFET Motor Driver
+
+To keep real-time motor control, video streaming, and cloud lighting isolated, the rover splits responsibilities across three Wi-Fi microcontrollers. Xander led Fusion 360 CAD/printing, the dual-IRLZ44 MOSFET driver, and Arduino MKR1010 Cloud telemetry while co-developing the ESP32-CAM stream alongside Lois Farasyn’s ESP32-C6 TCP server and Windows C++ XInput ground client.
+
+- **Node 1 — Drive (ESP32-C6 + Winsock2 / XInput):** tcp_client.cpp polls an Xbox controller (or emulated steering wheel/pedals) every 25 ms (40 Hz), computes differential inside-track throttling via gas_percent * (1.0f - wheel_percent), remaps 0–100% into 128–255 PWM (clamping &lt; 130 to 0 because duties below 50% stalled the tracks), and streams "L; R\n" over TCP port 1234 to GPIO 18 and GPIO 9.
+- **Power Stage — Dual IRLZ44 Logic-Level MOSFETs:** 3.3 V GPIO PWM signals drive logic-level IRLZ44 N-MOSFETs fitted with gate resistors, pull-downs, decoupling capacitors, and motor flyback diodes to clamp inductive voltage spikes.
+- **Node 2 — FPV Video (AI-Thinker ESP32-CAM):** Serves an HTTP MJPEG multipart/x-mixed-replace feed on port 80 (FRAMESIZE_VGA, JPEG quality 20, external Wi-Fi antenna, 100 ms loop delay in the final hotspot sketch).
+- **Node 3 — Cloud Lighting & Thermal Monitoring (MKR1010):** Connects to an Arduino Cloud mobile dashboard to toggle the front 5 V yellow LED bar and log TMP36 MOSFET temperature.
+
+<FigureGroup>
+  <Figure
+    src="/assets/images/projects/rcxd/system-architecture.png"
+    alt="Three-node Wi-Fi architecture diagram showing Xbox/ESP32 drive, ESP32-CAM FPV stream, and MKR1010 Arduino Cloud telemetry"
+    caption="Decoupled three-node Wi-Fi architecture separating low-latency TCP drive control, MJPEG FPV video, and Arduino Cloud lighting/thermal telemetry."
+    width={900}
+    height={1020}
+    surface="light"
+  />
+  <Figure
+    src="/assets/images/projects/rcxd/steering-flowchart.png"
+    alt="Differential drive steering flowchart mapping joystick X-axis deflection to left and right track PWM values"
+    caption="Differential drive logic flowchart translating joystick X-axis steering into left/right track speed attenuation."
+    width={670}
+    height={699}
+    surface="light"
+  />
+  <Figure
+    src="/assets/images/projects/rcxd/mosfet-schematic.png"
+    alt="Breadboard wiring schematic of the dual IRLZ44 N-MOSFET motor driver with flyback diodes and gate resistors"
+    caption="Dual-IRLZ44 logic-level MOSFET motor driver schematic with flyback protection diodes and pull-down resistors."
+    width={1178}
+    height={509}
+    surface="light"
+  />
+  <Figure
+    src="/assets/images/projects/rcxd/esp-cam-pov.jpg"
+    alt="Live VGA MJPEG FPV frame captured from the onboard AI-Thinker ESP32-CAM"
+    caption="Live onboard VGA MJPEG FPV frame streamed over Wi-Fi from the nose-mounted AI-Thinker ESP32-CAM."
+    width={1600}
+    height={900}
+    surface="dark"
+  />
+</FigureGroup>
+
+## Power Brownout Debugging, Thermal Telemetry & Lessons
+
+Full-throttle acceleration initially sagged the shared 7.4 V motor pack enough to trigger brownout resets on the ESP32-CAM. Moving the camera onto its own top-mounted USB powerbank isolated the RF video link from motor inrush currents.
+
+Even on clean USB power, persistent brownout panics resisted disabling RTC_CNTL_BROWN_OUT_REG and swapping camera sensors—until replacing the AI-Thinker ESP32-CAM board itself proved the original module had a hardware power defect. Arduino Cloud subsequently captured clean 26–35 °C MOSFET thermal logs, though the TMP36 lead snapped mechanically during transport to school. While decoupling into three nodes kept each subsystem clean, parallel hardware/software development compressed final integration time.
+
+<FigureGroup>
+  <Figure
+    src="/assets/images/projects/rcxd/cloud-temp-plot.png"
+    alt="Arduino Cloud time-series plot logging MOSFET temperature between 26 and 35 degrees Celsius"
+    caption="Arduino Cloud dashboard telemetry recording 26–35 °C MOSFET temperatures via the MKR1010 + TMP36 probe during drive tests."
+    width={1471}
+    height={628}
+    surface="light"
+  />
+</FigureGroup>

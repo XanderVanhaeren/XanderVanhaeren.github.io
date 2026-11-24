@@ -1,7 +1,7 @@
 # E2E Test Infrastructure (`TEST_INFRA.md`)
 
 ## Application Type
-`web-app` — Static multi-page **Vite 6 + React 19 + TypeScript** personal engineering showcase portfolio (`base: '/'`, built to `./dist`) with **5 HTML entry points**:
+`web-app` — Static **Astro 5 + MDX Content Collections + TypeScript** personal engineering showcase portfolio (`site: 'https://xandervanhaeren.github.io'`, `build.format: 'file'`, built to `./dist`) with **5 static HTML pages**:
 - `/` (`index.html` — Dark minimal `#1B1B1B` home view with left identity column `"Xander Vanhaeren."` / `"Engineering Student / KU Leuven"`, interactive 4-tile project grid, and native `<dialog>` article preview overlay)
 - `/projects/typhoon.html` (`projects/typhoon.html` — Full-page Project Typhoon article)
 - `/projects/bikeysens.html` (`projects/bikeysens.html` — Full-page Bikeysens article)

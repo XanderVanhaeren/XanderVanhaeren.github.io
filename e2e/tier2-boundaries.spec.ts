@@ -30,12 +30,13 @@ test.describe('Tier 2 — F1 Boundaries: Routing, Landmarks & Viewport Bounds', 
     diag.assertClean();
   });
 
-  test('T2-F1-02: all 4 tiles are <button> elements with accessible project titles', async ({ page }) => {
+  test('T2-F1-02: all 4 tiles are semantic <a> links with article hrefs and accessible project titles', async ({ page }) => {
     await gotoHomeReady(page, VIEWPORTS.desktopLarge);
     for (const project of PROJECTS_CONTRACT) {
       const tile = getTile(page, project.slug);
       const tagName = await tile.evaluate((el) => el.tagName.toLowerCase());
-      expect(tagName).toBe('button');
+      expect(tagName).toBe('a');
+      await expect(tile).toHaveAttribute('href', project.route);
       const label = await tile.evaluate((el) => el.getAttribute('aria-label') || el.textContent || '');
       expect(label.toLowerCase()).toContain(project.title.toLowerCase());
     }

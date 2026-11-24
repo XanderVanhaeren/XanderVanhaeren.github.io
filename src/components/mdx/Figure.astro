@@ -1,0 +1,44 @@
+---
+export interface Props {
+  src: string;
+  alt: string;
+  caption: string;
+  width: number;
+  height: number;
+  surface?: 'dark' | 'neutral' | 'light';
+  priority?: 'high';
+}
+
+const {
+  src,
+  alt,
+  caption,
+  width,
+  height,
+  surface = 'neutral',
+  priority,
+} = Astro.props;
+---
+
+<figure class={`article-figure surface-${surface}`} data-surface={surface}>
+  <button
+    type="button"
+    class="article-figure__zoom"
+    data-lightbox-src={src}
+    data-lightbox-alt={alt}
+    data-lightbox-caption={caption}
+    data-lightbox-surface={surface}
+    aria-label={`Inspect full-size figure: ${alt}`}
+  >
+    <img
+      src={src}
+      alt={alt}
+      width={width}
+      height={height}
+      fetchpriority={priority === 'high' ? 'high' : undefined}
+      loading={priority === 'high' ? undefined : 'lazy'}
+      decoding="async"
+    />
+  </button>
+  <figcaption>{caption}</figcaption>
+</figure>

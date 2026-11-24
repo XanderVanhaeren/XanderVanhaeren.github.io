@@ -1,0 +1,109 @@
+---
+export interface OverlayProjectItem {
+  slug: 'typhoon' | 'bikeysens' | 'rcxd' | 'team-214';
+  title: string;
+  subtitle: string;
+  period: string;
+  context: string;
+  status: 'completed' | 'in-progress';
+  statusLabel?: string;
+  tileImage: string;
+  tileAlt: string;
+  tileWidth: number;
+  tileHeight: number;
+  overlaySummary: string;
+  highlights: readonly string[];
+  tags: readonly string[];
+  route: string;
+}
+
+export interface Props {
+  projects: readonly OverlayProjectItem[];
+}
+
+const { projects } = Astro.props;
+---
+
+<dialog
+  class="project-overlay"
+  closedby="any"
+  aria-labelledby="project-overlay-title"
+>
+  <div class="project-overlay__surface">
+    <header class="project-overlay__header">
+      <div class="project-overlay__heading-group">
+        <div class="project-overlay__meta">
+          <span class="project-overlay__period" data-overlay-field="period"></span>
+          <span class="project-overlay__context" data-overlay-field="context"></span>
+          <span class="project-overlay__status" data-overlay-field="status" hidden>
+            <span class="project-overlay__status-dot" aria-hidden="true"></span>
+            <span data-overlay-field="statusText"></span>
+          </span>
+        </div>
+        <h2 id="project-overlay-title" class="project-overlay__title" data-overlay-field="title"></h2>
+        <p class="project-overlay__subtitle" data-overlay-field="subtitle"></p>
+      </div>
+      <button
+        type="button"
+        class="project-overlay__close"
+        data-overlay-close
+        aria-label="Close"
+      >
+        <span aria-hidden="true">×</span>
+      </button>
+    </header>
+
+    <div class="project-overlay__media">
+      <img
+        class="project-overlay__img"
+        data-overlay-field="img"
+        src={projects[0]?.tileImage ?? ''}
+        alt={projects[0]?.tileAlt ?? ''}
+        width={projects[0]?.tileWidth}
+        height={projects[0]?.tileHeight}
+        decoding="async"
+      />
+    </div>
+
+    <p class="project-overlay__summary" data-overlay-field="summary"></p>
+
+    <section aria-label="Highlights" class="project-overlay__section">
+      <h3 class="project-overlay__section-title">Key highlights</h3>
+      <ul class="project-overlay__highlights" data-overlay-field="highlights"></ul>
+    </section>
+
+    <ul class="project-overlay__tags" aria-label="Technologies" data-overlay-field="tags"></ul>
+
+    <footer class="project-overlay__footer">
+      <div class="project-overlay__stepper" role="group" aria-label="Switch project preview">
+        <button
+          type="button"
+          class="project-overlay__step"
+          data-overlay-step="prev"
+          aria-label="Previous project"
+        >
+          ← Prev
+        </button>
+        <span class="project-overlay__counter" data-overlay-field="counter" aria-live="polite"></span>
+        <button
+          type="button"
+          class="project-overlay__step"
+          data-overlay-step="next"
+          aria-label="Next project"
+        >
+          Next →
+        </button>
+      </div>
+      <a class="project-overlay__cta" data-overlay-field="cta" href="/projects/typhoon.html">
+        Read full article
+      </a>
+    </footer>
+  </div>
+</dialog>
+
+<script
+  is:inline
+  type="application/json"
+  id="projects-overlay-data"
+  set:html={JSON.stringify(projects)}
+/>

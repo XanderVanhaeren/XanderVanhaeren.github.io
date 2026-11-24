@@ -1,0 +1,158 @@
+---
+order: 4
+slug: team-214
+title: Peno team 214
+subtitle: Purely mechanical autonomous "Babybalestafette" ball-relay catapult for KU Leuven P&O-1a (Fall 2026 — active post-TZ3 prototype & Experiment 1).
+period: Oct–Nov 2026 (Active)
+domain: Mechanical Design
+context: "KU Leuven · Faculty of Engineering Science · P&O-1a"
+role: Team Leader (Groepsleider), CAD, Laser-Cutting & 3D Printing
+team: Xander Vanhaeren (r1162258), Daan Van Camp (r1157113), Hannes Yperman (r1173692), Zeno Wittevrongel (r1100375)
+status: in-progress
+statusLabel: "In Progress · Post-TZ3 Prototype & Experiment 1 Complete"
+tileImage: /assets/images/projects/team-214/tile.jpg
+tileAlt: Blender render of Peno team 214 mechanical ball-relay catapult with bent twin carbon-fiber spring rods, slotted MDF latch tower, and suspended catch basket
+tileWidth: 1600
+tileHeight: 1067
+overlaySummary: Active Fall 2026 KU Leuven P&O-1a "Babybalestafette" project. Designing a zero-electronics, sub-€30 mechanical catapult on a 30×60 cm MDF island that catches an incoming 29 g ball and automatically triggers a twin carbon-rod torsion launch across a 30–120 cm sea gap. Currently built through post-TZ3 MDF/3D-printed prototype and MATLAB Experiment 1 spring characterization.
+highlights:
+  - "Strict constraints: zero electronics/power, 30×60 cm footprint, ≤ 60 cm height, ≤ 10 m/s, ≤ €30 budget"
+  - "Twin Ø 2 mm carbon-fiber torsion leaf spring (212 mm active arm) + 20 cm slotted hex-bolt range adjuster"
+  - "MATLAB Experiment 1 (Series 2–4): M = (1.97 N·m/rad)θ + 0.0063 N·m, Adjusted R² = 0.98"
+  - "Active milestone status: TZ3 physical MDF prototype & CAD renders complete; Verslag 2/3 & relay demo ahead"
+tags:
+  - KU Leuven P&O-1a
+  - Blender CAD & FabLab
+  - Laser-Cut 4 mm MDF
+  - 3D Printing (PLA)
+  - MATLAB Regression
+heroFigure:
+  src: /assets/images/projects/team-214/full-cycle-render.jpg
+  alt: Full-cycle Blender composite render illustrating incoming ball capture, loaded carbon torsion spring, and launch trajectory
+  caption: Full-cycle Blender CAD render illustrating the incoming 29 g ball entering the suspended catch basket, releasing the slotted latch, and launching via the twin carbon-rod spring.
+  width: 1500
+  height: 1000
+  surface: dark
+video:
+  src: /assets/images/projects/team-214/animation.mp4
+  title: 3D Mechanism Cycle Animation
+  caption: Blender mechanism cycle animation (Peno.mp4) showing catch-basket drop, nylon cord pull, slotted latch release, and carbon-rod launch.
+  poster: /assets/images/projects/team-214/full-cycle-render.jpg
+specs:
+  - label: Course & Team
+    value: "KU Leuven P&O-1a (2026–2027) · Team 214 (4 students)"
+  - label: Project Status
+    value: Active (through Nov 19, 2026 — Post-TZ3 & Verslag 1 submitted)
+  - label: Footprint & Height
+    value: "30 × 60 cm 4 mm MDF island · ≤ 60 cm height · zero overhang"
+  - label: Energy Constraint
+    value: "100% mechanical (zero electronics, power, or living organisms) · ≤ 10 m/s"
+  - label: Target Ball & Basket
+    value: "29 g baby ball (~58–61 mm diameter) · Ø 13 cm catch basket"
+  - label: Spring Element
+    value: "2× Ø 2 mm carbon-fiber rods (267 × 35 × 5 mm total; r = 212 mm active)"
+  - label: Spring Constant (Exp. 1)
+    value: "k = 1.97 N·m/rad (Adj R² = 0.98, ±0.0212 N·m)"
+  - label: Relay Range & Budget
+    value: "30–120 cm sea gap (30 cm steps) · ≤ €30 total budget"
+sourcesNote: "Verified from KU Leuven team-214 repo (through 2026-11-19): opgave-PO1a-2026-babybalestafette.pdf, verslag-1_v3(def).pdf, lineaire_regressie.m, Testopstelling Veer/README.md, and numerieke gegevens.txt."
+---
+import Callout from '../../components/mdx/Callout.astro';
+import Figure from '../../components/mdx/Figure.astro';
+import FigureGroup from '../../components/mdx/FigureGroup.astro';
+
+## The "Babybalestafette" Challenge & Constraints
+
+For KU Leuven’s first-year P&O-1a engineering design course, Team 214 is building an autonomous mechanical relay station for the "Babybalestafette." Each team’s apparatus sits on a 30 × 60 cm 4 mm MDF "island": it must catch a 29 g (~58–61 mm diameter) baby ball thrown by the previous team inside a provided Ø 13 cm basket in the front half of the board, then use that impact energy solely as a trigger to launch a second ball across a 30–120 cm "sea" gap (30 cm increments, up to 20 points per trial at 120 cm across three scored runs).
+
+Rules prohibit all electronics, batteries, mains power, and living organisms. Total height cannot exceed 60 cm with zero overhang beyond the 30 × 60 cm baseplate, launch speed is capped at ≤ 10 m/s, total material cost must stay ≤ €30, and teams get a 5-minute reset window between scored runs.
+
+## Mechanical Design: Carbon Leaf-Torsion Spring & Slotted Latch
+
+Rather than coupling a coil spring through heavy pivoting arms with friction losses, Team 214 chose twin Ø 2 mm carbon-fiber rods (267 × 35 × 5 mm overall assembly: 35 mm clamped base, r = 212 mm active bending arm, and 20 mm tip) acting directly as an elastic cantilever leaf-torsion spring.
+
+- **3-Point Suspended Basket & Truss Towers:** The Ø 13 cm catch basket hangs from three points between two outer laser-cut 4 mm MDF triangular trusses to suppress lateral sway; spring-return on the basket was deliberately rejected in TZ3 to avoid rebound oscillation.
+- **Nylon Cord Trigger & Low-Friction Guide:** A yellow nylon cord runs from the basket over a 3D-printed grooved guide (TowerTop.stl) mounted atop a central tower height-matched to the latch top for maximum release leverage.
+- **20 cm Slotted Latch (gleuf) & Ball Cradle (houder_bal.stl):** An adjustable hex-bolt and nut sliding inside a 20 cm vertical slot sets spring preload deflection continuously for 30–120 cm sea gaps without re-cutting the baseplate, while a 4-prong 3D-printed cradle holds the 29 g ball securely through release.
+- **FabLab Nesting & Table Protection:** Smaller latch and bracket DXFs were nested inside unused baseplate cutouts to save laser-cut stock, and raised corner feet keep protruding tenon tabs off lab tables.
+
+<FigureGroup>
+  <Figure
+    src="/assets/images/projects/team-214/tz3-schematic.jpg"
+    alt="Annotated post-TZ3 design schematic labeling the truss towers, 20 cm latch slot, cord guide, and carbon-rod spring"
+    caption="Post-TZ3 mechanism schematic (ontwerp_na_TZ3.png) detailing the 3-point basket suspension, height-matched guide tower, and slotted latch trigger."
+    width={1400}
+    height={933}
+    surface="light"
+  />
+  <Figure
+    src="/assets/images/projects/team-214/side-elevation.jpg"
+    alt="Orthographic side-elevation Blender render of the Team 214 catapult showing spring deflection and launch arc"
+    caption="Orthographic side elevation illustrating the bent twin carbon rods, trigger cord geometry, and ball launch path."
+    width={1600}
+    height={800}
+    surface="dark"
+  />
+  <Figure
+    src="/assets/images/projects/team-214/latch-slot-detail.jpg"
+    alt="Close-up Blender render of the 20 cm vertical slotted MDF latch and adjustable hex bolt retaining the carbon rods"
+    caption="Detail render of the 20 cm slotted MDF latch (gleuf) and hex-bolt preload stop controlling launch energy."
+    width={1600}
+    height={900}
+    surface="dark"
+  />
+  <Figure
+    src="/assets/images/projects/team-214/basket-truss-detail.jpg"
+    alt="Close-up render of the Ø 13 cm catch basket suspended between laser-cut MDF triangular trusses"
+    caption="Close-up of the Ø 13 cm catch basket suspended by three cords inside the laser-cut 4 mm MDF truss towers."
+    width={1200}
+    height={1200}
+    surface="dark"
+  />
+</FigureGroup>
+
+## Experiment 1: MATLAB Spring Characterization (Verslag 1)
+
+For Verslag 1 (verslag-1_v3(def).pdf), the twin carbon-rod spring was clamped vertically in a bench vise and deflected from 0° to 45° in 5° steps across four measurement series using a perpendicular ±0.1 N dynamometer at active lever arm r = 0.212 m.
+
+Series 1 was excluded after hook rotation distorted the effective moment arm. Fitting Series 2–4 in MATLAB (fit(theta, M, "poly1") in lineaire_regressie.m) confirmed clean linear torsion behavior with a target ≥ 7.5 cm deflection window and 80–85% impulse transfer efficiency (1.1× energy margin) onto the soft 29 g ball.
+
+<Callout label="MATLAB Experiment 1 Fit (Series 2–4)">
+  M = (1.97 N·m/rad)·θ + 0.0063 N·m  |  k = 1.97 N·m/rad  |  Adjusted R² = 0.98  |  Uncertainty = ±0.0212 N·m
+</Callout>
+
+<FigureGroup>
+  <Figure
+    src="/assets/images/projects/team-214/spring-regression.png"
+    alt="MATLAB linear regression plot of bending moment M versus deflection angle theta for Series 2–4"
+    caption="MATLAB linear regression (lineaire_regressie.m) across Series 2–4 yielding k = 1.97 N·m/rad and Adjusted R² = 0.98."
+    width={1531}
+    height={986}
+    surface="light"
+  />
+</FigureGroup>
+
+## Post-TZ3 Prototype Status & Upcoming Milestones
+
+Through November 19, 2026, Team 214 has assembled the physical laser-cut 4 mm MDF prototype in the KU Leuven P&O studio (TZ3, Nov 10), finalized the 4-prong 3D-printed ball cradle houder_bal.stl (Nov 17), completed Experiment 1 / Verslag 1, and produced full Blender cycle renders and animation.
+
+Remaining Fall 2026 milestones still ahead include Experiment 2 (2.4 m drop test with Δt = 0.0001 s Euler integration in luchtweerstand experiment.xlsx to fit drag coefficient Cd), Verslag 2 and Verslag 3 submissions, Experiment 3 projectile video tracking, the A0 poster and isometric drawing, and final Quadrivium relay scoring.
+
+<FigureGroup>
+  <Figure
+    src="/assets/images/projects/team-214/prototype-studio.jpg"
+    alt="Physical laser-cut 4 mm MDF Team 214 catapult prototype assembled on a KU Leuven P&O studio workbench"
+    caption="Physical laser-cut 4 mm MDF prototype assembled in the KU Leuven P&O studio following TZ3 (November 10, 2026)."
+    width={1600}
+    height={1200}
+    surface="neutral"
+  />
+  <Figure
+    src="/assets/images/projects/team-214/prototype-isometric.jpg"
+    alt="Isometric studio view of the physical Team 214 MDF prototype showing twin carbon rods, slotted latch, and basket tower"
+    caption="Isometric studio photo of the assembled MDF prototype showing the carbon-rod clamp, slotted latch tower, and suspended basket frame."
+    width={1200}
+    height={1600}
+    surface="neutral"
+  />
+</FigureGroup>

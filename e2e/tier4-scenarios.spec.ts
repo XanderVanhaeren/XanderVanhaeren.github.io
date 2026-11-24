@@ -155,7 +155,8 @@ test.describe('Tier 4 — Real-World Application Scenarios', () => {
     for (const project of PROJECTS_CONTRACT) {
       const tile = page.locator(`[data-project="${project.slug}"]`);
       const tag = await tile.evaluate((el) => el.tagName.toLowerCase());
-      expect(tag).toBe('button');
+      expect(tag).toBe('a');
+      await expect(tile).toHaveAttribute('href', project.route);
       const ariaLabel = await tile.getAttribute('aria-label');
       expect((ariaLabel ?? '').toLowerCase()).toContain(project.title.toLowerCase());
     }
@@ -193,6 +194,71 @@ test.describe('Tier 4 — Real-World Application Scenarios', () => {
     const dialog = await openProjectOverlay(page, 'typhoon', 'click');
     await expect(dialog).toContainText('Project Typhoon');
     await closeProjectOverlay(page, 'button');
+    diag.assertClean();
+  });
+
+  test('T4-08: upgraded usability flow (GitHub link, hover caption, ?preview URL & Back sync, Prev/Next stepper, TOC & figure lightbox)', async ({
+    page,
+  }) => {
+    const diag = attachDiagnostics(page);
+    await gotoHomeReady(page, VIEWPORTS.desktopLarge);
+
+    // 1. Sidebar profile & tool links
+    const ghLink = page.getByRole('link', { name: 'GitHub' });
+    await expect(ghLink).toBeVisible();
+    await expect(ghLink).toHaveAttribute('href', 'https://github.com/XanderVanhaeren');
+    await expect(page.getByRole('link', { name: 'PDF Converter' })).toBeVisible();
+
+    // 2. Pure photography at rest, title caption revealed on desktop hover
+    const bikeysensTile = page.locator('[data-project="bikeysens"]');
+    const caption = bikeysensTile.locator('.project-tile__caption');
+    const restOpacity = await caption.evaluate((el) => parseFloat(getComputedStyle(el).opacity));
+    expect(restOpacity).toBe(0);
+
+    await hoverAndSettle(page, 'bikeysens');
+    await expect
+      .poll(async () => caption.evaluate((el) => parseFloat(getComputedStyle(el).opacity)))
+      .toBeGreaterThan(0.95);
+    await resetHoverToRest(page);
+
+    // 3. Preview overlay URL sync, Prev/Next switching, and Browser Back dismissal
+    const dialog = await openProjectOverlay(page, 'typhoon', 'click');
+    await expect(page).toHaveURL(/\/\?preview=typhoon$/);
+    await expect(dialog).toContainText('1 / 4');
+
+    await dialog.locator('[data-overlay-step="next"]').click();
+    await expect(page).toHaveURL(/\/\?preview=bikeysens$/);
+    await expect(dialog.locator('#project-overlay-title')).toHaveText('Bikeysens');
+    await expect(dialog).toContainText('2 / 4');
+
+    await page.keyboard.press('ArrowLeft');
+    await expect(page).toHaveURL(/\/\?preview=typhoon$/);
+    await expect(dialog.locator('#project-overlay-title')).toHaveText('Project Typhoon');
+
+    await page.goBack();
+    await expect(page.locator('dialog[open]')).toHaveCount(0);
+
+    // 4. Direct deep-link to ?preview=rcxd
+    await page.goto('/?preview=rcxd', { waitUntil: 'load' });
+    await expect(page.locator('dialog.project-overlay[open] #project-overlay-title')).toHaveText('RCXD');
+    await closeProjectOverlay(page, 'escape');
+    await expect(page).toHaveURL(/\/$/);
+
+    // 5. Article Table of Contents & Figure Lightbox zoom
+    await gotoArticleReady(page, 'typhoon', VIEWPORTS.desktopLarge);
+    const toc = page.getByRole('navigation', { name: 'On this page' });
+    await expect(toc).toBeVisible();
+    const tocLinks = toc.locator('a[href^="#"]');
+    expect(await tocLinks.count()).toBeGreaterThanOrEqual(4);
+
+    const firstZoomBtn = page.locator('[data-lightbox-src]').first();
+    await firstZoomBtn.click();
+    const lightbox = page.locator('dialog.figure-lightbox[open]');
+    await expect(lightbox).toBeVisible();
+    await expect(lightbox.locator('img.figure-lightbox__img')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.locator('dialog.figure-lightbox[open]')).toHaveCount(0);
+
     diag.assertClean();
   });
 });

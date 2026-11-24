@@ -1,84 +1,59 @@
 # Xander Vanhaeren — Engineering Portfolio
 
-Personal engineering portfolio for **Xander Vanhaeren** (Engineering Sciences Student at KU Leuven — Aerospace & Embedded Systems), built with **React 19**, **TypeScript**, **Vite 6**, and **`glisse`** (Liquid Glass UI).
+Static engineering showcase portfolio for **Xander Vanhaeren** (Engineering Student at KU Leuven), built with **Astro 5**, **MDX Content Collections**, and **TypeScript**.
 
 Live site: [xandervanhaeren.github.io](https://xandervanhaeren.github.io)
 
-## Features
+## Architecture
 
-- **Liquid Glass UI (`glisse`)**: Refractive glass surfaces, spring-physics `TabBar` navigation with scroll-spy, `SegmentedControl` filters, `SearchField`, and an interactive **Liquid Glass Optics HUD** to tune blur, glass bend, dispersion, and motion settings live.
-- **Interactive Topographic Isobar Canvas**: Marching-squares 14-level contour field in the hero section with pointer-reactive ridge physics, `IntersectionObserver` off-screen pausing, and `prefers-reduced-motion` support.
-- **Projects Showcase & Case Study**: Filterable project cards (**Project Typhoon**, **RCXD**, **BikeySens**), proof-of-work CAD/CFD gallery, and a full 5-section **Project Typhoon** engineering case study accessible both as an in-page modal and as a standalone page (`/projects/typhoon.html`).
-- **Skills & Instruments Matrix**: Interactive matrix of 16 skills across 5 categories loaded from `public/assets/data/skills.csv` with category filtering, search, and proficiency indicators.
-
-## Tech Stack
-
-- **Framework**: React 19, TypeScript 5.8
-- **Build Tool**: Vite 6 (multi-page build: `index.html` & `projects/typhoon.html`)
-- **UI / Styling**: `glisse` (`^0.6.0`), custom CSS design tokens
-- **Testing**: Vitest + React Testing Library (unit/component), Playwright (E2E)
-- **Deployment**: GitHub Pages
+- **Static-First HTML & Zero-Framework Runtime**: Astro pre-renders `/` and `/projects/<slug>.html` to static HTML at build time with full OpenGraph metadata, canonical URLs, native cross-document View Transitions, and lightweight progressive enhancement scripts (~3 KB total JS vs. ~265 KB in the previous client-rendered React build).
+- **MDX Content Collection (`src/content/projects/*.mdx`)**: Each engineering case study lives in its own Markdown/MDX file validated by a strict Zod schema in `src/content.config.ts`. Headings (`##`) automatically populate an on-page **Contents** jump bar, and `<Figure />` diagrams support full-resolution click-to-zoom inspection.
+- **Interactive Home Grid & Preview Overlay**:
+  - 4-tile responsive grid (`typhoon`, `bikeysens`, `rcxd`, `team-214`) using semantic `<a href="/projects/<slug>.html">` links so middle-click / Cmd+click opens full articles in a new tab while normal click / Enter / Space opens the quick-preview `<dialog>`.
+  - Desktop hover/focus reveals subtle project title + period captions while keeping pure photography at rest.
+  - Quick-preview `<dialog>` syncs `?preview=<slug>` with the History API (supporting shareable preview links and mobile Back-button dismissal) and supports `← Prev` / `Next →` buttons + `ArrowLeft` / `ArrowRight` keys.
+- **Self-Hosted Variable Fonts**: Uses `@fontsource-variable/jetbrains-mono` and `@fontsource-variable/inter` (`.woff2` variable subsets).
 
 ## Project Structure
 
 ```text
-├── public/assets/          # Static images, logos, and skills.csv
-├── projects/typhoon.html   # Standalone Project Typhoon case-study entry
+├── public/assets/              # Static project media, favicons, and logos
 ├── src/
 │   ├── components/
-│   │   ├── hero/           # HeroSection, TopoCanvas
-│   │   ├── layout/         # Navbar, GlassOpticsHud, Footer
-│   │   ├── projects/       # ProjectsSection, ProjectModal, TyphoonArticle, ProjectDiagrams
-│   │   └── skills/         # SkillsSection
-│   ├── data/               # portfolioData.ts, skillsData.ts
-│   ├── styles/             # styles.css
-│   ├── test/               # Vitest unit & component tests
-│   ├── types/              # TypeScript interfaces
-│   ├── App.tsx
-│   ├── main.tsx
-│   └── typhoonMain.tsx
-├── e2e/                    # Playwright end-to-end test suites
-├── index.html
+│   │   ├── mdx/                # Reusable MDX blocks: Figure, FigureGroup, Callout, SpecsTable
+│   │   └── ProjectOverlay.astro
+│   ├── content/
+│   │   └── projects/           # Per-project MDX case studies (typhoon, bikeysens, rcxd, team-214)
+│   ├── content.config.ts       # Astro 5 Content Layer Zod schema
+│   ├── layouts/
+│   │   └── BaseLayout.astro    # Shared HTML shell, SEO/OpenGraph tags, variable font imports
+│   ├── lib/
+│   │   └── previewUrl.ts       # Pure URL query & project stepper helpers
+│   ├── pages/
+│   │   ├── index.astro         # Home sidebar + 4-tile grid + quick-preview overlay
+│   │   └── projects/
+│   │       └── [slug].astro    # Static full-page case study template + TOC + figure lightbox
+│   ├── styles/                 # tokens.css, home.css, article.css
+│   └── test/                   # Vitest content & URL helper unit tests
+├── e2e/                        # Playwright 4-tier end-to-end test suite
+├── astro.config.mjs
 ├── package.json
-├── playwright.config.ts
-├── tsconfig.json
-└── vite.config.ts
+└── playwright.config.ts
 ```
 
-## Getting Started
+## Adding or Editing a Project
 
-### Prerequisites
+1. Place images/videos in `public/assets/images/projects/<slug>/`.
+2. Add or edit `src/content/projects/<slug>.mdx` (update `slug` enum in `src/content.config.ts` if adding a new slug).
+3. Run `npm test && npm run build` to verify schema types and asset references.
 
-- Node.js 20+ (24 LTS recommended)
-- npm
-
-### Installation
-
-```bash
-npm install
-```
-
-### Development
-
-```bash
-npm run dev
-```
-
-### Build & Preview
-
-```bash
-npm run build
-npm run preview
-```
-
-## Scripts
+## Commands
 
 | Command | Description |
 | --- | --- |
-| `npm run dev` | Start the Vite development server |
-| `npm run build` | Type-check (`tsc -b`) and build for production |
-| `npm run preview` | Preview the production build locally |
-| `npm run typecheck` | Run TypeScript type checking (`tsc --noEmit`) |
-| `npm test` | Run unit and component tests with Vitest |
-| `npm run test:e2e` | Build and run Playwright end-to-end tests |
-| `npm run deploy` | Deploy to GitHub Pages via `gh-pages` |
+| `npm run dev` | Start local Astro dev server |
+| `npm run build` | Run `astro check` and build static output to `./dist` |
+| `npm run preview` | Preview production `./dist` locally |
+| `npm run typecheck` | Type-check Astro templates, MDX frontmatter, and Playwright E2E specs |
+| `npm test` | Run Vitest unit & asset integrity tests |
+| `npm run test:e2e` | Build and run full Playwright E2E suite |
